@@ -1,8 +1,8 @@
 {
   "name": "Nextjs PWA App",
   "short_name": "NPWA",
-  "theme_color": "#fff",
-  "background_color": "#fff",
+  "theme_color": "#000",
+  "background_color": "#000",
   "display": "standalone",
   "orientation": "landscape",
   "scope": "/",
