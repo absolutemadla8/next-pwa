@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/providers/AuthProvider';
 import LoadingButton from '../components/ui/LoadingButton';
-import SmallLogoWhite from '../components/svg/SmallLogoWhite';
+// import SmallLogoWhite from '../components/svg/SmallLogoWhite';
 
 export default function VerifyPage() {
   const [otp, setOtp] = useState('');
@@ -66,7 +66,7 @@ export default function VerifyPage() {
     <div className="flex min-h-screen items-center justify-center bg-blue-600">
       <img src="https://aktt5yjwyc.ufs.sh/f/VfNn67L471NriyZEUVGTOah6yUfotzbSjNJ5LBrsDwqx1g7e" className='absolute h-full w-full object-cover'/>
       <form onSubmit={handleSubmit} className="w-full max-w-md p-6 z-10">
-        <SmallLogoWhite />
+        {/* <SmallLogoWhite /> */}
         <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-2xl mb-6">Verify Phone Number</h1>
         
         {phoneNumber && (
