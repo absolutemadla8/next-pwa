@@ -1,7 +1,10 @@
 'use client';
 
-import Lottie from 'lottie-react';
-import loadingAnimation from '@/app/lottie/travelloader.json'; // You'll need to add this JSON file
+import dynamic from 'next/dynamic';
+import type { LottieComponentProps } from 'lottie-react';
+import loadingAnimation from '@/app/lottie/travelloader.json';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 interface LoadingButtonProps {
   loading: boolean;
