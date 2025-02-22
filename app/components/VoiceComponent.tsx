@@ -5,10 +5,12 @@ import { api } from '@/app/lib/axios';
 import { useConversation } from "@11labs/react";
 import { Mic, MicOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
 import activeAnimation from "@/app/lottie/TrippyAvatar.json";
 import useVoiceChatStore from "@/app/store/voiceChatStore";
 import BottomSheet from "./ui/BottomSheet";
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 const VoiceChat = () => {
   // Local component state
