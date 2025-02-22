@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/providers/AuthProvider';
 import LoadingButton from '../components/ui/LoadingButton';
-import SmallLogoWhite from '../components/svg/SmallLogoWhite';
+// import SmallLogoWhite from '../components/svg/SmallLogoWhite';
 
 export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -36,7 +36,7 @@ export default function LoginPage() {
        <img src="https://aktt5yjwyc.ufs.sh/f/VfNn67L471NriyZEUVGTOah6yUfotzbSjNJ5LBrsDwqx1g7e" className='absolute h-full w-full object-cover'/>
       <form onSubmit={handleSubmit} className="w-full max-w-md p-6">
       <div className="flex flex-col items-start justify-start w-full">
-        <SmallLogoWhite />
+        {/* <SmallLogoWhite /> */}
         <h1 style={{ fontFamily: 'var(--font-nohemi)' }}  className="text-2xl font-[--font-nohemi] mb-6">Enter your phone number</h1>
         
         {error && <div className="text-red-500 mb-4">{error}</div>}
