@@ -9,7 +9,7 @@ import HorizontalScroll from '../components/ui/HorizontalScroll'
 import useVoiceChatStore from '../store/voiceChatStore'
 import DealsScroll from '../components/DealsScroll'
 
-const page = () => {
+const Page = () => {
   const { sessionPin } = useVoiceChatStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -73,4 +73,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
