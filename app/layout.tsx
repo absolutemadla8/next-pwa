@@ -1,8 +1,33 @@
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { AuthProvider } from "@/app/providers/AuthProvider"
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = localFont({
+  src: [
+    {
+      path: './fonts/Poppins_500Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: './fonts/Poppins_600SemiBold.ttf',
+      weight: '600',
+      style: 'semibold',
+    }
+  ],
+  variable: "--font",
+});
+
+const Nohemi = localFont({
+  src:[
+    {
+      path: './fonts/Nohemi-Medium.ttf',
+      style: 'normal',
+    }
+  ],
+  variable: '--font-nohemi'
+})
 
 const APP_NAME = "PWA App";
 const APP_DEFAULT_TITLE = "My Awesome PWA App";
@@ -54,8 +79,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <html lang="en" className={`${Nohemi.variable}`}>
+    <body
+      className={`${poppins.className} antialiased max-w-xl items-center mx-auto bg-blue-600`}
+    >
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </body>
+  </html>
   );
 }
