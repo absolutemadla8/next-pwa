@@ -1,6 +1,20 @@
 import Image from "next/image";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if app is installed (in standalone mode or installed PWA)
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone ||
+      document.referrer.includes('android-app://');
+
+    if (isInstalled) {
+      router.replace('/login');
+    }
+  }, [router]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
