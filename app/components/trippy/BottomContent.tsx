@@ -20,7 +20,10 @@ export default function BottomContent() {
 
   return (
     <>
-      <div className='absolute bottom-0 flex flex-col w-full'>
+      <div className='absolute bottom-0 flex flex-col w-full md:max-w-md'>
+        <div className='flex flex-row items-start justify-start p-4 bg-white/30 backdrop-blur-sm m-4 border border-white rounded-xl'>
+
+        </div>
         <div className='flex flex-col items-center justify-center p-6 bg-white w-full rounded-t-xl z-1'>
           <button onClick={() => setIsOpen(true)} className="flex flex-row items-center justify-between w-full">
             <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-blue-950">Trippy ActionSheet</h2>
