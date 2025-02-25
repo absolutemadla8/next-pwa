@@ -33,7 +33,7 @@ export default function LoginContent() {
 
   return (
     <div className="flex h-screen items-center justify-center bg-blue-600">
-      <img src="https://aktt5yjwyc.ufs.sh/f/VfNn67L471NriyZEUVGTOah6yUfotzbSjNJ5LBrsDwqx1g7e" className='absolute h-full w-full object-cover'/>
+      
       <form onSubmit={handleSubmit} className="w-full max-w-md p-6">
         <div className="flex flex-col items-start justify-start w-full">
           <SmallLogoWhite />

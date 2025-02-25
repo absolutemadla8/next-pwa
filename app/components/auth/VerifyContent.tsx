@@ -62,7 +62,7 @@ export default function VerifyContent() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-blue-600">
-      <img src="https://aktt5yjwyc.ufs.sh/f/VfNn67L471NriyZEUVGTOah6yUfotzbSjNJ5LBrsDwqx1g7e" className='absolute h-full w-full object-cover'/>
+     
       <form onSubmit={handleSubmit} className="w-full max-w-md p-6 z-10">
         <SmallLogoWhite />
         <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-2xl mb-6 text-white">Verify Phone Number</h1>
