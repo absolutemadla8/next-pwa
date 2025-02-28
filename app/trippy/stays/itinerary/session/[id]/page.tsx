@@ -443,7 +443,7 @@ const Page = () => {
               disabled={loading || !isRazorpayLoaded} 
               loading={loading} 
               onClick={submitBooking} 
-              size='sm' 
+              size='md' 
               variant="bland"
             >
               {loading ? 'Initiating...' : !isRazorpayLoaded ? 'Loading payment...' : 'Pay now'}
