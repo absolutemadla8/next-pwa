@@ -8,9 +8,21 @@ interface BottomSheetProps {
   isOpen?: boolean;
   onClose?: () => void;
   children?: React.ReactNode;
+  title?: string;
+  showPin?: boolean;
+  minHeight?: string;
+  maxHeight?: string;
 }
 
-const BottomSheet = ({ isOpen = true, onClose, children }: BottomSheetProps) => {
+const BottomSheet = ({ 
+  isOpen = true, 
+  onClose, 
+  children, 
+  title = "Trippy ActionSheet", 
+  showPin = false,
+  minHeight = '50vh',
+  maxHeight = '90vh'
+}: BottomSheetProps) => {
   const { sessionPin } = useVoiceChatStore();
   const [isDragging, setIsDragging] = useState(false);
 
@@ -43,7 +55,7 @@ const BottomSheet = ({ isOpen = true, onClose, children }: BottomSheetProps) => 
                 onClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-100 rounded-t-[32px] min-h-[30vh] max-h-[90vh] overflow-hidden"
+            className={`fixed bottom-0 left-0 right-0 z-50 bg-slate-100 rounded-t-[32px] min-h-[${minHeight}] max-h-[${maxHeight}] overflow-hidden`}
           >
             {/* Drag Handle */}
             <div className="w-full flex justify-center pt-4 pb-2">
@@ -52,12 +64,11 @@ const BottomSheet = ({ isOpen = true, onClose, children }: BottomSheetProps) => 
 
             <div className="pb-8">
               <div className="flex flex-row items-center justify-between w-full px-6">
-                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-blue-950">Trippy ActionSheet</h2>
+                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-blue-950">{title}</h2>
                 
-                {sessionPin ? (
+                {showPin && sessionPin ? (
                   <div className="flex justify-center space-x-1">
-                    {
-                    sessionPin.split("").map((digit, index) => (
+                    {sessionPin.split("").map((digit, index) => (
                       <div 
                         key={index} 
                         className="w-5 h-6 flex items-center justify-center bg-blue-100 border border-blue-600 rounded-md text-blue-800 text-md capitalize"
@@ -66,13 +77,13 @@ const BottomSheet = ({ isOpen = true, onClose, children }: BottomSheetProps) => 
                       </div>
                     ))}
                   </div>
-                ) : (
+                ) : showPin ? (
                   <p className='text-blue-800 text-md'>No active session</p>
-                )}
+                ) : null}
               </div>
 
               {/* Content */}
-              <div className={`mt-4 ${isDragging ? 'pointer-events-none' : ''}`}>
+              <div className={`mt-4 ${isDragging ? 'pointer-events-none overflow-scroll' : ''}`}>
                 {children}
               </div>
             </div>

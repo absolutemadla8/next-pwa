@@ -20,6 +20,8 @@ const VoiceChat = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [shouldPulse, setShouldPulse] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [wakeLock, setWakeLock] = useState(null);
+  const [wakeLockSupported, setWakeLockSupported] = useState(false);
   const [formData, setFormData] = useState({
     country: '',
     type: 'hotel',
@@ -42,6 +44,92 @@ const VoiceChat = () => {
     status,
     isSpeaking
   } = useVoiceChatStore();
+
+  // Check if wake lock is supported
+  useEffect(() => {
+    if ('wakeLock' in navigator) {
+      setWakeLockSupported(true);
+    } else {
+      console.warn('Wake Lock API not supported in this browser');
+      setWakeLockSupported(false);
+    }
+  }, []);
+
+  // Request wake lock when connected and release it when disconnected
+  useEffect(() => {
+    const requestWakeLock = async () => {
+      if (wakeLockSupported && status === "connected") {
+        try {
+          // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          const lock = await navigator.wakeLock.request('screen');
+           // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          setWakeLock(lock);
+          console.log('Wake Lock acquired');
+
+          // Add a listener to reacquire the wake lock if it's released
+          lock.addEventListener('release', () => {
+            console.log('Wake Lock released');
+            setWakeLock(null);
+            // Try to reacquire if still connected
+            if (status === "connected") {
+              requestWakeLock();
+            }
+          });
+        } catch (err) {
+           // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          console.error(`Failed to acquire Wake Lock: ${err.message}`);
+        }
+      }
+    };
+
+    const releaseWakeLock = async () => {
+      if (wakeLock) {
+        try {
+           // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          await wakeLock.release();
+          setWakeLock(null);
+          console.log('Wake Lock released');
+        } catch (err) {
+           // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          console.error(`Failed to release Wake Lock: ${err.message}`);
+        }
+      }
+    };
+
+    if (status === "connected") {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    // Clean up function
+    return () => {
+      releaseWakeLock();
+    };
+  }, [status, wakeLockSupported, wakeLock]);
+
+  // Re-acquire wake lock on visibility change (when user returns to the tab/app)
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (wakeLockSupported && status === "connected" && !wakeLock && document.visibilityState === 'visible') {
+        try {
+          // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          const lock = await navigator.wakeLock.request('screen');
+           // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          setWakeLock(lock);
+          console.log('Wake Lock reacquired after visibility change');
+        } catch (err) {
+           // @ts-ignore - The wakeLock API is not in all TypeScript definitions yet
+          console.error(`Failed to reacquire Wake Lock: ${err.message}`);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [wakeLockSupported, status, wakeLock]);
 
   const handleInputChange = (e:any) => {
     const { name, value } = e.target;

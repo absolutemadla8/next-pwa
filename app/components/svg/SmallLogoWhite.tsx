@@ -1,8 +1,13 @@
 import * as React from "react";
-const SmallLogoWhite = (props: any) => (
+
+interface SmallLogoWhiteProps extends React.SVGProps<SVGSVGElement> {
+  size?: number;
+}
+
+const SmallLogoWhite = ({ size = 60, ...props }: SmallLogoWhiteProps) => (
   <svg
-    width={60}
-    height={59}
+    width={size}
+    height={size * (59/60)}
     viewBox="0 0 60 59"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -18,4 +23,5 @@ const SmallLogoWhite = (props: any) => (
     />
   </svg>
 );
+
 export default SmallLogoWhite;

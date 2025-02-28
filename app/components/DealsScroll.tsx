@@ -65,7 +65,7 @@ const DealsScroll: React.FC<DealsScrollProps> = ({ onPopulate }) => {
     const fetchDeals = async () => {
       try {
         const response = await api.post<ApiResponse>('/trippy/sessions/get', {
-          pin: sessionPin
+          pin: sessionPin || 485039
         });
         
         // Set the content type
@@ -155,10 +155,10 @@ const DealsScroll: React.FC<DealsScrollProps> = ({ onPopulate }) => {
 
   // Function to handle room selection
   const handleRoomSelect = async (room: Room) => {
-    if (!sessionPin) {
-      console.error('Session PIN is required');
-      return;
-    }
+    // if (!sessionPin) {
+    //   console.error('Session PIN is required');
+    //   return;
+    // }
 
     // Find the rate for this room
     const rate = room.rates && room.rates.length > 0 ? room.rates[0] : null;
@@ -173,7 +173,7 @@ const DealsScroll: React.FC<DealsScrollProps> = ({ onPopulate }) => {
     try {
       // Send request to select the room
       const response = await api.post('/trippy/itinerary/rooms', {
-        pin: sessionPin,
+        pin: sessionPin || 485039,
         roomsAndRateAllocations: [
           {
             roomId: room.id,

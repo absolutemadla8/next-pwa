@@ -14,7 +14,7 @@ const SeeMoreText: React.FC<SeeMoreTextProps> = ({
     // If text is shorter than maxLength, just return it
     if (text.length <= maxLength) {
         return (
-            <p className='text-xs font-medium text-[#7e7e7e]'>
+            <p className='text-xs font-medium text-slate-600 tracking-tight'>
                 {text}
             </p>
         );
@@ -22,7 +22,7 @@ const SeeMoreText: React.FC<SeeMoreTextProps> = ({
 
     return (
         <div className='flex flex-col items-start gap-y-1 w-full'>
-            <p className='text-xs font-medium text-[#7e7e7e]'>
+            <p className='text-xs font-medium text-slate-600 tracking-tight'>
                 {isExpanded ? text : `${text.substring(0, maxLength)}...`}
             </p>
             <button 

@@ -11,6 +11,8 @@
   "dependencies": {
     "@11labs/react": "^0.0.7",
     "@ducanh2912/next-pwa": "^10.2.8",
+    "@headlessui/react": "^2.2.0",
+    "@phosphor-icons/react": "^2.1.7",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.7",
@@ -18,6 +20,7 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.475.0",
     "next": "14.2.7",
+    "razorpay": "^2.9.6",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^3.0.1",
