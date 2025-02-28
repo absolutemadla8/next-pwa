@@ -28,6 +28,7 @@ const Page = () => {
           <div className='flex flex-col items-center justify-start gap-y-2 w-full pt-4'>
             <div onClick={() => openSheet('search', { 
               title: 'Search Locations',
+              minHeight: '90%',
             })} className='flex flex-col items-start justify-center bg-white rounded-lg px-4 w-full h-14'>
               <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md'>{itinerary.locationName || "Select a location"}</h2>
             </div>
@@ -48,7 +49,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-        <div className='flex flex-col items-start justify-start w-full p-6'>
+        <div className='flex flex-col items-start justify-start w-full py-6 px-4'>
           <div className='flex flex-row items-start justify-between w-full'>
           <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-lg w-1/2 pr-4'>Explore top stay packages</h2>
           <hr className='w-1/2 border-[0.5px] border-slate-500 mt-3' />

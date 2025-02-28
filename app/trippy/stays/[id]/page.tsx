@@ -233,7 +233,7 @@ const Page = () => {
     </div>
 </div>
 <div className='flex w-full h-24'>
-    <p className='text-slate-600 text-sm font-normal tracking-tight overflow-hidden text-ellipsis'>
+    <p className='text-slate-600 text-xs font-normal tracking-tight overflow-hidden text-ellipsis'>
     {hotel?.policies[0]?.text?.trimStart()}
     </p>
 </div>
