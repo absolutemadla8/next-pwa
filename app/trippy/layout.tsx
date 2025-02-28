@@ -51,7 +51,7 @@ export default function TrippyLayout({
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Main content */}
-      <main className="flex-grow pb-24 items-center justify-center">
+      <main className="flex-grow pb-24">
         {children}
         
         {/* Floating action buttons */}
@@ -78,15 +78,10 @@ export default function TrippyLayout({
             <Search size={20} />
           </button>
         </div> */}
-         <div className='items-center justify-center w-full'>
-      <BottomNavigation navItems={navigationItems} />
-      </div>
       </main>
 
       {/* Bottom Navigation */}
-      {/* <div className='items-center justify-center w-full'>
       <BottomNavigation navItems={navigationItems} />
-      </div> */}
       
       {/* Date Range Bottom Sheet */}
       <BottomSheet 

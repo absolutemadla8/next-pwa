@@ -59,6 +59,7 @@ const Page = () => {
         <div className='flex flex-col items-start justify-start w-full p-6 gap-y-4'>
           {hotels.map((hotel: any) => (
             <HotelCard 
+                key={hotel.id}
                 name={hotel.name}
                 location={hotel.address.line1}
                 images={[hotel.hero_image]}

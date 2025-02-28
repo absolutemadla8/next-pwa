@@ -386,7 +386,7 @@ const Page = () => {
                         </span>
                         </span>
                         <span className='flex flex-row items-center justify-start gap-x-1 text-teal-600 text-xs font-semibold tracking-tight'>
-                            We're happy to help you find the best deals
+                            We&apos;re happy to help you find the best deals
                         </span>
                         </div>
                     </div>

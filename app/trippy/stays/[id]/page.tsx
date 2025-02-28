@@ -187,8 +187,8 @@ const Page = () => {
                            Amenities
                         </h1>
                         <div className='flex flex-row flex-wrap items-start justify-start gap-x-2 gap-y-2'>
-                            {hotel.facilities.slice(0, 6).map((facility: any) => (
-                            <div className='flex flex-row items-center justify-center gap-x-2'>
+                            {hotel.facilities.slice(0, 6).map((facility: any, index:number) => (
+                            <div key={index} className='flex flex-row items-center justify-center gap-x-2'>
                             <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
                             <span className='text-slate-600 text-sm font-normal tracking-tight'>
                                 {facility.name}
