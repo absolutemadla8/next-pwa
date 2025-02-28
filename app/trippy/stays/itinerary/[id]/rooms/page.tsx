@@ -98,15 +98,15 @@ const handleBookNow = async () => {
       <div className='fixed bottom-0 left-0 right-0 flex flex-col items-center justify-start w-full bg-gradient-to-t from-white via-white to-transparent p-4 z-20'>
             <div className='flex flex-col items-center justify-center rounded-lg overflow-hidden bg-blue-600 w-full max-w-screen-xl mx-auto'>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2 bg-blue-700'>
-                <span className='text-white text-xs font-normal tracking-tight'>
+                <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-white text-xs font-normal tracking-tight'>
                             Mar 19, 2025 - Mar 21, 2025, 2 Guests
                         </span>
                 </div>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2'>
                 <div className='flex flex-col items-start justify-start'>
                 <div className='flex flex-row items-center justify-start gap-x-1'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-white'>
-                Rs.123456
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-white'>
+                ₹{getTotalPrice()}
             </h1>
             <span className='text-xs text-slate-50 font-normal tracking-tight truncate'>
                    total
@@ -116,8 +116,8 @@ const handleBookNow = async () => {
                    Inclusive of taxes and fee
                 </span>
             </div>
-            <AnimatedButton disabled={loading} loading={loading} onClick={handleBookNow} size='sm' variant="bland">
-            {loading ? 'Selecting' : 'Select Rooms'}
+            <AnimatedButton disabled={loading} onClick={handleBookNow} size='md' variant="bland">
+            {loading ? 'Selecting' : 'Book Now'}
             </AnimatedButton>
                 </div>
             </div>

@@ -84,7 +84,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       ) : (
         <div className="flex items-center space-x-2">
           {icon && <span>{icon}</span>}
-          <span className='font-normal tracking-tight'>{children}</span>
+          <span className='font-semibold tracking-tight'>{children}</span>
         </div>
       )}
     </motion.button>

@@ -11,6 +11,7 @@ import GuestForm from '@/app/components/stays/GuestForm'
 import AnimatedButton from '@/app/components/ui/AnimatedButton'
 import { RoomAllocationPayload } from '@/app/types/roomAllocation'
 import Script from 'next/script'
+import { formatDate } from '@/app/lib/utils'
 
 const Page = () => {
   const params = useParams();
@@ -123,7 +124,7 @@ const Page = () => {
         alert("Payment successful!");
   
         // Redirect to confirmation page
-        window.location.href = `/booking/confirmation/${orderId}`;
+        window.location.href = `/bookings/${orderId}`;
       },
       modal: {
         ondismiss: function () {
@@ -395,7 +396,7 @@ const Page = () => {
                             Sub Total
                         </span>
                         <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-slate-600 text-sm'>
-                            Rs. {session?.baseRate? session.baseRate : 0}
+                        ₹{session?.baseRate? session.baseRate : 0}
                         </span>
                     </div>
                     <hr className='w-full' />
@@ -404,7 +405,7 @@ const Page = () => {
                             Taxes & fee
                         </span>
                         <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-slate-600 text-sm'>
-                            Rs. {session?.tax? session.tax : 0}
+                        ₹{session?.tax? session.tax : 0}
                         </span>
                     </div>
                     <hr className='w-full' />
@@ -412,8 +413,8 @@ const Page = () => {
                         <span className='text-blue-950 text-md font-normal'>
                             Total
                         </span>
-                        <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md'>
-                            Rs. {session?.finalRate? session.finalRate : 0}
+                        <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
+                        ₹{session?.finalRate? session.finalRate : 0}
                         </span>
                     </div>
                 </div>
@@ -423,15 +424,12 @@ const Page = () => {
         <div className='fixed bottom-0 left-0 right-0 flex flex-col items-center justify-start w-full bg-gradient-to-t from-white via-white to-transparent p-4 z-20'>
             <div className='flex flex-col items-center justify-center rounded-lg overflow-hidden bg-blue-600 w-full max-w-screen-xl mx-auto'>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2 bg-blue-700'>
-                <span className='text-white text-xs font-normal tracking-tight'>
-                            Mar 19, 2025 - Mar 21, 2025, 2 Guests
-                        </span>
                 </div>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2'>
                 <div className='flex flex-col items-start justify-start'>
                 <div className='flex flex-row items-center justify-start gap-x-1'>
                 <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-white'>
-                Rs.123456
+                ₹{session?.finalRate? session.finalRate : 0}
             </h1>
             <span className='text-xs text-slate-50 font-normal tracking-tight truncate'>
                    total

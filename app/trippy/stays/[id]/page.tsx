@@ -261,7 +261,7 @@ const Page = () => {
                   </div>
             <AnimatedButton 
               onClick={handleCreateItinerary} 
-              size='sm' 
+              size='md' 
               variant="bland"
               disabled={isCreating}
             >
