@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Sparkles, TagIcon, HomeIcon, Calendar, Search, Home, Building2 } from 'lucide-react';
+import { Sparkles, TagIcon, HomeIcon, Calendar, Search, Home, Building2, MessageCircle } from 'lucide-react';
 import BottomSheet from '../components/ui/BottomSheet';
 import HorizontalScroll from '../components/ui/HorizontalScroll';
 import DateRangeEvent from '../components/ui/DateRangeEvent';
@@ -27,9 +27,9 @@ export default function TrippyLayout({
   // Navigation items
   const navigationItems: any[] = [
     {
-      name: 'Home',
-      path: '/home',
-      icon: Home
+      name: 'Chat',
+      path: '/trippy/chat',
+      icon: MessageCircle
     },
     {
       name: 'Trippy',
@@ -49,7 +49,7 @@ export default function TrippyLayout({
   }, [pathname, closeSheet]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="flex flex-col max-h-screen overflow-hidden bg-gradient-to-b from-blue-50 to-white">
       {/* Main content */}
       <main className="flex-grow pb-24">
         {children}

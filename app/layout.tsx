@@ -19,6 +19,17 @@ const poppins = localFont({
   variable: "--font",
 });
 
+const Domine = localFont({
+  src:[
+    {
+      path: './fonts/Domine-VariableFont_wght.ttf',
+      weight: '400',
+      style: 'normal',
+    }
+  ],
+  variable: '--font-domine'
+})
+
 const Nohemi = localFont({
   src:[
     {
@@ -79,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${Nohemi.variable}`}>
+    <html lang="en" className={`${Nohemi.variable} ${Domine.variable}`}>
     <body
       className={`${poppins.className} antialiased w-full md:max-w-md items-center mx-auto bg-blue-950`}
     >

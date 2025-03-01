@@ -8,6 +8,7 @@ import AnimatedButton from '@/app/components/ui/AnimatedButton'
 import useItineraryStore from '@/app/store/itineraryStore'
 import { SelectRoomRatesPayload } from '@/app/types/roomRate'
 import { api } from '@/app/lib/axios'
+import { formatDate } from '@/app/lib/utils'
 
 const Page = () => {
   const params = useParams();
@@ -99,7 +100,7 @@ const handleBookNow = async () => {
             <div className='flex flex-col items-center justify-center rounded-lg overflow-hidden bg-blue-600 w-full max-w-screen-xl mx-auto'>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2 bg-blue-700'>
                 <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-white text-xs font-normal tracking-tight'>
-                            Mar 19, 2025 - Mar 21, 2025, 2 Guests
+                {itinerary.checkIn ? formatDate(itinerary.checkIn) : 'No date selected'} - {itinerary.checkOut ? formatDate(itinerary.checkOut) : 'No date selected'}
                         </span>
                 </div>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2'>

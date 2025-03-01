@@ -1,12 +1,14 @@
 {
-  "name": "TripppyAI",
-  "short_name": "Tripppy",
-  "theme_color": "#000",
-  "background_color": "#000",
+  "name": "TripppyAI - Your Travel Companion",
+  "short_name": "TripppyAI",
+  "description": "Best PWA app in the world!",
+  "theme_color": "#1e3a8a",
+  "background_color": "#1e3a8a",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "scope": "/",
   "start_url": "/",
+  "id": "/",
   "icons": [
     {
       "src": "images/icons/trippy192.png",
@@ -17,7 +19,10 @@
     {
       "src": "images/icons/trippy512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
 }
