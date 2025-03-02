@@ -25,11 +25,9 @@ const Page = () => {
     roomId: string, 
     rateId: string, 
     recommendationId: string, 
-    price: number,
-    boardType?: string,
-    roomType?: string
+    price: number
   ) => {
-    console.log("Room selected:", roomId, rateId, recommendationId, price, boardType, roomType);
+    console.log("Room selected:", roomId, rateId, recommendationId, price);
     itinerary.rooms.forEach(room => {
       setRoomDetails(room.id, { rateId, roomId, price });
       setRecommendationId(recommendationId);
@@ -39,6 +37,9 @@ const Page = () => {
     const totalPrice = getTotalPrice();
     setSelectedPrice(totalPrice);
     
+    const recommendation_Id = recommendationId;
+    setRecommendationId(recommendation_Id);
+
     // Update the bottom order info with the new price
     setInfoSubtitle(`Rs.${totalPrice}`);
   };
