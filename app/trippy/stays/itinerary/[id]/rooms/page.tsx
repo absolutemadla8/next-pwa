@@ -13,77 +13,88 @@ import useBottomOrderStore from '@/app/store/bottomOrderStore'
 
 const Page = () => {
   const params = useParams();
-   const [selectedPrice, setSelectedPrice] = React.useState(0);
+  const [selectedPrice, setSelectedPrice] = React.useState(0);
   const { rooms, itineraryId, traceId, type } = useRoomStore()
   const [loading, setLoading] = useState(false);
   const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const {itinerary, setRecommendationId, setRoomDetails, getTotalPrice} = useItineraryStore()
   const router = useRouter()
   
- // In the parent component (Page)
-const handleRoomSelect = async (
-  roomId: string, 
-  rateId: string, 
-  recommendationId: string, 
-  price: number
-) => {
-  console.log("Room selected:", roomId, rateId, recommendationId, price);
-  itinerary.rooms.forEach(room => {
-    setRoomDetails(room.id, { rateId, roomId, price });
-    setRecommendationId(recommendationId);
-  });
-  const totalPrice = getTotalPrice();
-  setSelectedPrice(totalPrice);
-};
-
-const handleBookNow = async () => {
-  try {
-    if (!itineraryId) {
-      console.error('No itinerary ID found');
-      return;
-    }
-    setLoading(true);
-
-    const payload: SelectRoomRatesPayload = {
-      roomsAndRateAllocations: itinerary.rooms.map(room => ({
-        rateId: String(room.rateId),
-          roomId: String(room.roomId),
-          occupancy: {
-            adults: room.adults,
-            childAges: room.children.map(child => child.age)
+  // Combined function that handles both room selection and booking
+  const handleRoomSelectAndBook = async (
+    roomId: string, 
+    rateId: string, 
+    recommendationId: string, 
+    price: number,
+    bookNow = false // Optional parameter to indicate if we should proceed to booking
+  ) => {
+    console.log("Room selected:", roomId, rateId, recommendationId, price);
+    
+    // Update room details in store
+    itinerary.rooms.forEach(room => {
+      setRoomDetails(room.id, { rateId, roomId, price });
+      setRecommendationId(recommendationId);
+    });
+    
+    // Update total price
+    const totalPrice = getTotalPrice();
+    setSelectedPrice(totalPrice);
+    
+    // If bookNow is true, proceed with booking process
+    if (bookNow) {
+      try {
+        if (!itineraryId) {
+          console.error('No itinerary ID found');
+          return;
         }
-      })),
-      traceId,
-      recommendationId: String(itinerary.recommendationId),
-      items: [{
-        code: type.code,
-        type: 'HOTEL'
-      }]
-    };
+        setLoading(true);
 
-    const response = await api.post(`/hotels/itineraries/${itineraryId}/select-roomrates`, payload);
+        const payload: SelectRoomRatesPayload = {
+          roomsAndRateAllocations: itinerary.rooms.map(room => ({
+            rateId: String(room.rateId),
+            roomId: String(room.roomId),
+            occupancy: {
+              adults: room.adults,
+              childAges: room.children.map(child => child.age)
+            }
+          })),
+          traceId,
+          recommendationId: String(recommendationId),
+          items: [{
+            code: type.code,
+            type: 'HOTEL'
+          }]
+        };
 
-    //@ts-ignore mlmr
-    if (response?.data.status === 'success') {
-      router.push(`/trippy/stays/itinerary/session/${params.id}`)
+        const response = await api.post(`/hotels/itineraries/${itineraryId}/select-roomrates`, payload);
+
+        //@ts-ignore mlmr
+        if (response?.data.status === 'success') {
+          router.push(`/trippy/stays/itinerary/session/${params.id}`)
+        }
+        console.log('Room selection response:', response);
+      } catch (error) {
+        console.error('Error selecting room rates:', error);
+        // You might want to show an error toast or message to the user
+      } finally {
+        setLoading(false);
+      }
     }
-    console.log('Room selection response:', response);
-    // Navigate to the next step after successful room selection
-  } catch (error) {
-    console.error('Error selecting room rates:', error);
-    // You might want to show an error toast or message to the user
-  }
-  finally {
-    setLoading(false);
-  }
-};
+  };
 
-React.useEffect(() => {
-  setButtonText('Book now');
-  setHandleCreateItinerary(handleBookNow);
-  setInfoTitle('inclusive of all taxes');
-  setInfoSubtitle(`Rs.${getTotalPrice()}` || 'Guests not Selected');
-}, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle])
+  React.useEffect(() => {
+    // Set up bottom order bar with the combined function
+    setButtonText('Book now');
+    setHandleCreateItinerary(() => handleRoomSelectAndBook(
+      itinerary.rooms[0]?.roomId || '',
+      itinerary.rooms[0]?.rateId || '',
+      itinerary.recommendationId || '',
+      getTotalPrice(),
+      true // Pass true to initiate booking
+    ));
+    setInfoTitle('inclusive of all taxes');
+    setInfoSubtitle(`Rs.${getTotalPrice()}` || 'Guests not Selected');
+  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice])
   
   return (
     <div className='flex flex-col items-start justify-start w-full bg-[#F1F2F4] min-h-screen max-h-screen overflow-scroll'>
@@ -96,7 +107,9 @@ React.useEffect(() => {
             <RoomRateCard 
               key={room.id} 
               room={room} 
-              onBookNow={handleRoomSelect}
+              onBookNow={(roomId, rateId, recommendationId, price) => 
+                handleRoomSelectAndBook(roomId, rateId, recommendationId, price)
+              }
             />
           ))
         ) : (
