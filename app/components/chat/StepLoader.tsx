@@ -89,7 +89,7 @@ const StepLoader: React.FC<StepLoaderProps> = ({
                 >
                   <div className="flex-shrink-0 mt-1">
                     <motion.div 
-                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      className={`w-5 h-5 rounded-full flex items-center justify-center ${
                         isCompleted 
                           ? 'bg-blue-500 text-white' 
                           : isActive 
@@ -98,7 +98,7 @@ const StepLoader: React.FC<StepLoaderProps> = ({
                       }`}
                     >
                       {isCompleted ? (
-                        <Check size={16} />
+                        <Check size={14} />
                       ) : (
                         <div className="w-2 h-2 rounded-full bg-white" />
                       )}

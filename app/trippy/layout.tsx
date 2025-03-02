@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Sparkles, TagIcon, HomeIcon, Calendar, Search, Home, Building2, MessageCircle } from 'lucide-react';
+import { Sparkles, Building2, MessageCircle } from 'lucide-react';
 import BottomSheet from '../components/ui/BottomSheet';
 import HorizontalScroll from '../components/ui/HorizontalScroll';
 import DateRangeEvent from '../components/ui/DateRangeEvent';
@@ -14,6 +14,7 @@ import useBottomSheetStore from '../store/bottomSheetStore';
 import RoomConfiguration from '../components/ui/RoomConfiguration';
 import useItineraryStore from '../store/itineraryStore';
 import BottomNavigation from '../components/trippy/BottomNavigation';
+import { IconBubbleText, IconBuildings, IconSparkles, IconUserCircle } from '@tabler/icons-react';
 
 export default function TrippyLayout({
   children,
@@ -29,17 +30,22 @@ export default function TrippyLayout({
     {
       name: 'Chat',
       path: '/trippy/chat',
-      icon: MessageCircle
+      icon: IconBubbleText
     },
     {
       name: 'Trippy',
       path: '/trippy', 
-      icon: Sparkles
+      icon: IconSparkles
     },
     {
       name: 'Stays',
       path: '/trippy/stays',
-      icon: Building2
+      icon: IconBuildings
+    },
+    {
+      name: 'Profile',
+      path: '/trippy/profile',
+      icon: IconUserCircle
     },
   ];
 
@@ -49,39 +55,16 @@ export default function TrippyLayout({
   }, [pathname, closeSheet]);
 
   return (
-    <div className="flex flex-col max-h-screen overflow-hidden bg-gradient-to-b from-blue-50 to-white">
+    <div className="flex flex-col min-h-screen max-h-screen overflow-hidden bg-gray-800">
       {/* Main content */}
-      <main className="flex-grow pb-24">
+      <main className="flex h-[92vh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b from-blue-50 to-white overflow-hidden">
         {children}
-        
-        {/* Floating action buttons */}
-        {/* <div className="fixed bottom-20 right-4 flex flex-col gap-2">
-          <button 
-            onClick={() => openSheet('dateRange', { 
-              title: 'Check in & Check out',
-              minHeight: '60vh'
-            })}
-            className="bg-blue-600 text-white p-3 rounded-full shadow-lg"
-            aria-label="Select dates"
-          >
-            <Calendar size={20} />
-          </button>
-          <button 
-            onClick={() => openSheet('search', { 
-              title: 'Search Locations',
-              minHeight: '90vh',
-              maxHeight: '90vh'
-            })}
-            className="bg-blue-600 text-white p-3 rounded-full shadow-lg"
-            aria-label="Search"
-          >
-            <Search size={20} />
-          </button>
-        </div> */}
       </main>
 
       {/* Bottom Navigation */}
+      <div className='flex items-center w-full h-[8vh]'>
       <BottomNavigation navItems={navigationItems} />
+      </div>
       
       {/* Date Range Bottom Sheet */}
       <BottomSheet 

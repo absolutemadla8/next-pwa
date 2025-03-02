@@ -9,6 +9,9 @@
   "scope": "/",
   "start_url": "/",
   "id": "/",
+  "cookies": {
+    "sameSite": "strict"
+  },
   "icons": [
     {
       "src": "images/icons/trippy192.png",

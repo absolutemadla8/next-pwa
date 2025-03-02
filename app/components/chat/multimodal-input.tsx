@@ -21,13 +21,13 @@ import { Textarea } from "@headlessui/react";
 const suggestedActions = [
   {
     title: "Help me book a hotel",
-    label: "from San Francisco to London",
-    action: "Help me book a flight from San Francisco to London",
+    label: "in Tokyo",
+    action: "Help me book a hotel in Tokyo with a budget of $500",
   },
   {
     title: "Help me find a deal",
-    label: "of flight BA142 flying tmrw?",
-    action: "What is the status of flight BA142 flying tmrw?",
+    label: "for my honeymoon in Maldives",
+    action: "Help me find a deal for my honeymoon in Maldives",
   },
 ];
 
@@ -155,7 +155,7 @@ export function MultimodalInput({
       {messages.length === 0 &&
         attachments.length === 0 &&
         uploadQueue.length === 0 && (
-          <div className="grid sm:grid-cols-2 gap-4 w-full md:px-0 mx-auto md:max-w-[500px]">
+          <div className="grid grid-cols-2 gap-2 w-full md:px-0 mx-auto md:max-w-[500px]">
             {suggestedActions.map((suggestedAction, index) => (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -172,10 +172,10 @@ export function MultimodalInput({
                       content: suggestedAction.action,
                     });
                   }}
-                  className="border border-slate-200 bg-white w-full text-left text-blue-950 p-4 rounded-lg font-semibold transition-colors flex flex-col"
+                  className=" bg-gradient-to-r border border-white from-blue-200 to-violet-200 w-full text-left text-blue-950 p-4 rounded-lg font-semibold transition-colors flex flex-col"
                 >
-                  <span className="font-semibold tracking-tight">{suggestedAction.title}</span>
-                  <span className="font-normal text-slate-500 tracking-tight text-sm">
+                  <span className="font-semibold tracking-tight truncate">{suggestedAction.title}</span>
+                  <span className="font-normal text-blue-800 tracking-tight text-sm truncate">
                     {suggestedAction.label}
                   </span>
                 </button>
@@ -219,16 +219,17 @@ export function MultimodalInput({
         value={input}
         onChange={handleInput}
         style={{ fontFamily: 'var(--font-nohemi)' }}
-        className="text-md max-h-14 rounded-full overflow-hidden resize-none text-base bg-muted shadow-sm p-4 border border-slate-200 text-blue-950"
+        className="text-md max-h-14 rounded-lg overflow-scroll max-w-[80%] resize-none text-base bg-muted shadow-sm p-4 border border-slate-200 text-blue-950"
         rows={3}
         onKeyDown={(event) => {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-
-            if (isLoading) {
-              // toast.error("Please wait for the model to finish its response!");
-            } else {
-              submitForm();
+          if (event.key === "Enter") {
+            if (!event.shiftKey) {
+              event.preventDefault();
+              if (isLoading) {
+                // toast.error("Please wait for the model to finish its response!");
+              } else {
+                submitForm();
+              }
             }
           }
         }}
@@ -236,7 +237,7 @@ export function MultimodalInput({
 
       {isLoading ? (
         <Button
-          className="rounded-full p-1.5 h-fit absolute bottom-20 right-0 left-0 m-0.5 z-10 text-white"
+          className="rounded-full p-2 h-fit absolute bottom-2.5 right-2 m-0.5 text-white bg-blue-600"
           onClick={(event) => {
             event.preventDefault();
             stop();
@@ -246,7 +247,7 @@ export function MultimodalInput({
         </Button>
       ) : (
         <Button
-          className="rounded-full p-1.5 h-fit absolute bottom-2 right-2 m-0.5 text-white"
+          className="rounded-full p-2 h-fit absolute bottom-2.5 right-2 m-0.5 text-white bg-blue-600"
           onClick={(event) => {
             event.preventDefault();
             submitForm();
@@ -258,7 +259,7 @@ export function MultimodalInput({
       )}
 
       <Button
-        className="rounded-full p-1.5 h-fit absolute bottom-2 right-10 m-0.5 dark:border-zinc-700"
+        className="rounded-full p-2 h-fit absolute bottom-2.5 right-10 m-0.5 dark:border-zinc-700"
         onClick={(event) => {
           event.preventDefault();
           fileInputRef.current?.click();

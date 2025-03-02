@@ -8,6 +8,8 @@ import { PreviewAttachment } from "./preview-attachment";
 import { Markdown } from "./markdown";
 import { BotIcon, UserIcon } from "./icons";
 import { SearchLocationResults } from "./SearchLocationResults";
+import { HotelsList } from "./HotelsList";
+import { RoomRates } from "./RoomRates";
 
 export const Message = ({
   chatId,
@@ -55,7 +57,15 @@ export const Message = ({
                   <div key={toolCallId}>
                     {toolName === "getLocations" ? (
                       <SearchLocationResults chatId={chatId} results={result} />
-                    ) : (
+                    ) :
+                    toolName === "getHotels"? (
+                      <HotelsList results={result} chatId={chatId} />
+                    ) :
+                    toolName === "getRoomRates" ? (
+                      <RoomRates results={result} chatId={chatId} />
+                    )
+                    :
+                    (
                       <div>{JSON.stringify(result, null, 2)}</div>
                     )}
                   </div>
@@ -65,7 +75,14 @@ export const Message = ({
                   <div key={toolCallId} className="skeleton">
                     {toolName === "getLocations" ? (
                       <SearchLocationResults chatId={chatId} />
-                    ) : null}
+                    ) :
+                    toolName === "getHotels"? (
+                      <HotelsList chatId={chatId} />
+                    ) :
+                    toolName === "getRoomRates" ? (
+                      <RoomRates chatId={chatId} />
+                    ):
+                    null}
                   </div>
                 );
               }

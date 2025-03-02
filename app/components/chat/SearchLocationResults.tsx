@@ -74,7 +74,7 @@ export function SearchLocationResults({ results, chatId }: SearchLocationResults
         {isLoading ? (
           <StepLoader
             steps={searchSteps}
-            totalTimeMs={8000}
+            totalTimeMs={4000}
             onComplete={() => setIsLoading(false)}
           />
         ) : (
@@ -82,6 +82,7 @@ export function SearchLocationResults({ results, chatId }: SearchLocationResults
             {results?.slice(0, 4).map((location, index) => (
               <React.Fragment key={location.id}>
                 <AnimatedButton
+                  variant='bland'
                   className="flex items-center justify-between w-full p-3 h-16 text-left bg-white"
                   onClick={() => {
                     append({

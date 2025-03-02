@@ -58,6 +58,9 @@ export async function POST(request: Request) {
       (message) => message.content.length > 0,
     );
 
+    // Track the final assistant message for saving
+    let finalAssistantMessage = null;
+
     const result = await streamText({
       model: geminiProModel,
       system: `\n
@@ -101,40 +104,92 @@ export async function POST(request: Request) {
         getHotels: {
           description: "Get the hotels for the given location",
           parameters: z.object({
-            location_id: z.string().describe("Location ID"),
-            check_in: z.string().describe("Check-in date"),
-            check_out: z.string().describe("Check-out date"),
+            locationId: z.string().describe("Location ID"),
+            checkIn: z.string().describe("Check-in date in YYYY-MM-DD format"),
+            checkOut: z.string().describe("Check-out date YYYY-MM-DD format"),
             occupancies: z.array(
               z.object({
-                adults: z.number().describe("Number of adults"),
+                numOfAdults: z.number().describe("Number of adults"),
                 childAges: z.array(z.number()).describe("Child ages"),
               }),
             ).describe("Occupancies"),
           }),
-          execute: async ({ location_id, check_in, check_out, occupancies }) => {
-            const hotelsResponse = await serverApi.get(`/hotels/search-hotels`, {
-              params: {
-                location_id,
-                check_in,
-                check_out,
-                occupancies: occupancies,
-              }
-            });
+          execute: async ({ locationId, checkIn, checkOut, occupancies }) => {
+            const hotelsResponse = await serverApi.post(`/hotels/search-hotels`, {
+                locationId,
+                nationality: "IN",
+                checkIn,
+                checkOut,
+                occupancies,
+              });
             //@ts-ignore mlmr
-            return hotelsResponse.data.data;
+            return hotelsResponse.data.data.results;
+          },
+        },
+        getRoomRates: {
+          description: "Get the room rates for the given hotel",
+          parameters: z.object({
+            hotelId: z.string().describe("Hotel ID"),
+            checkIn: z.string().describe("Check-in date in YYYY-MM-DD format"),
+            checkOut: z.string().describe("Check-out date YYYY-MM-DD format"),
+            occupancies: z.array(
+              z.object({
+                numOfAdults: z.number().describe("Number of adults"),
+                childAges: z.array(z.number()).describe("Child ages"),
+              }),
+            ).describe("Occupancies"),
+          }),
+          execute: async ({ hotelId, checkIn, checkOut, occupancies }) => {
+            const roomRatesResponse = await serverApi.post(`/hotels/itineraries/create`, {
+                hotelId,
+                checkIn,
+                checkOut,
+                occupancies,
+                nationality: "IN",
+              });
+            //@ts-ignore mlmr
+            return roomRatesResponse.data.data.rooms.slice(0, 4);
           },
         },
       },
-      //@ts-ignore mlmr
-      onFinish: async ({ responseMessages }) => {
-          try {
-            await serverApi.post('trippy/sessions/chat', {
-              id,
-              messages: [...coreMessages, ...responseMessages],
-            });
-          } catch (error) {
-            console.error("Failed to save chat", error);
+      onFinish: async (result) => {
+        try {
+          // Log the result for debugging
+          console.log("onFinish triggered, result:", JSON.stringify(result).substring(0, 200) + "...");
+          
+          // Check if we have a response message
+           //@ts-ignore mlmr
+          if (result.messages && result.messages.length > 0) {
+             //@ts-ignore mlmr
+            const assistantMessage = result.messages[result.messages.length - 1];
+            
+            // Log the attempt to save chat
+            console.log(`Attempting to save chat for session ${id} with ${coreMessages.length} core messages and 1 assistant message`);
+            
+            // Make the API call with explicit error handling
+            try {
+              const saveResponse = await serverApi.post('/trippy/sessions/chat', {
+                pin: id, // Make sure we're using the correct parameter name
+                messages: [...coreMessages, assistantMessage],
+              });
+              console.log("Chat saved successfully:", saveResponse.status);
+            } catch (saveError) {
+              console.error("Failed to save chat:", saveError);
+              // Check if there's more detailed error information
+               //@ts-ignore mlmr
+              if (saveError.response) {
+                 //@ts-ignore mlmr
+                console.error("Response data:", saveError.response.data);
+                 //@ts-ignore mlmr
+                console.error("Response status:", saveError.response.status);
+              }
+            }
+          } else {
+            console.warn("No assistant message found to save");
           }
+        } catch (e) {
+          console.error("Error in onFinish callback:", e);
+        }
       },
       experimental_telemetry: {
         isEnabled: true,
@@ -142,9 +197,30 @@ export async function POST(request: Request) {
       },
     });
 
+    // After streaming is complete, make an additional attempt to save the chat
+    // This serves as a backup in case the onFinish callback fails
+    try {
+      console.log("Streaming complete, making final attempt to save chat");
+      await serverApi.post('/trippy/sessions/chat', {
+        pin: id,
+        messages: messages, // Use the original messages as a fallback
+      });
+      console.log("Backup chat save completed");
+    } catch (finalSaveError) {
+      console.error("Final attempt to save chat failed:", finalSaveError);
+    }
+
     return result.toDataStreamResponse({});
   } catch (error) {
     console.error("Error in API route:", error);
+    // Log detailed error information
+     //@ts-ignore mlmr
+    if (error.response) {
+       //@ts-ignore mlmr
+      console.error("Response data:", error.response.data);
+       //@ts-ignore mlmr
+      console.error("Response status:", error.response.status);
+    }
     return new Response("An error occurred", { status: 500 });
   }
 }

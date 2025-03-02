@@ -12,7 +12,9 @@ interface RoomRateCardProps {
     roomId: string, 
     rateId: string, 
     recommendationId: string, 
-    price: number
+    price: number,
+    boardType?: string,
+    roomType?: string
   ) => void;
 }
 
@@ -248,16 +250,18 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Book Now Button */}
             <div className='w-full pt-3'>
               <AnimatedButton 
-                variant={itinerary.rooms[0].rateId == selectedRate.rateId ? 'success' : 'secondary'}
+                variant="secondary"
                 className='w-full' 
                 onClick={() => onBookNow(
                   room.id, 
                   selectedRate.rateId, 
                   selectedRate.recommendationId, 
-                  selectedRate.finalRate
+                  selectedRate.finalRate,
+                  selectedRate.boardBasis.type,
+                  room.type
                 )}
               >
-                {itinerary.rooms[0].rateId == selectedRate.rateId ? 'Selected' : 'Book Now'}
+                Book now
               </AnimatedButton>
             </div>
           </div>
@@ -321,16 +325,18 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
           {/* Book Now Button */}
           <div className='w-full pt-3'>
             <AnimatedButton 
-              variant={itinerary.rooms[0].rateId == rate.rateId ? 'success' : 'secondary'}
+              variant="secondary"
               className='w-full' 
               onClick={() => onBookNow(
                 room.id, 
                 rate.rateId, 
                 rate.recommendationId, 
-                rate.finalRate
+                rate.finalRate,
+                rate.boardBasis.type,
+                room.type
               )}
             >
-              {itinerary.rooms[0].rateId == rate.rateId ? 'Selected' : 'Book Now'}
+              Book Now
             </AnimatedButton>
           </div>
         </div>
