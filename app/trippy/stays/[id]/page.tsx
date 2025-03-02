@@ -15,16 +15,68 @@ import { CreateItineraryPayload } from '@/app/types/itinerary'
 import { useRoomStore } from '@/app/store/roomRateStore'
 import { useHotelStore } from '@/app/store/hotelsSearchStore'
 import { formatDate } from '@/app/lib/utils'
+import useBottomOrderStore from '@/app/store/bottomOrderStore'
 
 const Page = () => {
   const router = useRouter();
   const params = useParams();
+  const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const { itinerary, getOccupancies, getTotalAdults, getTotalChildren, getTotalRooms } = useItineraryStore();
   const {setRooms, setItineraryId, setType, setTraceId} = useRoomStore();
   const {hotel, setHotel} = useHotelStore();
   const [isCreating, setIsCreating] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Moved handleCreateItinerary function higher in the component
+  const handleCreateItinerary = async () => {
+    if (!itinerary.checkIn || !itinerary.checkOut) {
+      alert('Please select check-in and check-out dates');
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      const payload: CreateItineraryPayload = {
+        checkIn: itinerary.checkIn.toISOString().split('T')[0],
+        checkOut: itinerary.checkOut.toISOString().split('T')[0],
+        nationality: 'IN',
+        hotelId: params.id as string,
+        occupancies: getOccupancies()
+      };
+
+      const response = await api.post('/hotels/itineraries/create', payload);
+      //@ts-ignore mlmr
+      if (response.data.status === 'success') {
+        //@ts-ignore mlmr
+        const sessionId = response.data.data.sessionId;
+        //@ts-ignore mlmr
+        setRooms(response.data.data.rooms);
+        //@ts-ignore mlmr
+        setItineraryId(response.data.data.itineraryCode);
+        //@ts-ignore mlmr
+        setType(response.data.data.item)
+        //@ts-ignore mlmr
+        setTraceId(response.data.data.traceId)
+        router.push(`/trippy/stays/itinerary/${sessionId}/rooms`);
+      } else {
+        throw new Error('Failed to create itinerary');
+      }
+    } catch (error) {
+      console.error('Error creating itinerary:', error);
+      alert('Failed to create itinerary. Please try again.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  React.useEffect(() => {
+    setButtonText('Select Rooms');
+    setHandleCreateItinerary(handleCreateItinerary);
+    setInfoTitle('Create Itinerary');
+    setInfoSubtitle(`${getTotalRooms()} Rooms, ${getTotalAdults()} Guests` || 'Guests not Selected');
+  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle])
 
   React.useEffect(() => {
     const fetchHotelData = async () => {
@@ -52,58 +104,16 @@ const Page = () => {
 
   if (loading) {
   return (
-      <div className="flex items-center justify-center h-screen bg-[#F1F2F4]">
+      <div className="flex items-center justify-center h-screen bg-[#F1F2F4] w-full">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  const handleCreateItinerary = async () => {
-    if (!itinerary.checkIn || !itinerary.checkOut) {
-      alert('Please select check-in and check-out dates');
-      return;
-    }
-
-    setIsCreating(true);
-
-    try {
-      const payload: CreateItineraryPayload = {
-        checkIn: itinerary.checkIn.toISOString().split('T')[0],
-        checkOut: itinerary.checkOut.toISOString().split('T')[0],
-        nationality: 'IN',
-        hotelId: params.id as string,
-        occupancies: getOccupancies()
-      };
-
-      const response = await api.post('/hotels/itineraries/create', payload);
-      
-      //@ts-ignore mlmr
-      if (response.data.status === 'success') {
-        //@ts-ignore mlmr
-        const sessionId = response.data.data.sessionId;
-        //@ts-ignore mlmr
-        setRooms(response.data.data.rooms);
-         //@ts-ignore mlmr
-        setItineraryId(response.data.data.itineraryCode);
-         //@ts-ignore mlmr
-        setType(response.data.data.item)
-         //@ts-ignore mlmrres
-        setTraceId(response.data.data.traceId)
-        router.push(`/trippy/stays/itinerary/${sessionId}/rooms`);
-      } else {
-        throw new Error('Failed to create itinerary');
-      }
-    } catch (error) {
-      console.error('Error creating itinerary:', error);
-      alert('Failed to create itinerary. Please try again.');
-    } finally {
-      setIsCreating(false);
-    }
-  };
 
   return (
-    <div className='flex flex-col w-full min-h-screen items-center justify-center bg-[#F1F2F4]'>
-        <div className="flex flex-col items-center justify-start h-full w-full">
+    <div className='relative flex flex-col w-full min-h-screen items-center justify-center bg-[#F1F2F4] overflow-scroll'>
+        <div className="flex flex-col items-center justify-start h-full w-full pb-32">
             <div className='sticky top-0 flex flex-col items-start justify-start w-full h-64'>
             <img src={hotel.heroImage} className='h-64 w-full transition-all delay-150 duration-300 ease-in-out' />
             <div className='absolute -bottom-1 h-36 w-full bg-gradient-to-t from-[#F1F2F4] to-[#F1F2F400]' />
@@ -246,7 +256,7 @@ const Page = () => {
                 <div className='py-6' />
             </div>
         </div>
-        <div className='fixed bottom-0 left-0 right-0 flex flex-col items-center justify-start w-full bg-gradient-to-t from-white via-white to-transparent p-4 z-20'>
+        {/* <div className='fixed bottom-0 left-0 right-0 flex flex-col items-center justify-start w-full bg-gradient-to-t from-white via-white to-transparent p-4 z-20'>
             <div className='flex flex-col items-center justify-center rounded-lg overflow-hidden bg-blue-600 w-full max-w-screen-xl mx-auto'>
                 <div className='flex flex-row items-center justify-between w-full px-3 py-2 bg-blue-700'>
                 </div>
@@ -269,7 +279,7 @@ const Page = () => {
             </AnimatedButton>
                 </div>
             </div>
-        </div>
+        </div> */}
    </div>
   )
 }

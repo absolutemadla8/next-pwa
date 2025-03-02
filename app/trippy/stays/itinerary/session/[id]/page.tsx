@@ -238,7 +238,7 @@ const Page = () => {
     );
   }
   return (
-    <div className='flex flex-col w-full min-h-screen items-center justify-center'>
+    <div className='flex flex-col w-full min-h-screen max-h-screen overflow-scroll items-center justify-center bg-[#F1F2F4] py-20'>
         {/* Add Razorpay script */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
@@ -247,7 +247,7 @@ const Page = () => {
           onError={() => setError('Failed to load payment gateway. Please try again later.')}
         />
         
-        <div className="flex flex-col items-center justify-start h-full w-full bg-[#F1F2F4]">
+        <div className="flex flex-col items-center justify-start w-full">
             <div className='relative flex flex-col items-start justify-start w-full h-64'>
             <img src={session.hotelDetails.images[0].url} className='h-64 w-full transition-all delay-150 duration-300 ease-in-out' />
             <div className='absolute -bottom-1 h-48 w-full bg-gradient-to-t from-[#F1F2F4] to-[#F1F2F400]' />
@@ -417,37 +417,6 @@ const Page = () => {
                         ₹{session?.finalRate? session.finalRate : 0}
                         </span>
                     </div>
-                </div>
-            </div>
-            <div className='py-6' />
-        </div>
-        <div className='fixed bottom-0 left-0 right-0 flex flex-col items-center justify-start w-full bg-gradient-to-t from-white via-white to-transparent p-4 z-20'>
-            <div className='flex flex-col items-center justify-center rounded-lg overflow-hidden bg-blue-600 w-full max-w-screen-xl mx-auto'>
-                <div className='flex flex-row items-center justify-between w-full px-3 py-2 bg-blue-700'>
-                </div>
-                <div className='flex flex-row items-center justify-between w-full px-3 py-2'>
-                <div className='flex flex-col items-start justify-start'>
-                <div className='flex flex-row items-center justify-start gap-x-1'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-white'>
-                ₹{session?.finalRate? session.finalRate : 0}
-            </h1>
-            <span className='text-xs text-slate-50 font-normal tracking-tight truncate'>
-                   total
-                </span>
-            </div>
-            <span className='text-xs text-slate-50 font-normal tracking-tight truncate'>
-                   Inclusive of taxes and fee
-                </span>
-            </div>
-            <AnimatedButton 
-              disabled={loading || !isRazorpayLoaded} 
-              loading={loading} 
-              onClick={submitBooking} 
-              size='md' 
-              variant="bland"
-            >
-              {loading ? 'Initiating...' : !isRazorpayLoaded ? 'Loading payment...' : 'Pay now'}
-            </AnimatedButton>
                 </div>
             </div>
         </div>

@@ -52,7 +52,7 @@ const Page = () => {
   }, [itinerary.locationId, itinerary.checkIn, itinerary.checkOut]);
 
   return (
-    <div className='flex flex-col items-start justify-start w-full'>
+    <div className='flex flex-col items-start justify-start w-full overflow-scroll'>
         <div className='flex w-full sticky top-0 z-10'>
           <StayInformationHeader />
         </div>

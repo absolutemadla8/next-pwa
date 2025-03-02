@@ -15,6 +15,7 @@ import RoomConfiguration from '../components/ui/RoomConfiguration';
 import useItineraryStore from '../store/itineraryStore';
 import BottomNavigation from '../components/trippy/BottomNavigation';
 import { IconBubbleText, IconBuildings, IconSparkles, IconUserCircle } from '@tabler/icons-react';
+import BottomOrderInfo from '../components/trippy/BottomOrderInfo';
 
 export default function TrippyLayout({
   children,
@@ -62,9 +63,15 @@ export default function TrippyLayout({
       </main>
 
       {/* Bottom Navigation */}
+      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search') ?
       <div className='flex items-center w-full h-[9vh]'>
-      <BottomNavigation navItems={navigationItems} />
+        <BottomNavigation navItems={navigationItems} />
       </div>
+      :
+      <div className='flex items-center w-full h-[9vh]'>
+        <BottomOrderInfo  />
+      </div>
+      }   
       
       {/* Date Range Bottom Sheet */}
       <BottomSheet 
