@@ -57,12 +57,12 @@ export default function TrippyLayout({
   return (
     <div className="flex flex-col min-h-screen max-h-screen overflow-hidden bg-gray-800">
       {/* Main content */}
-      <main className="flex h-[92vh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b from-blue-50 to-white overflow-hidden">
+      <main className="flex h-[91vh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b from-blue-50 to-white overflow-hidden">
         {children}
       </main>
 
       {/* Bottom Navigation */}
-      <div className='flex items-center w-full h-[8vh]'>
+      <div className='flex items-center w-full h-[9vh]'>
       <BottomNavigation navItems={navigationItems} />
       </div>
       
