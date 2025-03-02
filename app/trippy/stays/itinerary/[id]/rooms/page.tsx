@@ -20,6 +20,9 @@ const Page = () => {
   const {itinerary, setRecommendationId, setRoomDetails, getTotalPrice} = useItineraryStore()
   const router = useRouter()
   
+  // Add state to track the recommendation ID locally
+  const [currentRecommendationId, setCurrentRecommendationId] = useState<string | null>(null);
+  
   // In the parent component (Page)
   const handleRoomSelect = async (
     roomId: string, 
@@ -28,20 +31,26 @@ const Page = () => {
     price: number
   ) => {
     console.log("Room selected:", roomId, rateId, recommendationId, price);
+    
+    // Store recommendation ID locally
+    setCurrentRecommendationId(recommendationId);
+    
+    // Update the itinerary store with the recommendation ID
+    setRecommendationId(recommendationId);
+    
+    // Set room details for all rooms in the itinerary
     itinerary.rooms.forEach(room => {
       setRoomDetails(room.id, { rateId, roomId, price });
-      setRecommendationId(recommendationId);
     });
     
     // Update the selected price immediately after state changes
     const totalPrice = getTotalPrice();
     setSelectedPrice(totalPrice);
     
-    const recommendation_Id = recommendationId;
-    setRecommendationId(recommendation_Id);
-
     // Update the bottom order info with the new price
     setInfoSubtitle(`Rs.${totalPrice}`);
+    
+    console.log("After selection - RecommendationID:", recommendationId);
   };
 
   const handleBookNow = async () => {
@@ -50,7 +59,21 @@ const Page = () => {
         console.error('No itinerary ID found');
         return;
       }
+      
+      // Log state before submission
+      console.log("Booking with recommendationId:", currentRecommendationId || itinerary.recommendationId);
+      console.log("Itinerary state:", itinerary);
+      
       setLoading(true);
+
+      // Use the locally stored recommendationId as a fallback
+      const recommendationId = itinerary.recommendationId || currentRecommendationId;
+      
+      if (!recommendationId) {
+        console.error('No recommendation ID found');
+        setLoading(false);
+        return;
+      }
 
       const payload: SelectRoomRatesPayload = {
         roomsAndRateAllocations: itinerary.rooms.map(room => ({
@@ -62,12 +85,14 @@ const Page = () => {
           }
         })),
         traceId,
-        recommendationId: String(itinerary.recommendationId),
+        recommendationId: String(recommendationId),
         items: [{
           code: type.code,
           type: 'HOTEL'
         }]
       };
+
+      console.log("Sending payload:", payload);
 
       const response = await api.post(`/hotels/itineraries/${itineraryId}/select-roomrates`, payload);
 
@@ -93,12 +118,13 @@ const Page = () => {
     setInfoSubtitle(`Rs.${totalPrice}` || 'Guests not Selected');
   }, [itinerary, getTotalPrice, setInfoSubtitle]);
   
-  // Set up initial values
+  // Set up initial values and ensure handleBookNow has the latest state
   useEffect(() => {
+    const bookNowHandler = () => handleBookNow();
     setButtonText('Book now');
-    setHandleCreateItinerary(handleBookNow);
+    setHandleCreateItinerary(bookNowHandler);
     setInfoTitle('inclusive of all taxes');
-  }, [setButtonText, setHandleCreateItinerary, setInfoTitle]);
+  }, [setButtonText, setInfoTitle]);
   
   return (
     <div className='flex flex-col items-start justify-start w-full bg-[#F1F2F4] min-h-screen max-h-screen overflow-scroll'>
