@@ -28,9 +28,9 @@ const HorizontalScroll = ({ children, className = '' }: HorizontalScrollProps) =
         variants={container}
         initial="hidden"
         animate="show"
-        className={`flex flex-row gap-4 pb-4 ${className}`}
+        className={`flex flex-row gap-2 pb-4 ${className}`}
       >
-        <div className='pl-2' />
+        <div className='' />
         {React.Children.map(children, (child) => (
           <motion.div variants={item}>
             {child}

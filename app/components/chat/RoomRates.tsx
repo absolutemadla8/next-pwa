@@ -2,19 +2,25 @@ import { useChat } from 'ai/react';
 import React from 'react'
 import HorizontalScroll from '../ui/HorizontalScroll';
 import RoomRateCard from '../stays/RoomRateCard';
+import SimpleRoomRateCard from './SimpleRoomRateCard';
+import AnimatedButton from '../ui/AnimatedButton';
 
 export function RoomRates({ results, chatId }: { results?: any, chatId: string }) {
-    const { append } = useChat({
-      id: chatId,
-      body: { id: chatId },
-      maxSteps: 5,
-    });
+  const { append, error, reload } = useChat({
+    id: chatId,
+    body: { id: chatId },
+    maxSteps: 5,
+  });
+  {error && (
+    <>
+      <div>An error occurred.</div>
+      <button type="button" onClick={() => reload()}>
+        Retry
+      </button>
+    </>
+  )}
   
     const handleBookNow = (
-      roomId: string, 
-      rateId: string, 
-      recommendationId: string, 
-      price: number,
       boardType?: string,
       roomType?: string
     ) => {
@@ -29,16 +35,17 @@ export function RoomRates({ results, chatId }: { results?: any, chatId: string }
         {results && results.length > 0 ? (
           results.map((room: any, index: number) => (
             <div key={index} className="w-72 flex-shrink-0 p-2">
-              <RoomRateCard 
+              <SimpleRoomRateCard 
+                chatId={chatId}
                 room={room} 
-                onBookNow={handleBookNow} 
+                onSelect={()=>handleBookNow} 
               />
             </div>
           ))
         ) : (
-          <div className="p-4 text-center w-full">
-            No rooms available for the selected criteria
-          </div>
+        <AnimatedButton type="button" onClick={() => reload()}>
+          Retry
+        </AnimatedButton>
         )}
       </HorizontalScroll>
     );

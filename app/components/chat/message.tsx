@@ -55,10 +55,10 @@ export const Message = ({
 
                 return (
                   <div key={toolCallId}>
-                    {toolName === "getLocations" ? (
+                    {toolName === "searchLocation" ? (
                       <SearchLocationResults chatId={chatId} results={result} />
                     ) :
-                    toolName === "getHotels"? (
+                    toolName === "searchHotels"? (
                       <HotelsList results={result} chatId={chatId} />
                     ) :
                     toolName === "getRoomRates" ? (
@@ -73,10 +73,10 @@ export const Message = ({
               } else {
                 return (
                   <div key={toolCallId} className="skeleton">
-                    {toolName === "getLocations" ? (
+                    {toolName === "searchLocation" ? (
                       <SearchLocationResults chatId={chatId} />
                     ) :
-                    toolName === "getHotels"? (
+                    toolName === "searchHotels"? (
                       <HotelsList chatId={chatId} />
                     ) :
                     toolName === "getRoomRates" ? (

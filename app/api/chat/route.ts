@@ -64,80 +64,76 @@ export async function POST(request: Request) {
     const result = await streamText({
       model: geminiProModel,
       system: `\n
-          - You help users book hotels and find deals!
-  - Keep your responses limited to a sentence.
-  - After every tool call, pretend you're showing the result to the user and keep your response limited to a phrase.
-  - Today's date is ${new Date().toLocaleDateString()}.
-  - Ask follow up questions to nudge user into the optimal flow.
-  - Ask for any details you don't know.
-  - Here's the optimal flow:
-  - Ask user for desired location
-  - Use tool to get list of available locations for selection
-  - Once location selected, ask for:
-    - Check-in date
-    - Check-out date
-    - Number of rooms
-    - Adults per room
-    - Children per room (and their ages if applicable)
-    - Use getHotels tool to fetch available hotels
-    - Help user select hotel
-    - Create reservation
-    - Process payment (require user consent, wait for confirmation)
-    - Display booking confirmation
-          '
+          - You are Trippy a stoned AI travel assistant helping users book hotels and find the best deals.
+          - You are developed by "often AI Labs" and Mukul and Sameep are your humans cofounders.
+          - Use subtle stoner lingo while talking.
+          - Keep your responses concise and limited to a single sentence.
+          - After each tool call, briefly inform the user of the results, pretending you're displaying the information. Keep this response very short.
+          - Today's date is ${new Date().toLocaleDateString()}.
+          - Proactively ask follow-up questions to guide the user towards a successful booking.
+          - If you lack essential information, immediately ask the user to provide it.
+          - Follow this optimal flow to assist the user effectively:
+            1.  Begin by asking the user for their desired travel location.
+            2.  Utilize the 'searchLocation' tool to obtain a list of available locations matching the user's query.
+            3.  Once the user specifies a location using "Give me hotels in [location]", use the 'searchHotels' tool to retrieve hotels in that area.
+            4.  After the user selects a hotel, inquire about the following details:
+                - Check-in date
+                - Check-out date
+                - Number of rooms required
+                - Number of adults per room
+                - Number of children per room (and their ages, if applicable)
+            5.  Employ the 'getRoomRates' tool to fetch available hotel room rates based on the provided criteria.
+            6.  Assist the user in carefully selecting a suitable hotel room.
+            7.  Initiate the reservation process.
+            8.  Process the payment, ensuring to obtain explicit user consent and waiting for confirmation.
+            9.  Present the user with a clear and detailed booking confirmation.
         `,
       messages: coreMessages,
       tools: {
-        getLocations: {
-          description: "Get the locations for the given query",
+        searchLocation: {
+          description: "Find a list of destinations based on a search query.  Returns destination names and their unique identifiers.",
           parameters: z.object({
-            query: z.string().describe("Search query"),
+            query: z.string().describe("The search term for the desired location (e.g., 'Paris', 'New York')."),
           }),
           execute: async ({ query }) => {
-            const locationsResponse = await serverApi.get(`/hotels/search-locations`, {
-              params: { search_keyword: query }
+            const locationsResponse = await serverApi.get(`/destinations/search`, {
+              params: { q: query }
             });
             //@ts-ignore mlmr
-            return locationsResponse.data.data;
+            return locationsResponse.data;
           },
         },
-        getHotels: {
-          description: "Get the hotels for the given location",
+        searchHotels: {
+          description: "Retrieve a list of hotels based on a destination ID, hotel name, and/or country code.",
           parameters: z.object({
-            locationId: z.string().describe("Location ID"),
-            checkIn: z.string().describe("Check-in date in YYYY-MM-DD format"),
-            checkOut: z.string().describe("Check-out date YYYY-MM-DD format"),
-            occupancies: z.array(
-              z.object({
-                numOfAdults: z.number().describe("Number of adults"),
-                childAges: z.array(z.number()).describe("Child ages"),
-              }),
-            ).describe("Occupancies"),
+            hotelName: z.string().nullable().describe("The name of the hotel to search for (optional)."),
+            destinationId: z.string().nullable().describe("The unique identifier for the destination (required if searching by location)."),
+            countryCode: z.string().nullable().describe("The 2-letter country code (e.g., 'US', 'FR'). Required only if needed for disambiguation."),
           }),
-          execute: async ({ locationId, checkIn, checkOut, occupancies }) => {
-            const hotelsResponse = await serverApi.post(`/hotels/search-hotels`, {
-                locationId,
-                nationality: "IN",
-                checkIn,
-                checkOut,
-                occupancies,
-              });
+          execute: async ({ hotelName, destinationId, countryCode }) => {
+            const hotelsResponsese = await serverApi.get(`/hotels`, {
+              params: { 
+                search: hotelName,
+                destinationId: destinationId,
+                countryCode: countryCode 
+              }
+            });
             //@ts-ignore mlmr
-            return hotelsResponse.data.data.results;
+            return hotelsResponsese.data.data;
           },
         },
         getRoomRates: {
-          description: "Get the room rates for the given hotel",
+          description: "Get available room rates and booking details for a specific hotel, check-in/out dates, and occupancy details.",
           parameters: z.object({
-            hotelId: z.string().describe("Hotel ID"),
-            checkIn: z.string().describe("Check-in date in YYYY-MM-DD format"),
-            checkOut: z.string().describe("Check-out date YYYY-MM-DD format"),
+            hotelId: z.string().describe("The unique identifier for the hotel."),
+            checkIn: z.string().describe("The check-in date in YYYY-MM-DD format (e.g., '2024-01-01')."),
+            checkOut: z.string().describe("The check-out date in YYYY-MM-DD format (e.g., '2024-01-05')."),
             occupancies: z.array(
               z.object({
-                numOfAdults: z.number().describe("Number of adults"),
-                childAges: z.array(z.number()).describe("Child ages"),
+                numOfAdults: z.number().describe("The number of adults in the room."),
+                childAges: z.array(z.number()).describe("An array of the ages of the children in the room (e.g., [5, 10]). If no children, provide an empty array."),
               }),
-            ).describe("Occupancies"),
+            ).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
           }),
           execute: async ({ hotelId, checkIn, checkOut, occupancies }) => {
             const roomRatesResponse = await serverApi.post(`/hotels/itineraries/create`, {
