@@ -95,6 +95,14 @@ const Page = () => {
     setInfoTitle('inclusive of all taxes');
     setInfoSubtitle(`Rs.${getTotalPrice()}` || 'Guests not Selected');
   }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice])
+
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center h-screen bg-[#F1F2F4] w-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
   
   return (
     <div className='flex flex-col items-start justify-start w-full bg-[#F1F2F4] min-h-screen max-h-screen overflow-scroll'>
