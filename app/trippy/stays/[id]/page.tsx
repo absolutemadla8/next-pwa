@@ -74,7 +74,7 @@ const Page = () => {
   React.useEffect(() => {
     setButtonText('Select Rooms');
     setHandleCreateItinerary(handleCreateItinerary);
-    setInfoTitle('Create Itinerary');
+    setInfoTitle(`${itinerary.checkIn ? formatDate(itinerary.checkIn) : 'No date selected'} - ${itinerary.checkOut ? formatDate(itinerary.checkOut) : 'No date selected'}`);
     setInfoSubtitle(`${getTotalRooms()} Rooms, ${getTotalAdults()} Guests` || 'Guests not Selected');
   }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle])
 
@@ -110,7 +110,6 @@ const Page = () => {
     );
   }
 
-
   return (
     <div className='relative flex flex-col w-full min-h-screen items-center justify-center bg-[#F1F2F4] overflow-scroll'>
         <div className="flex flex-col items-center justify-start h-full w-full pb-32">
@@ -118,7 +117,15 @@ const Page = () => {
             <img src={hotel.heroImage} className='h-64 w-full transition-all delay-150 duration-300 ease-in-out' />
             <div className='absolute -bottom-1 h-36 w-full bg-gradient-to-t from-[#F1F2F4] to-[#F1F2F400]' />
             </div>
-            <div className='flex flex-col items-center justify-center w-full gap-y-3 px-4 -mt-10 z-10'>
+            <div className='flex flex-col items-center justify-center w-full gap-y-3 px-4 -mt-16 z-10'>
+              <div className='flex flex-col items-end justify-end w-full'>
+                <div onClick={()=>router.push(`/trippy/stays/${params.id}/gallery`)} className='flex flex-col relative items-center justify-center size-12 rounded-lg bg-cover bg-center overflow-hidden border border-white' style={{ backgroundImage: `url(${hotel.heroImage})` }}>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-white text-sm z-10'>
+                           +{hotel.images.length - 1}
+                </h1>
+                <div className='absolute h-full w-full bg-black/30 backdrop-blur-sm rounded-lg overflow-hidden' />
+                </div>
+              </div>
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
                     <div className='flex flex-row items-center justify-between w-full'>
                         <div className='flex flex-col gap-y-1 w-[60%]'>

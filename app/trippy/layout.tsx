@@ -68,6 +68,10 @@ export default function TrippyLayout({
         <BottomNavigation navItems={navigationItems} />
       </div>
       :
+      pathname.startsWith('/trippy/chat/') && pathname.length > '/trippy/chat/'.length ?
+      <div className='flex items-center w-full h-[9vh]'>
+      </div>
+      :
       <div className='flex items-center w-full h-[9vh]'>
         <BottomOrderInfo  />
       </div>

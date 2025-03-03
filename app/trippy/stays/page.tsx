@@ -15,10 +15,14 @@ const Page = () => {
   const {itinerary, getTotalAdults, getTotalRooms, getTotalChildren, getOccupancies} = useItineraryStore();
 
   const handleSearch = () => {
-    if (!itinerary.locationId || !itinerary.checkIn || !itinerary.checkOut) {
+    if (!itinerary.checkIn || !itinerary.checkOut) {
       return;
     }
-    router.push('/trippy/stays/search');
+    if (itinerary.hotelId) {
+      router.push(`/trippy/stays/${itinerary.hotelId}`);
+    } else {
+      router.push('/trippy/stays/search');
+    }
   };
 
   return (

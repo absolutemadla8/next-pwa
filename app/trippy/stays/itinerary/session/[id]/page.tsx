@@ -1,7 +1,7 @@
 'use client'
 
 import { ListCheck, Star } from 'lucide-react'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import StarRating from '@/app/components/ui/StarRating'
 import { useParams } from 'next/navigation'
 import { api } from '@/app/lib/axios'
@@ -12,11 +12,13 @@ import AnimatedButton from '@/app/components/ui/AnimatedButton'
 import { RoomAllocationPayload } from '@/app/types/roomAllocation'
 import Script from 'next/script'
 import { formatDate } from '@/app/lib/utils'
+import useBottomOrderStore from '@/app/store/bottomOrderStore'
 
 const Page = () => {
   const params = useParams();
   const {hotel} = useHotelStore();
   const { setGuests, guests, updateGuest, hasChanged, setInitialGuests, resetChanges } = useGuestStore();
+  const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +100,7 @@ const Page = () => {
   const totalRooms = session?.rooms ? session.rooms.length : 0;
   const totalAdults = roomData ? roomData.adults * totalRooms : 0;
 
-  const handleRazorpayPayment = (orderId: string, amount: number, currency: string) => {
+  const handleRazorpayPayment = useCallback((orderId: string, amount: number, currency: string) => {
     if (!window.Razorpay) {
       setError('Payment gateway not loaded. Please refresh the page and try again.');
       return;
@@ -140,9 +142,12 @@ const Page = () => {
       console.error("Razorpay initialization error:", err);
       setError('Failed to initialize payment gateway. Please try again.');
     }
-  };
+  }, [guests, setError]);
 
-  const submitBooking = async () => {
+  // Define submitBooking as a useCallback that depends on session and other dependencies
+  const submitBooking = useCallback(async () => {
+    console.log("Submitting booking with session:", session);
+    
     if (!session || !params.id) {
       setError('Missing session data or booking reference');
       return;
@@ -177,10 +182,15 @@ const Page = () => {
           }))
       };
   
+      console.log("Room allocation payload:", roomAllocationPayload);
+  
       const roomAllocationResponse = await api.post(
         `/hotels/itineraries/${session.itineraryCode}/rooms-allocations`,
         roomAllocationPayload
       );
+
+      console.log("Room allocation response:", roomAllocationResponse.data);
+      
       //@ts-ignore can't be fixed will do later
       if (roomAllocationResponse.data.status !== 'success') {
         //@ts-ignore can't be fixed will do later
@@ -189,12 +199,14 @@ const Page = () => {
   
       // Step 2: Generate Order
       const orderResponse = await api.post(`/hotels/itineraries/${params.id}/order`);
-  //@ts-ignore can't be fixed will do later
+      console.log("Order response:", orderResponse.data);
+      
+      //@ts-ignore can't be fixed will do later
       if (orderResponse.data.status !== 'success') {
         //@ts-ignore can't be fixed will do later
         throw new Error(orderResponse.data.message || 'Failed to create order');
       }
-  //@ts-ignore can't be fixed will do later
+      //@ts-ignore can't be fixed will do later
       const orderData = orderResponse.data.data;
       const razorpayOrderId = orderData.id; // Extract Razorpay Order ID
   
@@ -206,13 +218,25 @@ const Page = () => {
       handleRazorpayPayment(razorpayOrderId, orderData.amount, orderData.currency);
   
     } catch (err: any) {
+      console.error("Booking submission error:", err);
       const errorMessage =
         err.response?.data?.message || err.message || 'An unexpected error occurred';
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [session, params.id, isRazorpayLoaded, guests, handleRazorpayPayment, setLoading, setError]);
+
+  // Update the bottom order store with the latest submitBooking function whenever it changes
+  useEffect(() => {
+    setButtonText('Pay Now');
+    setHandleCreateItinerary(submitBooking);
+    
+    if (session) {
+      setInfoTitle(`${session.hotelDetails?.name || 'Hotel'}`);
+      setInfoSubtitle(`${totalRooms} Room${totalRooms > 1 ? 's' : ''}, ${totalAdults} Adult${totalAdults > 1 ? 's' : ''}`);
+    }
+  }, [submitBooking, setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, session, totalRooms, totalAdults]);
 
   if (loading) {
     return (

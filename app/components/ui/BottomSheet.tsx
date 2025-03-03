@@ -72,7 +72,7 @@ const BottomSheet = ({
               minHeight: minHeight, 
               maxHeight: maxHeight 
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-100 rounded-t-[32px] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-100 rounded-t-[32px] flex flex-col w-full md:max-w-md"
           >
             {/* Drag Handle */}
             <div className="w-full flex justify-center pt-4 pb-2 flex-shrink-0">

@@ -51,6 +51,14 @@ const Page = () => {
     searchHotels();
   }, [itinerary.locationId, itinerary.checkIn, itinerary.checkOut]);
 
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center h-screen bg-[#F1F2F4] w-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
+
   return (
     <div className='flex flex-col items-start justify-start w-full overflow-scroll'>
         <div className='flex w-full sticky top-0 z-10'>
