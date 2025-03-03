@@ -30,6 +30,7 @@ const Page = () => {
 
   // Moved handleCreateItinerary function higher in the component
   const handleCreateItinerary = async () => {
+    setLoading(true);
     if (!itinerary.checkIn || !itinerary.checkOut) {
       alert('Please select check-in and check-out dates');
       return;
@@ -68,6 +69,7 @@ const Page = () => {
       alert('Failed to create itinerary. Please try again.');
     } finally {
       setIsCreating(false);
+      setLoading(false);
     }
   };
 

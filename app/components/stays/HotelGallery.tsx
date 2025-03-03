@@ -167,7 +167,7 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
                 e.stopPropagation()
                 closeModal()
               }}
-              className="p-2 rounded-full bg-black bg-opacity-50"
+              className="p-2 rounded-full bg-black bg-opacity-50 z-10"
             >
               <X size={20} />
             </button>
