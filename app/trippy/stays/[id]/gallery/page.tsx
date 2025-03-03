@@ -42,8 +42,8 @@ const Page = () => {
     console.log('Processed image URLs:', allImages);
     
     return (
-        <div className='relative flex flex-col w-full max-h-screen items-center justify-center bg-[#F1F2F4]'>
-            <div className='flex flex-col items-center justify-center w-full'>
+        <div className='relative flex flex-col w-full min-h-screen max-h-screen items-center justify-center bg-[#F1F2F4]'>
+            <div className='flex flex-col items-center justify-center w-full h-full'>
             <HotelGallery images={allImages} />
             </div>
         </div>
