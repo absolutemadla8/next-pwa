@@ -115,7 +115,7 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
         </div>
         
         {/* Smaller thumbnails */}
-        {images.slice(1).map((image, index) => (
+        {images.slice(1, 8).map((image, index) => (
           <div 
             key={index}
             className="aspect-square rounded-lg overflow-hidden cursor-pointer"
@@ -167,7 +167,7 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
                 e.stopPropagation()
                 closeModal()
               }}
-              className="p-2 rounded-full bg-black bg-opacity-50 z-10"
+              className="p-2 rounded-full bg-black bg-opacity-50"
             >
               <X size={20} />
             </button>
