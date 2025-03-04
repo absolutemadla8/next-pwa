@@ -250,16 +250,14 @@ export const useItineraryStore = create<ItineraryStore>()(
       name: 'itinerary-storage',
       storage: createJSONStorage(() => customStorage),
       partialize: (state) => {
-        // Exclude rooms and recommendationId from persistence
+        // Include all data including rooms for persistence
         const { itinerary } = state;
-        const { rooms, recommendationId, ...persistedItineraryData } = itinerary;
         
         return {
           itinerary: {
-            ...persistedItineraryData,
-            // Keep empty arrays for rooms and null for recommendationId
-            rooms: [],
-            recommendationId: null,
+            ...itinerary,
+            // Keep recommendationId (might be needed for API calls)
+            recommendationId: itinerary.recommendationId,
           }
         };
       },
@@ -272,6 +270,11 @@ export const useItineraryStore = create<ItineraryStore>()(
           }
           if (state.itinerary.checkOut && typeof state.itinerary.checkOut === 'string') {
             state.itinerary.checkOut = new Date(state.itinerary.checkOut);
+          }
+          
+          // Make sure rooms array exists
+          if (!state.itinerary.rooms) {
+            state.itinerary.rooms = [];
           }
         }
       }

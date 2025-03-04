@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -12,6 +12,10 @@ import CalendarList from '../components/ui/CalendarList';
 import SearchComponent from '../components/ui/Search';
 import useBottomSheetStore from '../store/bottomSheetStore';
 import RoomConfiguration from '../components/ui/RoomConfiguration';
+import ErrorSheet from '../components/ui/ErrorSheet';
+import PassportExpiryPicker from '../components/ui/PassportExpiryPicker';
+import AmenitiesBottomSheet from '../components/stays/AmenitiesBottomSheet';
+import PoliciesBottomSheet from '../components/stays/PoliciesBottomSheet';
 import useItineraryStore from '../store/itineraryStore';
 import BottomNavigation from '../components/trippy/BottomNavigation';
 import { IconBubbleText, IconBuildings, IconSparkles, IconUserCircle } from '@tabler/icons-react';
@@ -25,6 +29,55 @@ export default function TrippyLayout({
   const pathname = usePathname();
   const { activeSheet, openSheet, closeSheet, sheetConfig } = useBottomSheetStore();
   const {itinerary, increaseAdultsInRoom, decreaseAdultsInRoom, addChildToRoom, addRoomToItinerary, removeChildFromRoom, removeRoomFromItinerary, setDates} = useItineraryStore();
+  
+  // State for passport expiry date picker
+  const [currentGuestIndex, setCurrentGuestIndex] = React.useState<number>(0);
+  const [onPassportExpirySelect, setOnPassportExpirySelect] = React.useState<(date: string) => void>(() => () => {});
+  
+  // Function to set up passport expiry date selection
+  React.useEffect(() => {
+    // Expose a function for components to set up passport expiry date selection
+    (window as any).setupPassportExpirySelection = (index: number, callback: (date: string) => void) => {
+      setCurrentGuestIndex(index);
+      setOnPassportExpirySelect(() => callback);
+    };
+    
+    return () => {
+      delete (window as any).setupPassportExpirySelection;
+    };
+  }, []);
+  
+  // Popular dates configuration
+  const popularDates = useMemo(() => [
+    {
+      id: 1,
+      name: "Upcoming Weekend",
+      description: "Weekend Getaway",
+      startDate: new Date(new Date().setDate(new Date().getDate() + (5 - new Date().getDay()) % 7 + 1)), // Next Friday
+      endDate: new Date(new Date().setDate(new Date().getDate() + (7 - new Date().getDay()) % 7 + 1))    // Next Sunday
+    },
+    {
+      id: 2,
+      name: "Week-long Stay",
+      description: "Perfect for 7 nights",
+      startDate: new Date(new Date().setDate(new Date().getDate() + 14)), // 2 weeks from now
+      endDate: new Date(new Date().setDate(new Date().getDate() + 21))    // 3 weeks from now
+    },
+    {
+      id: 3,
+      name: "Summer Vacation",
+      description: "Beat the heat",
+      startDate: new Date(new Date().getFullYear(), 5, 15), // June 15
+      endDate: new Date(new Date().getFullYear(), 5, 25)    // June 25
+    }
+  ], []);
+  
+  // Handle popular date selection
+  const handlePopularDateSelect = (startDate: Date, endDate: Date) => {
+    setDates(startDate, endDate);
+    // Close the bottom sheet after selection for better UX
+    closeSheet();
+  };
   
   // Navigation items
   const navigationItems: any[] = [
@@ -90,17 +143,32 @@ export default function TrippyLayout({
         <div className='flex flex-col w-full'>
           <div className='flex flex-col items-start justify-start bg-blue-600 mb-4'>
             <h2 className='text-white font-normal text-md pt-3 px-6 tracking-tight'>Popular Dates</h2>
-            <HorizontalScroll className='pt-2'>
-              <DateRangeEvent
-                dateRange="March 22 - March 28"
-                eventDescription="Long Weekend"
-              />
+            <HorizontalScroll className='pt-2 pb-4'>
+              {popularDates.map(date => {
+                // Format the dates for display
+                const startStr = date.startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const endStr = date.endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                return (
+                  <DateRangeEvent
+                    key={date.id}
+                    dateRange={`${startStr} - ${endStr}`}
+                    eventDescription={date.description}
+                    startDate={date.startDate}
+                    endDate={date.endDate}
+                    onClick={handlePopularDateSelect}
+                  />
+                );
+              })}
             </HorizontalScroll>
           </div>
           <CalendarList
             mode="range"
-            minDate={new Date(2025, 1, 1)}
-            maxDate={new Date(2025, 11, 31)}
+            minDate={new Date()} // Set min date to today
+            maxDate={new Date(new Date().getFullYear() + 1, 11, 31)} // Set max date to end of next year
+            initialSelectedDates={itinerary.checkIn && itinerary.checkOut ? 
+              [itinerary.checkIn, itinerary.checkOut] : 
+              []}
             onChange={(dates) => {
                 try {
                 if (dates.length === 2) {
@@ -154,6 +222,57 @@ export default function TrippyLayout({
          itinerary={itinerary}
          />
         </div>
+      </BottomSheet>
+      
+      {/* Error Bottom Sheet */}
+      <BottomSheet
+        isOpen={activeSheet === 'error'}
+        onClose={closeSheet}
+        title={sheetConfig.title}
+        minHeight={sheetConfig.minHeight}
+        maxHeight={sheetConfig.maxHeight}
+        showPin={sheetConfig.showPin}
+      >
+        <ErrorSheet />
+      </BottomSheet>
+      
+      {/* Passport Expiry Date Bottom Sheet */}
+      <BottomSheet
+        isOpen={activeSheet === 'passportExpiry'}
+        onClose={closeSheet}
+        title={sheetConfig.title}
+        minHeight={sheetConfig.minHeight}
+        maxHeight={sheetConfig.maxHeight}
+        showPin={sheetConfig.showPin}
+      >
+        <PassportExpiryPicker
+          guestIndex={currentGuestIndex}
+          onDateSelect={onPassportExpirySelect}
+        />
+      </BottomSheet>
+      
+      {/* Amenities Bottom Sheet */}
+      <BottomSheet
+        isOpen={activeSheet === 'amenities'}
+        onClose={closeSheet}
+        title={sheetConfig.title}
+        minHeight={sheetConfig.minHeight}
+        maxHeight={sheetConfig.maxHeight}
+        showPin={sheetConfig.showPin}
+      >
+        <AmenitiesBottomSheet />
+      </BottomSheet>
+      
+      {/* Policies Bottom Sheet */}
+      <BottomSheet
+        isOpen={activeSheet === 'policies'}
+        onClose={closeSheet}
+        title={sheetConfig.title}
+        minHeight={sheetConfig.minHeight}
+        maxHeight={sheetConfig.maxHeight}
+        showPin={sheetConfig.showPin}
+      >
+        <PoliciesBottomSheet />
       </BottomSheet>
     </div>
   );

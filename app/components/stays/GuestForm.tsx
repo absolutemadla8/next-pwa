@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption, RadioGroup, Field, Radio, Label } from '@headlessui/react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Calendar, AlertTriangle } from 'lucide-react';
+import useBottomSheetStore from '@/app/store/bottomSheetStore';
+import { 
+  validateGuestForm, 
+  separatePhoneNumber, 
+  GuestFormErrors 
+} from '@/app/schemas/guestFormSchema';
 
 // Type definitions
 interface Guest {
@@ -21,6 +27,7 @@ interface GuestFormProps {
   isPanCardRequired: boolean;
   isPassportRequired: boolean;
   updateGuest: (index: number, updatedGuest: Partial<Guest>) => void;
+  onValidationChange?: (index: number, isValid: boolean) => void;
 }
 
 const countryCodeOptions = [
@@ -34,9 +41,14 @@ const GuestForm: React.FC<GuestFormProps> = ({
   index, 
   isPanCardRequired, 
   isPassportRequired, 
-  updateGuest 
+  updateGuest,
+  onValidationChange
 }) => {
   const titleOptions = ['Mr', 'Mrs', 'Ms'];
+  const { openSheet } = useBottomSheetStore();
+  const [errors, setErrors] = useState<GuestFormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isValid, setIsValid] = useState<boolean>(false);
   
   // Initialize default guest if undefined
   const safeGuest: Guest = guest || {
@@ -49,6 +61,96 @@ const GuestForm: React.FC<GuestFormProps> = ({
     panCardNumber: null,
     passportNumber: null,
     passportExpiry: null
+  };
+  
+  // Validate the form whenever the guest data changes
+  useEffect(() => {
+    //@ts-ignore mlmr
+    const result = validateGuestForm(safeGuest, isPanCardRequired, isPassportRequired);
+    
+    if (!result.success && result.errors) {
+      setErrors(result.errors);
+      setIsValid(false);
+    } else {
+      setErrors({});
+      setIsValid(true);
+    }
+    
+    // Report validation status to parent
+    if (onValidationChange) {
+      onValidationChange(index, result.success);
+    }
+    
+  }, [safeGuest, isPanCardRequired, isPassportRequired, index, onValidationChange]);
+  
+  // Handle field blur for validation
+  const handleBlur = (field: keyof Guest) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+  
+  // Handle phone number input with automatic country code separation
+  const handlePhoneInput = (value: string) => {
+    // If the value starts with +, attempt to separate country code
+    if (value.startsWith('+')) {
+      const { isdCode, contactNumber, isValid } = separatePhoneNumber(value);
+      
+      if (isValid) {
+        // Valid ISD code, update both fields
+        updateGuest(index, { 
+          isdCode,
+          contactNumber 
+        });
+      } else {
+        // Invalid ISD code, just update the field but don't separate
+        updateGuest(index, { contactNumber: value });
+        
+        // Show an error for invalid ISD code
+        setErrors(prev => ({
+          ...prev,
+          contactNumber: 'Invalid country code. Please use +1, +44, or +91'
+        }));
+      }
+    } else {
+      // Regular update without separation
+      updateGuest(index, { contactNumber: value });
+    }
+    
+    setTouched(prev => ({ ...prev, contactNumber: true }));
+  };
+  
+  // Function to open passport expiry date picker
+  const openPassportExpiryPicker = () => {
+    // Set up the date selection callback
+    if (typeof window !== 'undefined' && (window as any).setupPassportExpirySelection) {
+      (window as any).setupPassportExpirySelection(
+        index,
+        (date: string) => {
+          updateGuest(index, { passportExpiry: date });
+          setTouched(prev => ({ ...prev, passportExpiry: true }));
+        }
+      );
+    }
+    
+    // Open the bottom sheet
+    openSheet('passportExpiry', {
+      title: 'Passport Expiry Date',
+      minHeight: '70vh',
+      maxHeight: '90vh',
+      showPin: false
+    });
+  };
+  
+  // Helper to render error message
+  const renderError = (field: keyof Guest) => {
+    if (touched[field] && errors[field]) {
+      return (
+        <div className="text-red-500 text-xs mt-1 flex items-center">
+          <AlertTriangle className="h-3 w-3 mr-1" />
+          {errors[field]}
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -88,8 +190,12 @@ const GuestForm: React.FC<GuestFormProps> = ({
             placeholder="First Name"
             value={safeGuest.firstName || ''}
             onChange={(e) => updateGuest(index, { firstName: e.target.value })}
-            className="w-full text-md font-normal px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onBlur={() => handleBlur('firstName')}
+            className={`w-full text-md font-normal px-4 py-3 bg-gray-50 border ${
+              touched.firstName && errors.firstName ? 'border-red-500' : 'border-gray-200'
+            } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
+          {renderError('firstName')}
         </div>
         
         <div>
@@ -99,29 +205,48 @@ const GuestForm: React.FC<GuestFormProps> = ({
             placeholder="Last Name"
             value={safeGuest.lastName || ''}
             onChange={(e) => updateGuest(index, { lastName: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onBlur={() => handleBlur('lastName')}
+            className={`w-full px-4 py-3 bg-gray-50 border ${
+              touched.lastName && errors.lastName ? 'border-red-500' : 'border-gray-200'
+            } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
+          {renderError('lastName')}
         </div>
       </div>
 
       {/* Email Field */}
       <div className="mb-4">
         <input
-        style={{ fontFamily: 'var(--font-nohemi)' }}
+          style={{ fontFamily: 'var(--font-nohemi)' }}
           type="email"
           placeholder="Email Address"
           value={safeGuest.email || ''}
           onChange={(e) => updateGuest(index, { email: e.target.value })}
-          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          onBlur={() => handleBlur('email')}
+          className={`w-full px-4 py-3 bg-gray-50 border ${
+            touched.email && errors.email ? 'border-red-500' : 'border-gray-200'
+          } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
         />
+        {renderError('email')}
       </div>
 
       {/* Phone Fields */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div>
-          <Listbox value={safeGuest.isdCode || '91'} onChange={(value) => updateGuest(index, { isdCode: value })}>
+          <Listbox 
+            value={safeGuest.isdCode || '91'} 
+            onChange={(value) => {
+              updateGuest(index, { isdCode: value });
+              setTouched(prev => ({ ...prev, isdCode: true }));
+            }}
+          >
             <div className="relative">
-              <ListboxButton style={{ fontFamily: 'var(--font-nohemi)' }} className="relative w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 text-left">
+              <ListboxButton 
+                style={{ fontFamily: 'var(--font-nohemi)' }} 
+                className={`relative w-full px-4 py-3 bg-gray-50 border ${
+                  touched.isdCode && errors.isdCode ? 'border-red-500' : 'border-gray-200'
+                } rounded-lg text-gray-800 text-left`}
+              >
                 {safeGuest.isdCode ? `+${safeGuest.isdCode}` : '+91'}
               </ListboxButton>
               <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -143,17 +268,22 @@ const GuestForm: React.FC<GuestFormProps> = ({
               </ListboxOptions>
             </div>
           </Listbox>
+          {renderError('isdCode')}
         </div>
         
         <div className="col-span-2">
           <input
-          style={{ fontFamily: 'var(--font-nohemi)' }}
+            style={{ fontFamily: 'var(--font-nohemi)' }}
             type="tel"
-            placeholder="Phone Number"
+            placeholder="Phone Number (e.g. +91 98765 43210)"
             value={safeGuest.contactNumber || ''}
-            onChange={(e) => updateGuest(index, { contactNumber: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={(e) => handlePhoneInput(e.target.value)}
+            onBlur={() => handleBlur('contactNumber')}
+            className={`w-full px-4 py-3 bg-gray-50 border ${
+              touched.contactNumber && errors.contactNumber ? 'border-red-500' : 'border-gray-200'
+            } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
           />
+          {renderError('contactNumber')}
         </div>
       </div>
 
@@ -166,14 +296,23 @@ const GuestForm: React.FC<GuestFormProps> = ({
               PAN Card is required for this booking
             </span>
           </div>
-          <input
-          style={{ fontFamily: 'var(--font-nohemi)' }}
-            type="text"
-            placeholder="PAN Number"
-            value={safeGuest.panCardNumber || ''}
-            onChange={(e) => updateGuest(index, { panCardNumber: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+          <div>
+            <input
+              style={{ fontFamily: 'var(--font-nohemi)' }}
+              type="text"
+              placeholder="PAN Number (e.g. ABCDE1234F)"
+              value={safeGuest.panCardNumber || ''}
+              onChange={(e) => updateGuest(index, { panCardNumber: e.target.value.toUpperCase() })}
+              onBlur={() => handleBlur('panCardNumber')}
+              className={`w-full px-4 py-3 bg-gray-50 border ${
+                touched.panCardNumber && errors.panCardNumber ? 'border-red-500' : 'border-gray-200'
+              } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            />
+            {renderError('panCardNumber')}
+            <span className="text-gray-500 text-xs mt-1">
+              Format: 5 letters, 4 digits, 1 letter (e.g. ABCDE1234F)
+            </span>
+          </div>
         </div>
       )}
 
@@ -190,24 +329,43 @@ const GuestForm: React.FC<GuestFormProps> = ({
           <div className="grid grid-cols-1 gap-4">
             <div>
               <input
-              style={{ fontFamily: 'var(--font-nohemi)' }}
+                style={{ fontFamily: 'var(--font-nohemi)' }}
                 type="text"
-                placeholder="Passport Number"
+                placeholder="Passport Number (min 4 characters)"
                 value={safeGuest.passportNumber || ''}
                 onChange={(e) => updateGuest(index, { passportNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onBlur={() => handleBlur('passportNumber')}
+                className={`w-full px-4 py-3 bg-gray-50 border ${
+                  touched.passportNumber && errors.passportNumber ? 'border-red-500' : 'border-gray-200'
+                } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               />
+              {renderError('passportNumber')}
             </div>
             
             <div>
-              <input
-              style={{ fontFamily: 'var(--font-nohemi)' }}
-                type="text"
-                placeholder="Expiry Date (YYYY-MM-DD)"
-                value={safeGuest.passportExpiry || ''}
-                onChange={(e) => updateGuest(index, { passportExpiry: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="relative">
+                <input
+                  style={{ fontFamily: 'var(--font-nohemi)' }}
+                  type="text"
+                  placeholder="Expiry Date (YYYY-MM-DD)"
+                  value={safeGuest.passportExpiry || ''}
+                  onChange={(e) => updateGuest(index, { passportExpiry: e.target.value })}
+                  onBlur={() => handleBlur('passportExpiry')}
+                  className={`w-full px-4 py-3 bg-gray-50 border ${
+                    touched.passportExpiry && errors.passportExpiry ? 'border-red-500' : 'border-gray-200'
+                  } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10`}
+                  readOnly
+                  onClick={openPassportExpiryPicker}
+                />
+                <button 
+                  type="button"
+                  onClick={openPassportExpiryPicker}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-blue-600"
+                >
+                  <Calendar className="h-5 w-5" />
+                </button>
+                {renderError('passportExpiry')}
+              </div>
             </div>
           </div>
         </div>

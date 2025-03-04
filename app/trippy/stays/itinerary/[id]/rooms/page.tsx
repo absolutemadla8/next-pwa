@@ -30,15 +30,18 @@ const Page = () => {
   ) => {
     console.log("Room selected:", roomId, rateId, recommendationId, price);
     
-    // Update room details in store
-    itinerary.rooms.forEach(room => {
-      setRoomDetails(room.id, { rateId, roomId, price });
-      setRecommendationId(recommendationId);
-    });
-    
-    // Update total price
-    const totalPrice = getTotalPrice();
-    setSelectedPrice(price*itinerary.rooms.length);
+    // Check if we're actually changing the rate to avoid unnecessary updates
+    if (itinerary.rooms[0]?.rateId !== rateId) {
+      // Update room details in store
+      itinerary.rooms.forEach(room => {
+        setRoomDetails(room.id, { rateId, roomId, price });
+        setRecommendationId(recommendationId);
+      });
+      
+      // Update total price
+      const totalPrice = getTotalPrice();
+      setSelectedPrice(price * itinerary.rooms.length);
+    }
     
     // If bookNow is true, proceed with booking process
     if (bookNow) {
@@ -82,19 +85,37 @@ const Page = () => {
     }
   };
 
+  // Update the bottom order bar price whenever selectedPrice or itinerary changes
   React.useEffect(() => {
+    const currentTotalPrice = getTotalPrice();
+    
     // Set up bottom order bar with the combined function
     setButtonText('Book now');
     setHandleCreateItinerary(() => handleRoomSelectAndBook(
       itinerary.rooms[0]?.roomId || '',
       itinerary.rooms[0]?.rateId || '',
       itinerary.recommendationId || '',
-      getTotalPrice(),
+      currentTotalPrice,
       true // Pass true to initiate booking
     ));
     setInfoTitle('inclusive of all taxes');
-    setInfoSubtitle(`Rs.${getTotalPrice()}` || 'Guests not Selected');
-  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice])
+    setInfoSubtitle(`Rs.${currentTotalPrice.toLocaleString()} total` || 'Guests not Selected');
+    
+    // Log prices for debugging
+    console.log('Price updated:', {
+      totalPrice: currentTotalPrice,
+      selectedPrice: selectedPrice,
+      roomPrice: itinerary.rooms[0]?.price
+    });
+  }, [
+    setButtonText, 
+    setHandleCreateItinerary, 
+    setInfoSubtitle, 
+    setInfoTitle, 
+    itinerary.rooms[0]?.rateId, 
+    itinerary.rooms[0]?.roomId,
+    itinerary.recommendationId
+  ])
 
   if (loading) {
     return (

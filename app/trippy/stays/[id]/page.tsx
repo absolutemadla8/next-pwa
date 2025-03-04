@@ -16,6 +16,7 @@ import { useRoomStore } from '@/app/store/roomRateStore'
 import { useHotelStore } from '@/app/store/hotelsSearchStore'
 import { formatDate } from '@/app/lib/utils'
 import useBottomOrderStore from '@/app/store/bottomOrderStore'
+import useBottomSheetStore from '@/app/store/bottomSheetStore'
 
 const Page = () => {
   const router = useRouter();
@@ -24,6 +25,7 @@ const Page = () => {
   const { itinerary, getOccupancies, getTotalAdults, getTotalChildren, getTotalRooms } = useItineraryStore();
   const {setRooms, setItineraryId, setType, setTraceId} = useRoomStore();
   const {hotel, setHotel} = useHotelStore();
+  const { openSheet } = useBottomSheetStore();
   const [isCreating, setIsCreating] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -113,7 +115,7 @@ const Page = () => {
   }
 
   return (
-    <div className='relative flex flex-col w-full min-h-screen items-center justify-center bg-[#F1F2F4] overflow-scroll'>
+    <div className='relative flex flex-col w-full min-h-screen max-h-screen items-center justify-center bg-[#F1F2F4] overflow-scroll'>
         <div className="flex flex-col items-center justify-start h-full w-full pb-32">
             <div className='sticky top-0 flex flex-col items-start justify-start w-full h-64'>
             <img src={hotel.heroImage} className='h-64 w-full transition-all delay-150 duration-300 ease-in-out' />
@@ -216,9 +218,18 @@ const Page = () => {
                             ))}
                         </div>
                         <div className='flex flex-col items-center justify-center w-full'>
-<AnimatedButton size='sm' variant="bland">
-             View All Amenities
-          </AnimatedButton>
+<AnimatedButton 
+  size='sm' 
+  variant="bland"
+  onClick={() => openSheet('amenities', { 
+    title: 'All Amenities', 
+    minHeight: '70vh', 
+    maxHeight: '90vh',
+    showPin: false
+  })}
+>
+  View All Amenities
+</AnimatedButton>
           </div>
                 </div>
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
@@ -257,39 +268,24 @@ const Page = () => {
     </p>
 </div>
 <div className='flex flex-col items-center justify-center w-full'>
-<AnimatedButton size='sm' variant="bland">
-             View All Policies
-          </AnimatedButton>
+    <AnimatedButton 
+        size='sm' 
+        variant="bland"
+        onClick={() => openSheet('policies', { 
+            title: 'Hotel Policies', 
+            minHeight: '70vh', 
+            maxHeight: '90vh',
+            showPin: false
+        })}
+    >
+        View All Policies
+    </AnimatedButton>
+</div>
           </div>
+          <div className='h-20' />
                 </div>
-                <div className='py-6' />
             </div>
         </div>
-        {/* <div className='fixed bottom-0 left-0 right-0 flex flex-col items-center justify-start w-full bg-gradient-to-t from-white via-white to-transparent p-4 z-20'>
-            <div className='flex flex-col items-center justify-center rounded-lg overflow-hidden bg-blue-600 w-full max-w-screen-xl mx-auto'>
-                <div className='flex flex-row items-center justify-between w-full px-3 py-2 bg-blue-700'>
-                </div>
-                <div className='flex flex-row items-center justify-between w-full px-3 py-2'>
-                  <div className='flex flex-col items-start justify-start'>
-                  <h2 style={{ fontFamily: 'var(--font-nohemi)' }}>
-                    {getTotalAdults() + getTotalChildren()} Guests, {getTotalRooms()} Room
-                  </h2>
-                  <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-white text-xs font-normal tracking-tight'>
-                {itinerary.checkIn ? formatDate(itinerary.checkIn) : 'No date selected'} - {itinerary.checkOut ? formatDate(itinerary.checkOut) : 'No date selected'}
-                        </span>
-                  </div>
-            <AnimatedButton 
-              onClick={handleCreateItinerary} 
-              size='md' 
-              variant="bland"
-              disabled={isCreating}
-            >
-                {isCreating ? 'Creating...' : 'Select Rooms'}
-            </AnimatedButton>
-                </div>
-            </div>
-        </div> */}
-   </div>
   )
 }
 

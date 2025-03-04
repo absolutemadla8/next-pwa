@@ -3,6 +3,7 @@ import { useItineraryStore } from '@/app/store/itineraryStore';
 import { Bed, MapPin, Plane, Train, Building } from 'lucide-react';
 import axios from 'axios';
 import { api } from '@/app/lib/axios';
+import useBottomSheetStore from '@/app/store/bottomSheetStore';
 
 interface SearchResult {
   id: number;
@@ -22,6 +23,7 @@ export default function LocationSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const { setLocationDetails } = useItineraryStore();
+  const { closeSheet } = useBottomSheetStore();
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -73,6 +75,9 @@ export default function LocationSearch() {
       hotelId: item.referenceId ? Number(item.referenceId) : null,
     });
     setKeyword('');
+    
+    // Close the bottom sheet after selection
+    closeSheet();
   };
 
   return (

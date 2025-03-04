@@ -83,10 +83,22 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
     const alternateRate = rates.find(rate => rate.refundable === targetRefundable);
     
     if (alternateRate) {
+      // Update the selected rate ID
       setSelectedRateIds({
         ...selectedRateIds,
         [boardType]: alternateRate.rateId
       });
+      
+      // Only call onBookNow if this is the rate that's currently selected in the itinerary
+      // or if we don't have a selected rate yet
+      if (itinerary.rooms[0]?.rateId === currentRate.rateId || !itinerary.rooms[0]?.rateId) {
+        onBookNow(
+          room.id,
+          alternateRate.rateId,
+          alternateRate.recommendationId,
+          alternateRate.finalRate
+        );
+      }
     }
   };
 
@@ -123,7 +135,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
       
       return xxlImage ? xxlImage.url : (standardImage ? standardImage.url : '/placeholder-room.jpg');
     }
-    return '/placeholder-room.jpg';
+    return "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png";
   };
 
   // Check if both refundable and non-refundable options exist for a specific board type
@@ -167,7 +179,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
               </span>
             </div>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full'>
+          <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full lowercase'>
             {room.type}
           </h1>
           <span className='text-xs text-slate-600 font-normal tracking-tight line-clamp-6'>
@@ -185,9 +197,9 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
         if (!selectedRate) return null;
         
         return (
-          <div key={boardType} className='flex flex-col items-start justify-start w-full bg-white rounded-xl overflow-hidden p-4 border-2 border-blue-600'>
+          <div key={boardType} className='flex flex-col items-start justify-start w-full bg-white overflow-hidden p-4 border-t border-slate-300'>
             {/* Board Type Header */}
-            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full'>
+            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full lowercase'>
               {selectedRate.boardBasis.description}
             </h1>
             
@@ -203,11 +215,11 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
                 </Switch>
                 <div className='flex flex-row items-center justify-start gap-x-1'>
                   <span className='text-xs text-slate-700 font-normal tracking-tight truncate'>
-                    {selectedRate.refundable ? 'Free cancellation till' : 'Non-refundable'}
+                  Free cancellation
                   </span>
                   {selectedRate.refundable && (
                     <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-xs text-green-600 font-normal tracking-tight truncate mt-[1px]'>
-                      {getCancellationDate(selectedRate)}
+                      till {getCancellationDate(selectedRate)}
                     </span>
                   )}
                 </div>

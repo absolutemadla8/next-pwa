@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 
 // Define all possible bottom sheet IDs
-type BottomSheetId = 'dateRange' | 'search' | 'roomConfig' | null;
+type BottomSheetId = 'dateRange' | 'search' | 'roomConfig' | 'error' | 'passportExpiry' | 'amenities' | 'policies' | null;
 
 // Define configuration options for bottom sheets
 interface SheetConfig {
@@ -12,6 +12,13 @@ interface SheetConfig {
   minHeight: string;
   maxHeight: string;
   showPin: boolean;
+}
+
+// Interface for error data
+interface ErrorData {
+  message: string;
+  details?: string;
+  code?: string | number;
 }
 
 // Define the state and actions for the bottom sheet store
@@ -22,15 +29,20 @@ interface BottomSheetState {
   // Sheet configuration options
   sheetConfig: SheetConfig;
   
+  // Error data for error sheet
+  errorData: ErrorData | null;
+  
   // Sheet methods
   openSheet: (id: BottomSheetId, config?: Partial<SheetConfig>) => void;
   closeSheet: () => void;
   toggleSheet: (id: BottomSheetId, config?: Partial<SheetConfig>) => void;
+  showError: (error: ErrorData) => void;
 }
 
 const useBottomSheetStore = create<BottomSheetState>((set) => ({
   // Initial state
   activeSheet: null,
+  errorData: null,
   
   // Default sheet configuration
   sheetConfig: {
@@ -60,6 +72,18 @@ const useBottomSheetStore = create<BottomSheetState>((set) => ({
       ...config
     }
   })),
+  
+  // Show error sheet with error data
+  showError: (error) => set({
+    activeSheet: 'error',
+    errorData: error,
+    sheetConfig: {
+      title: 'Error',
+      minHeight: '30vh',
+      maxHeight: '50vh',
+      showPin: false
+    }
+  }),
 }));
 
 export default useBottomSheetStore;

@@ -33,6 +33,20 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+// Import the bottom sheet store for error handling
+// We need to import it dynamically to avoid Next.js SSR issues
+import { useEffect, useRef } from 'react';
+let useBottomSheetStore: any = null;
+
+// Dynamic import function for the store
+const getBottomSheetStore = async () => {
+  if (typeof window !== 'undefined' && !useBottomSheetStore) {
+    const importedModule = await import('../store/bottomSheetStore');
+    useBottomSheetStore = importedModule.default;
+  }
+  return useBottomSheetStore;
+};
+
 // Response interceptor for handling common errors
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -48,6 +62,24 @@ axiosInstance.interceptors.response.use(
       // Redirect to login if on client side
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
+      }
+    }
+    
+    // Show error bottom sheet for all API errors
+    if (typeof window !== 'undefined') {
+      try {
+        const bottomSheetStore = await getBottomSheetStore();
+        if (bottomSheetStore) {
+          const errorData = {
+            message: error.response?.data?.message || error.message || 'An error occurred',
+            details: error.response?.data?.details || error.response?.data?.error || '',
+            code: error.response?.status || error.code || ''
+          };
+          
+          bottomSheetStore.showError(errorData);
+        }
+      } catch (e) {
+        console.error('Failed to show error bottom sheet:', e);
       }
     }
     
