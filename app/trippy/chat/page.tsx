@@ -42,14 +42,17 @@ const Page = () => {
   };
 
   return (
-    <div className="container">
+    <div className="flex flex-col min-h-screen max-h-screen items-center justify-center w-full">
       <form onSubmit={handleSubmit}>
-        <div className="relative">
+        <div className="relative flex flex-col w-[90vw]">
+        <div className="flex flex-col items-center justify-center w-full p-4">
+      <img src="https://often-public-assets.blr1.cdn.digitaloceanspaces.com/Group%20482081.png" className="h-44 w-44 object-contain" />
+      </div>
           <textarea
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             placeholder="Ask about your trip..."
-            className="w-full h-32 p-4 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none shadow-sm text-blue-950"
+            className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none shadow-sm text-blue-950"
             disabled={loading}
           />
           <button
