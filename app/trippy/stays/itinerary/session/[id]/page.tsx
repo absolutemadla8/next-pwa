@@ -223,8 +223,8 @@ const Page = () => {
     setButtonText('Book now');
     setHandleCreateItinerary(submitBooking);
     setInfoTitle('inclusive of all taxes');
-    setInfoSubtitle(`Rs.${getTotalPrice()} total` || 'Guests not Selected');
-  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice])
+    setInfoSubtitle(`₹${session?.finalRate ? session.finalRate : 0} total` || 'Guests not Selected');
+  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, session])
 
   if (loading) {
     return (

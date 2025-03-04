@@ -44,7 +44,7 @@ interface ItineraryStore {
   getTotalAdults: () => number; // Get total number of adults across all rooms
   getTotalChildren: () => number; // Get total number of children across all rooms
   getTotalRooms: () => number; // Get total number of rooms
-  getOccupancies: () => { numOfAdults: number; childAges: number[]; rateId: string | null; roomId: string | null; }[]; // Get occupancy data for all rooms
+  getOccupancies: () => { numOfAdults: number; childAges: number[]; }[]; // Get occupancy data for all rooms
   getNumberOfNights: () => number; // Get number of nights between check-in and check-out dates
   getTotalPrice: () => number; // Get total price across all rooms
 }

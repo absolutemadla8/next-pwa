@@ -38,7 +38,7 @@ const Page = () => {
     
     // Update total price
     const totalPrice = getTotalPrice();
-    setSelectedPrice(totalPrice);
+    setSelectedPrice(price*itinerary.rooms.length);
     
     // If bookNow is true, proceed with booking process
     if (bookNow) {

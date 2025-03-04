@@ -44,7 +44,7 @@ const Page = () => {
         checkOut: itinerary.checkOut.toISOString().split('T')[0],
         nationality: 'IN',
         hotelId: params.id as string,
-        occupancies: getOccupancies()
+        occupancies: getOccupancies(),
       };
 
       const response = await api.post('/hotels/itineraries/create', payload);

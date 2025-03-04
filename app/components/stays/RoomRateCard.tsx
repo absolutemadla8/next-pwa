@@ -237,7 +237,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
                   Rs.{selectedRate.finalRate.toLocaleString()}
                 </h1>
                 <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
-                  room per night
+                  total per room
                 </span>
               </div>
               <span className='text-xs text-teal-600 font-normal tracking-tight truncate'>
