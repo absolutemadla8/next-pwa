@@ -12,11 +12,15 @@ import AnimatedButton from '@/app/components/ui/AnimatedButton'
 import { RoomAllocationPayload } from '@/app/types/roomAllocation'
 import Script from 'next/script'
 import { formatDate } from '@/app/lib/utils'
+import useItineraryStore from '@/app/store/itineraryStore'
+import useBottomOrderStore from '@/app/store/bottomOrderStore'
 
 const Page = () => {
   const params = useParams();
   const {hotel} = useHotelStore();
   const { setGuests, guests, updateGuest, hasChanged, setInitialGuests, resetChanges } = useGuestStore();
+    const {itinerary, setRecommendationId, setRoomDetails, getTotalPrice} = useItineraryStore();
+    const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -214,9 +218,17 @@ const Page = () => {
     }
   };
 
+  React.useEffect(() => {
+    // Set up bottom order bar with the combined function
+    setButtonText('Book now');
+    setHandleCreateItinerary(submitBooking);
+    setInfoTitle('inclusive of all taxes');
+    setInfoSubtitle(`Rs.${getTotalPrice()} total` || 'Guests not Selected');
+  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice])
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#F1F2F4]">
+      <div className="flex items-center justify-center min-h-screen w-full bg-[#F1F2F4]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -418,8 +430,8 @@ const Page = () => {
                         </span>
                     </div>
                 </div>
+                <div className='h-20' />
             </div>
-            <div className='pb-10' />
         </div>
    </div>
   )
