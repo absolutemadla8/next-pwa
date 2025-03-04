@@ -10,6 +10,8 @@ import { BotIcon, UserIcon } from "./icons";
 import { SearchLocationResults } from "./SearchLocationResults";
 import { HotelsList } from "./HotelsList";
 import { RoomRates } from "./RoomRates";
+import AnimatedButton from "../ui/AnimatedButton";
+import { SessionCheckout } from "./SessionCheckout";
 
 export const Message = ({
   chatId,
@@ -65,6 +67,9 @@ export const Message = ({
                       <RoomRates results={result} chatId={chatId} />
                     )
                     :
+                    toolName === "selectRoomRate"? (
+                      <SessionCheckout results={result} chatId={chatId} />
+                    ) :
                     (
                       <div>{JSON.stringify(result, null, 2)}</div>
                     )}
@@ -82,6 +87,9 @@ export const Message = ({
                     toolName === "getRoomRates" ? (
                       <RoomRates chatId={chatId} />
                     ):
+                    toolName === "selectRoomRate"? (
+                      <SessionCheckout chatId={chatId} />
+                    ) :
                     null}
                   </div>
                 );

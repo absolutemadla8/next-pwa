@@ -3,6 +3,7 @@ import React from 'react'
 import AnimatedButton from '../ui/AnimatedButton'
 import { Frame, User } from 'lucide-react'
 import { useChat } from 'ai/react';
+import useItineraryStore from '@/app/store/itineraryStore';
 
 interface RoomRateCardProps {
   room: any;
@@ -11,42 +12,52 @@ interface RoomRateCardProps {
 }
 
 const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelect }) => {
-    const { append, error, reload } = useChat({
-        id: chatId,
-        body: { id: chatId },
-        maxSteps: 5,
-      });
-      {error && (
-        <>
-          <div>An error occurred.</div>
-          <button type="button" onClick={() => reload()}>
-            Retry
-          </button>
-        </>
-      )}
-      
-        const handleBookNow = (
-          boardType?: string,
-          roomType?: string
-        ) => {
-          append({
-            role: "user",
-            content: `I want to book ${boardType} option in ${roomType}.`,
-          });
-        };
+  const { itinerary, setRoomDetails } = useItineraryStore();
+  
+  const { append, error, reload } = useChat({
+    id: chatId,
+    body: { 
+      id: chatId,
+      payload: {
+        roomsAndRateAllocations: itinerary.rooms.map(room => ({
+          rateId: String(room.rateId),
+          roomId: String(room.roomId),
+          occupancy: {
+            adults: room.adults,
+            childAges: room.children.map(child => child.age)
+          }
+        })),
+        recommendationId: String(itinerary.recommendationId),
+      }
+    },
+    maxSteps: 5,
+  });
+
   // Get first image URL
   const imageUrl = room.images?.[0]?.links?.find((l: any) => 
     ['Xxl', 'Standard'].includes(l.size)
-  )?.url || 'https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png'
+  )?.url || 'https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png';
 
-  if (!room?.rates?.length) return null
+  const handleBookNow = (recommendationId: string, rateId: string, roomId: string, boardType:string, roomType:string) => {
+    
+    // Call the onSelect callback
+    onSelect({ recommendationId, rateId, roomId});
+    
+    // Append message to chat
+    append({
+      role: "user",
+      content: `I want to book ${room.rates.find((r: any) => r.rateId === rateId)?.boardBasis?.description || 'selected'} option in ${room.type}.`,
+    });
+  };
+
+  if (!room?.rates?.length) return null;
 
   return (
     <div className="w-full bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
       {/* Room Header */}
       <div className="relative">
         <img 
-          src={imageUrl ?? "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png"} 
+          src={imageUrl} 
           alt={room.type} 
           className="w-full h-40 object-cover"
         />
@@ -70,7 +81,20 @@ const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelec
       </div>
 
       {/* Rates List */}
-      <div className="space-y-4 max-h-56 overflow-scroll">
+      <div className="space-y-4 max-h-56 overflow-auto">
+        {error && (
+          <div className="p-4">
+            <div className="text-red-500">An error occurred.</div>
+            <button 
+              type="button" 
+              onClick={() => reload()}
+              className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+        
         {room.rates.map((rate: any) => (
           <div key={rate.rateId} className="p-4 border-b border-slate-300">
             {/* Rate Header */}
@@ -116,7 +140,7 @@ const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelec
             <AnimatedButton
               variant="secondary"
               className="w-full mt-4"
-              onClick={() => handleBookNow(rate.boardBasis.type, room.type)}
+              onClick={() => handleBookNow(rate.recommendationId, rate.rateId, room.id, rate.boardBasis.type, room.type )}
             >
               Select Rate
             </AnimatedButton>
@@ -124,13 +148,13 @@ const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelec
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Helper function to format cancellation date
 const formatCancellationDate = (rate: any) => {
-  const policy = rate.cancellationPolicies?.[0]?.rules?.[0]
-  return policy?.end ? new Date(policy.end).toLocaleDateString() : 'check-in'
-}
+  const policy = rate.cancellationPolicies?.[0]?.rules?.[0];
+  return policy?.end ? new Date(policy.end).toLocaleDateString() : 'check-in';
+};
 
-export default SimpleRoomRateCard
+export default SimpleRoomRateCard;

@@ -3,12 +3,13 @@ import { convertToCoreMessages, Message, streamText } from "ai";
 import { geminiProModel } from "@/ai";
 import { z } from "zod";
 import { cookies } from 'next/headers';
+import { useRoomStore } from '@/app/store/roomRateStore';
 
 // Create a server-side axios instance with auth token
 const createServerApi = (token?: string) => {
   const instance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
-    timeout: 20000,
+    timeout: 30000,
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
   // Create server-side API instance with the token
   const serverApi = createServerApi(token);
   
-  const { id, messages }: { id: string; messages: Array<Message> } =
+  const { id, messages, payload}: { id: string; messages: Array<Message>; payload?:any } =
     await request.json();
 
   try {
@@ -82,8 +83,9 @@ export async function POST(request: Request) {
                 - Number of rooms required
                 - Number of adults per room
                 - Number of children per room (and their ages, if applicable)
-            5.  Employ the 'getRoomRates' tool to fetch available hotel room rates based on the provided criteria.
-            6.  Assist the user in carefully selecting a suitable hotel room.
+            5.  Employ the 'getRoomRates' tool to fetch available hotel room rates based on the provided criteria, ask the user 6 digit pin..
+            6.  After obtaining the room rates, use the 'selectRoomRate' tool to select the desired room and rate.
+            6a.  Assist the user in carefully selecting a suitable hotel room.
             7.  Initiate the reservation process.
             8.  Process the payment, ensuring to obtain explicit user consent and waiting for confirmation.
             9.  Present the user with a clear and detailed booking confirmation.
@@ -125,6 +127,7 @@ export async function POST(request: Request) {
         getRoomRates: {
           description: "Get available room rates and booking details for a specific hotel, check-in/out dates, and occupancy details.",
           parameters: z.object({
+            pin: z.string().describe("The 6 digit unique identifier for session."),
             hotelId: z.string().describe("The unique identifier for the hotel."),
             checkIn: z.string().describe("The check-in date in YYYY-MM-DD format (e.g., '2024-01-01')."),
             checkOut: z.string().describe("The check-out date in YYYY-MM-DD format (e.g., '2024-01-05')."),
@@ -135,8 +138,9 @@ export async function POST(request: Request) {
               }),
             ).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
           }),
-          execute: async ({ hotelId, checkIn, checkOut, occupancies }) => {
-            const roomRatesResponse = await serverApi.post(`/hotels/itineraries/create`, {
+          execute: async ({ pin, hotelId, checkIn, checkOut, occupancies }) => {
+            const roomRatesResponse = await serverApi.post(`/trippy/itinerary`, {
+                pin,
                 hotelId,
                 checkIn,
                 checkOut,
@@ -147,6 +151,30 @@ export async function POST(request: Request) {
             return roomRatesResponse.data.data.rooms.slice(0, 4);
           },
         },
+        selectRoomRate: {
+          description: "Select and allot the room asked by the user",
+          parameters: z.object({
+            pin: z.string().describe("The 6 digit unique identifier for session."),
+            roomsAndRateAllocations: z.array(
+              z.object({
+                roomId: z.string(),
+                rateId: z.string(),
+                occupancy: z.object({
+                    adults: z.number().describe("The number of adults in the room."),
+                    childAges: z.array(z.number()).describe("An array of the ages of the children in the room (e.g., [5, 10]). If no children, provide an empty array."),
+                  }),
+               }).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
+            ),
+            recommendationId: z.string()
+          }),
+          execute: async (params) => {
+            const selectResponse = await serverApi.post(`trippy/itinerary/rooms`, {
+              ...params,
+              ...payload
+            });
+            return selectResponse.data;
+          },
+        }
       },
       onFinish: async (result) => {
         try {
