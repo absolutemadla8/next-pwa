@@ -14,7 +14,7 @@ interface RoomRateCardProps {
 const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelect }) => {
   const { itinerary, setRoomDetails } = useItineraryStore();
   
-  const { append, error, reload } = useChat({
+  const { append, error, reload, isLoading } = useChat({
     id: chatId,
     body: { 
       id: chatId,
@@ -49,6 +49,20 @@ const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelec
       content: `I want to book ${room.rates.find((r: any) => r.rateId === rateId)?.boardBasis?.description || 'selected'} option in ${room.type}.`,
     });
   };
+
+  // Skeleton loader for when data is loading (room exists but no rates yet and no error)
+  if (isLoading && !error) {
+    return (
+      <div className="w-full bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="h-40 bg-slate-200 animate-pulse"></div>
+        <div className="p-4 space-y-4">
+          <div className="h-6 bg-slate-200 rounded animate-pulse w-3/4"></div>
+          <div className="h-4 bg-slate-200 rounded animate-pulse w-1/2"></div>
+          <div className="h-10 bg-slate-200 rounded animate-pulse w-full mt-4"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (!room?.rates?.length) return null;
 
