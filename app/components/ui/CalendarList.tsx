@@ -176,7 +176,13 @@ const CalendarList: React.FC<CalendarListProps> = ({
   // Check if date is before min date or after max date
   const isDateDisabled = (date: Date | null): boolean => {
     if (!date) return true;
-    return date < minDate || date > maxDate;
+    
+    // Start of day comparison to allow selecting today
+    const dateAtStartOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const minDateAtStartOfDay = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+    const maxDateAtStartOfDay = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
+    
+    return dateAtStartOfDay < minDateAtStartOfDay || dateAtStartOfDay > maxDateAtStartOfDay;
   };
 
   // Handle date click based on mode

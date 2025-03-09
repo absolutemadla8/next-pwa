@@ -18,7 +18,7 @@ import AmenitiesBottomSheet from '../components/stays/AmenitiesBottomSheet';
 import PoliciesBottomSheet from '../components/stays/PoliciesBottomSheet';
 import useItineraryStore from '../store/itineraryStore';
 import BottomNavigation from '../components/trippy/BottomNavigation';
-import { IconBubbleText, IconBuildings, IconSparkles, IconUserCircle } from '@tabler/icons-react';
+import { IconApps, IconBubbleText, IconBuildings, IconDiscount, IconHome, IconNavigationDiscount, IconSparkles, IconUserCircle } from '@tabler/icons-react';
 import BottomOrderInfo from '../components/trippy/BottomOrderInfo';
 
 export default function TrippyLayout({
@@ -82,14 +82,19 @@ export default function TrippyLayout({
   // Navigation items
   const navigationItems: any[] = [
     {
-      name: 'Chat',
-      path: '/trippy/chat',
-      icon: IconBubbleText
+      name: 'Deals',
+      path: '/trippy/deals',
+      icon: IconNavigationDiscount
     },
     {
-      name: 'Trippy',
-      path: '/trippy', 
+      name: 'Chat',
+      path: '/trippy/chat',
       icon: IconSparkles
+    },
+    {
+      name: 'Home',
+      path: '/trippy', 
+      icon: IconApps
     },
     {
       name: 'Stays',
@@ -111,12 +116,12 @@ export default function TrippyLayout({
   return (
     <div className="flex flex-col min-h-screen max-h-screen overflow-hidden bg-gray-800">
       {/* Main content */}
-      <main className="flex h-[91vh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b from-blue-50 to-white overflow-hidden">
-        {children}
+      <main className="flex min-h-[91vh] max-h-[91vh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b bg-[#F1F2F4] overflow-y-auto">
+        <div className="w-full overflow-auto">{children}</div>
       </main>
 
       {/* Bottom Navigation */}
-      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search') ?
+      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search' || pathname === '/trippy/deals') ?
       <div className='flex items-center w-full h-[9vh]'>
         <BottomNavigation navItems={navigationItems} />
       </div>

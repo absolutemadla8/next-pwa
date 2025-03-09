@@ -23,20 +23,12 @@ export function Chat({
       id,
       body: { id },
       initialMessages,
-      maxSteps: 10,
+      maxSteps: 1,
       onFinish: () => {
         console.log("messages", messages);
         window.history.replaceState({}, "", `/trippy/chat/${id}`);
       },
     });
-
-    const voiceId = "21m00Tcm4TlvDq8ikWAM";
-    const text = {initialMessages}
-    const apiKey = "your_api_key";
-    const voiceSettings = {
-      stability: 0,
-      similarity_boost: 0,
-    };
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -44,7 +36,7 @@ export function Chat({
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 
   return (
-    <div className="flex flex-row justify-center h-dvh overflow-hidden bg-gradient bg-gradient-to-b from-blue-100 to-violet-100 pt-4 w-full md:max-w-md">
+    <div className="flex flex-row justify-center h-dvh max-h-full bg-gradient bg-gradient-to-b from-blue-100 to-violet-100 w-full md:max-w-md">
       <div className="flex flex-col justify-between items-center w-full md:max-w-[500px] h-full">
         <div
           ref={messagesContainerRef}

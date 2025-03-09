@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, MouseEvent, TouchEvent } from 'react'
 import { ChevronLeft, ChevronRight, X, Image as ImageIcon } from 'lucide-react'
+import AnimatedButton from '../ui/AnimatedButton';
 
 // Define image type that can handle both string URLs and object with url property
 type ImageType = string | { url: string; [key: string]: any }
@@ -101,10 +102,10 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
   return (
     <>
       {/* Thumbnail Gallery Grid */}
-      <div className="grid grid-cols-3 gap-2 w-full max-h-screen overflow-scroll py-14 px-4">
+      <div className="grid grid-cols-2 gap-1.5 w-full pt-4 px-3">
         {/* Main large image */}
         <div 
-          className="col-span-3 h-64 rounded-lg overflow-hidden cursor-pointer"
+          className="col-span-2 h-72 rounded-xl overflow-hidden cursor-pointer shadow-md transition-transform hover:scale-[1.01]"
           onClick={() => openModal(0)}
         >
           <img 
@@ -114,44 +115,54 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
           />
         </div>
         
-        {/* Smaller thumbnails */}
-        {images.slice(1, 8).map((image, index) => (
-          <div 
-            key={index}
-            className="aspect-square rounded-lg overflow-hidden cursor-pointer"
-            onClick={() => openModal(index + 1)}
-          >
-            <img 
-              src={getImageUrl(image)} 
-              alt={`Hotel view ${index + 1}`} 
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ))}
-        
-        {/* "View more" button if there are more than 5 images */}
-        {images.length > 5 && (
-          <div 
-            className="aspect-square relative rounded-lg overflow-hidden cursor-pointer bg-slate-800"
-            onClick={() => openModal(5)}
-          >
-            <img 
-              src={getImageUrl(images[5])} 
-              alt="More hotel images" 
-              className="w-full h-full object-cover opacity-60"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-              <ImageIcon className="mb-1" />
-              <span className="text-sm font-semibold">+{images.length - 5}</span>
+        {/* First row of thumbnails - larger and prominent */}
+        <div className="col-span-2 grid grid-cols-2 gap-1.5 mt-1.5">
+          {images.slice(1, 3).map((image, index) => (
+            <div 
+              key={index}
+              className="h-40 rounded-xl overflow-hidden cursor-pointer shadow-sm transition-transform hover:scale-[1.02]"
+              onClick={() => openModal(index + 1)}
+            >
+              <img 
+                src={getImageUrl(image)} 
+                alt={`Hotel view ${index + 1}`} 
+                className="w-full h-full object-cover"
+              />
             </div>
-          </div>
+          ))}
+        </div>
+        
+        {/* Remaining thumbnails */}
+        <div className="col-span-2 grid grid-cols-3 gap-1.5 mt-1.5">
+          {images.slice(3, 9).map((image, index) => (
+            <div 
+              key={index}
+              className="aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm transition-transform hover:scale-[1.02]"
+              onClick={() => openModal(index + 3)}
+            >
+              <img 
+                src={getImageUrl(image)} 
+                alt={`Hotel view ${index + 3}`} 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+        
+        {/* "View more" button if there are more than 9 images */}
+        <div className='flex flex-col w-full py-2'>
+        {images.length > 9 && (
+         <AnimatedButton variant='primary' onClick={() => openModal(9)}>
+            View all Images
+         </AnimatedButton>
         )}
+        </div>
       </div>
 
       {/* Full Screen Modal */}
       {showModal && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col"
+          className="fixed inset-0 bg-black z-50 flex flex-col"
           onClick={closeModal}
         >
           {/* Modal Header */}
@@ -159,15 +170,17 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
             className="flex justify-between items-center p-4 text-white"
             onClick={(e) => e.stopPropagation()}
           >
-            <span style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg">
-              {currentIndex + 1} / {images.length}
-            </span>
+            <div className="flex items-center">
+              <span style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg font-medium">
+                {currentIndex + 1} / {images.length}
+              </span>
+            </div>
             <button 
               onClick={(e: MouseEvent) => {
                 e.stopPropagation()
                 closeModal()
               }}
-              className="p-2 rounded-full bg-black bg-opacity-50 z-10"
+              className="p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-colors z-10"
             >
               <X size={20} />
             </button>
@@ -175,7 +188,7 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
           
           {/* Image Container */}
           <div 
-            className="flex-1 flex items-center justify-center"
+            className="flex-1 flex items-center justify-center px-4"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
@@ -184,8 +197,30 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
             <img 
               src={getImageUrl(images[currentIndex])} 
               alt={`Hotel view ${currentIndex + 1}`}
-              className="max-h-full max-w-full"
+              className="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl"
             />
+          </div>
+          
+          {/* Thumbnail Strip */}
+          <div 
+            className="px-4 py-3 overflow-x-auto flex space-x-2 bg-black bg-opacity-50" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.map((image, index) => (
+              <div 
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`h-16 w-24 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${
+                  index === currentIndex ? 'border-2 border-white scale-105' : 'opacity-70'
+                }`}
+              >
+                <img 
+                  src={getImageUrl(image)} 
+                  alt={`Thumbnail ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
           
           {/* Navigation Controls */}
@@ -195,7 +230,7 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
           >
             <button 
               onClick={prevImage}
-              className="bg-black bg-opacity-30 p-2 rounded-r-lg"
+              className="bg-black bg-opacity-30 hover:bg-opacity-50 p-3 rounded-r-xl transition-colors ml-2"
             >
               <ChevronLeft color="white" size={32} />
             </button>
@@ -207,7 +242,7 @@ const HotelGallery: React.FC<HotelGalleryProps> = ({ images }) => {
           >
             <button 
               onClick={nextImage}
-              className="bg-black bg-opacity-30 p-2 rounded-l-lg"
+              className="bg-black bg-opacity-30 hover:bg-opacity-50 p-3 rounded-l-xl transition-colors mr-2"
             >
               <ChevronRight color="white" size={32} />
             </button>

@@ -42,7 +42,7 @@ const Page = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen max-h-screen items-center justify-center w-full">
+    <div className="flex flex-col h-screen items-center justify-center w-full">
       <form onSubmit={handleSubmit}>
         <div className="relative flex flex-col w-[90vw]">
         <div className="flex flex-col items-center justify-center w-full p-4">

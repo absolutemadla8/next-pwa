@@ -2,12 +2,10 @@
 
 import SeeMoreText from '@/app/components/ui/SeeMoreText'
 import StarRating from '@/app/components/ui/StarRating'
-import { ArrowRightCircle, Check, Star } from 'lucide-react'
+import { Check, Star } from 'lucide-react'
 import React from 'react'
 import { api } from '@/app/lib/axios'
 import { useParams, useRouter } from 'next/navigation'
-import LoadingButton from '@/app/components/ui/LoadingButton'
-import FacilityGroups from '@/app/components/ui/FacilityGroups'
 import AnimatedButton from '@/app/components/ui/AnimatedButton'
 import HotelRating from '@/app/components/stays/HotelRating'
 import useItineraryStore from '@/app/store/itineraryStore'
@@ -23,7 +21,7 @@ const Page = () => {
   const params = useParams();
   const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const { itinerary, getOccupancies, getTotalAdults, getTotalChildren, getTotalRooms } = useItineraryStore();
-  const {setRooms, setItineraryId, setType, setTraceId} = useRoomStore();
+  const {setRooms, setItineraryId, setType, setTraceId,setSessionId} = useRoomStore();
   const {hotel, setHotel} = useHotelStore();
   const { openSheet } = useBottomSheetStore();
   const [isCreating, setIsCreating] = React.useState(false);
@@ -55,6 +53,8 @@ const Page = () => {
         //@ts-ignore mlmr
         const sessionId = response.data.data.sessionId;
         //@ts-ignore mlmr
+        setSessionId(response.data.data.sessionId);
+        //@ts-ignore mlmr
         setRooms(response.data.data.rooms);
         //@ts-ignore mlmr
         setItineraryId(response.data.data.itineraryCode);
@@ -79,7 +79,7 @@ const Page = () => {
     setButtonText('Select Rooms');
     setHandleCreateItinerary(handleCreateItinerary);
     setInfoTitle(`${itinerary.checkIn ? formatDate(itinerary.checkIn) : 'No date selected'} - ${itinerary.checkOut ? formatDate(itinerary.checkOut) : 'No date selected'}`);
-    setInfoSubtitle(`${getTotalRooms()} Rooms, ${getTotalAdults()} Guests` || 'Guests not Selected');
+    setInfoSubtitle(`${getTotalRooms()} Rooms, ${getTotalAdults()+getTotalChildren()} Guests` || 'Guests not Selected');
   }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle])
 
   React.useEffect(() => {
@@ -115,10 +115,10 @@ const Page = () => {
   }
 
   return (
-    <div className='relative flex flex-col w-full min-h-screen max-h-screen items-center justify-center bg-[#F1F2F4] overflow-scroll'>
-        <div className="flex flex-col items-center justify-start h-full w-full pb-32">
+    <div className='relative flex flex-col w-full h-full items-center justify-center bg-[#F1F2F4]'>
+        <div className="flex flex-col items-center justify-start h-full w-full">
             <div className='sticky top-0 flex flex-col items-start justify-start w-full h-64'>
-            <img src={hotel.heroImage} className='h-64 w-full transition-all delay-150 duration-300 ease-in-out' />
+            <img src={hotel.heroImage} className='h-64 w-full transition-all delay-150 duration-300 ease-in-out object-cover' />
             <div className='absolute -bottom-1 h-36 w-full bg-gradient-to-t from-[#F1F2F4] to-[#F1F2F400]' />
             </div>
             <div className='flex flex-col items-center justify-center w-full gap-y-3 px-4 -mt-16 z-10'>
@@ -282,7 +282,6 @@ const Page = () => {
     </AnimatedButton>
 </div>
           </div>
-          <div className='h-20' />
                 </div>
             </div>
         </div>

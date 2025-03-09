@@ -12,6 +12,9 @@ import { HotelsList } from "./HotelsList";
 import { RoomRates } from "./RoomRates";
 import AnimatedButton from "../ui/AnimatedButton";
 import { SessionCheckout } from "./SessionCheckout";
+import { RouteList } from "./RouteList";
+import { useChat } from "ai/react";
+import { SelectedHotels } from "./SelectedHotels";
 
 export const Message = ({
   chatId,
@@ -26,6 +29,11 @@ export const Message = ({
   toolInvocations: Array<ToolInvocation> | undefined;
   attachments?: Array<Attachment>;
 }) => {
+  const { append, error, reload } = useChat({
+    id: chatId,
+    body: { id: chatId },
+    maxSteps: 5,
+  });
   return (
     <motion.div
       className={`flex flex-col gap-2 px-4 w-full md:w-[500px] md:px-0 first-of-type:pt-20`}
@@ -34,7 +42,7 @@ export const Message = ({
     >
       <div className="rounded-sm p-1 flex flex-col justify-center items-start shrink-0 text-zinc-500">
         {role === "assistant" ? <img 
-        src="https://often-public-assets.blr1.cdn.digitaloceanspaces.com/Group%20482055.png" className="size-[28px] object-contain"
+        src="https://often-public-assets.blr1.cdn.digitaloceanspaces.com/Group%20482055.png" className="size-[24px] object-contain"
         /> : <span className="text-xs text-slate-500 tracking-tight">You</span>}
       </div>
 
@@ -42,7 +50,7 @@ export const Message = ({
         {content && typeof content === "string" && (
           <div
           style={{ fontFamily: role === "assistant" ? 'var(--font-domine)' : ''}}
-          className={`text-blue-950 flex flex-col gap-4 ${role === "assistant" ? "text-xl" : "text-sm tracking-tight bg-white rounded-lg p-2 border border-slate-200"}`}>
+          className={`text-blue-950 flex flex-col gap-4 ${role === "assistant" ? "text-lg" : "text-sm tracking-tight bg-white rounded-lg p-2 border border-slate-200"}`}>
             <Markdown>{content}</Markdown>
           </div>
         )}
@@ -50,7 +58,7 @@ export const Message = ({
         {toolInvocations && (
           <div className="flex flex-col gap-4">
             {toolInvocations.map((toolInvocation) => {
-              const { toolName, toolCallId, state } = toolInvocation;
+              const { toolName, toolCallId, state, args } = toolInvocation;
 
               if (state === "result") {
                 const { result } = toolInvocation;
@@ -58,10 +66,16 @@ export const Message = ({
                 return (
                   <div key={toolCallId}>
                     {toolName === "searchLocation" ? (
-                      <SearchLocationResults chatId={chatId} results={result} />
+                      <SearchLocationResults isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ) :
+                    toolName === "getRoutes"? (
+                      <RouteList isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ) :
+                    toolName === "createItinerary" ? (
+                      <SelectedHotels isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ):
                     toolName === "searchHotels"? (
-                      <HotelsList results={result} chatId={chatId} />
+                      <HotelsList isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ) :
                     toolName === "getRoomRates" ? (
                       <RoomRates results={result} chatId={chatId} />
@@ -79,10 +93,16 @@ export const Message = ({
                 return (
                   <div key={toolCallId} className="skeleton">
                     {toolName === "searchLocation" ? (
-                      <SearchLocationResults chatId={chatId} />
+                      <SearchLocationResults toolName={toolName} chatId={chatId} />
                     ) :
+                    toolName === "getRoutes"? (
+                      <RouteList toolName={toolName} chatId={chatId} />
+                    ) :
+                    toolName === "createItinerary" ? (
+                      <SelectedHotels toolName={toolName} chatId={chatId}/>
+                    ):
                     toolName === "searchHotels"? (
-                      <HotelsList chatId={chatId} />
+                      <HotelsList toolName={toolName} chatId={chatId} />
                     ) :
                     toolName === "getRoomRates" ? (
                       <RoomRates chatId={chatId} />
@@ -90,7 +110,9 @@ export const Message = ({
                     toolName === "selectRoomRate"? (
                       <SessionCheckout chatId={chatId} />
                     ) :
-                    null}
+                    <AnimatedButton onClick={reload} variant="primary">
+                      Reload
+                      </AnimatedButton>}
                   </div>
                 );
               }

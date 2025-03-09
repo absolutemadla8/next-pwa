@@ -14,11 +14,17 @@ interface RoomRateCardProps {
     recommendationId: string, 
     price: number
   ) => void;
+  selectedRateId?: string; // Add optional prop to track which rate is selected
+  roomIndex?: number; // Add optional prop to track which room index we're selecting
+  isMultiRoom?: boolean; // Flag to indicate if we're in multi-room selection mode
 }
 
 const RoomRateCard: React.FC<RoomRateCardProps> = ({
   room,
-  onBookNow
+  onBookNow,
+  selectedRateId,
+  roomIndex = 0, // Default to first room if not specified
+  isMultiRoom = false // Default to single room mode
 }) => {
   const {itinerary} = useItineraryStore()
   const [boardTypeRates, setBoardTypeRates] = useState<Record<string, any[]>>({});
@@ -91,7 +97,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
       
       // Only call onBookNow if this is the rate that's currently selected in the itinerary
       // or if we don't have a selected rate yet
-      if (itinerary.rooms[0]?.rateId === currentRate.rateId || !itinerary.rooms[0]?.rateId) {
+      if (itinerary.rooms[roomIndex]?.rateId === currentRate.rateId || !itinerary.rooms[roomIndex]?.rateId) {
         onBookNow(
           room.id,
           alternateRate.rateId,
@@ -180,7 +186,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             </div>
           </div>
           <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full lowercase'>
-            {room.type}
+            {room.type || room.roomType}
           </h1>
           <span className='text-xs text-slate-600 font-normal tracking-tight line-clamp-6'>
             {room.description && room.description.startsWith('<p>') 
@@ -260,16 +266,19 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Book Now Button */}
             <div className='w-full pt-3'>
               <AnimatedButton 
-                variant={itinerary.rooms[0].rateId == selectedRate.rateId ? 'success' : 'secondary'}
+                variant={selectedRateId && selectedRateId === selectedRate.rateId ? 'success' : 'primary'}
                 className='w-full' 
                 onClick={() => onBookNow(
-                  room.id, 
+                  room.roomId || room.id, 
                   selectedRate.rateId, 
-                  selectedRate.recommendationId, 
+                  selectedRate.recommendationId || room.bestRate?.recommendationId, 
                   selectedRate.finalRate
                 )}
               >
-                {itinerary.rooms[0].rateId == selectedRate.rateId ? 'Selected' : 'Book Now'}
+                {isMultiRoom 
+                  ? (selectedRateId && selectedRateId === selectedRate.rateId ? 'Selected' : 'Book Now')
+                  : (itinerary.rooms.some(room => room.rateId === selectedRate.rateId) ? 'Selected' : 'Book Now')
+                }
               </AnimatedButton>
             </div>
           </div>
@@ -333,16 +342,16 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
           {/* Book Now Button */}
           <div className='w-full pt-3'>
             <AnimatedButton 
-              variant={itinerary.rooms[0].rateId == rate.rateId ? 'success' : 'secondary'}
+              variant={selectedRateId === rate.rateId || itinerary.rooms[roomIndex]?.rateId === rate.rateId ? 'success' : 'secondary'}
               className='w-full' 
               onClick={() => onBookNow(
-                room.id, 
+                room.roomId || room.id, 
                 rate.rateId, 
-                rate.recommendationId, 
+                rate.recommendationId || room.bestRate?.recommendationId, 
                 rate.finalRate
               )}
             >
-              {itinerary.rooms[0].rateId == rate.rateId ? 'Selected' : 'Book Now'}
+              {selectedRateId === rate.rateId || itinerary.rooms[roomIndex]?.rateId === rate.rateId ? 'Selected' : 'Book Now'}
             </AnimatedButton>
           </div>
         </div>

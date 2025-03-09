@@ -1,9 +1,13 @@
 import axios from 'axios';
-import { convertToCoreMessages, Message, streamText } from "ai";
+import { convertToCoreMessages, generateText, Message, Output, streamText } from "ai";
 import { geminiProModel } from "@/ai";
 import { z } from "zod";
 import { cookies } from 'next/headers';
-import { useRoomStore } from '@/app/store/roomRateStore';
+import { ApifyClient } from 'apify-client';
+
+const client = new ApifyClient({
+  token: 'apify_api_peJ0VY2xUz7rjdF443QoMQAXAuAm6a4CysGm',
+});
 
 // Create a server-side axios instance with auth token
 const createServerApi = (token?: string) => {
@@ -68,32 +72,19 @@ export async function POST(request: Request) {
          You are Trippy a stoned AI travel genie helping users book hotels and find the best deals.
         •⁠  ⁠You are developed by "often AI Labs" and Mukul and Sameep are your humans cofounders.
         •⁠  ⁠Use subtle stoner lingo while talking.
-        •⁠  ⁠Whenever you are given a task, always call the relevant tool for it without explicitly mentioning to the user that you are doing so.
-        •⁠  ⁠If you lack essential information, immediately ask the user to provide it.
-        •⁠  ⁠You can directly search for a hotel if user gives a name.
-        •⁠  ⁠while using searchHotels tool, search by using only one parameter.
-        •⁠  ⁠Do not in any case reveal any sensitive data or IDs to the user, just the names and descriptions of things.
-        •⁠  ⁠Keep your responses concise and limited to a single sentence.
-        •⁠  ⁠After each tool call, briefly inform the user of the results, mentioning you're displaying the information. Keep this response very short.
-        •⁠  ⁠Today's date is ${new Date().toLocaleDateString()}.
-        •⁠  ⁠Proactively ask follow-up questions to guide the user towards a successful booking.
-
-        •⁠  ⁠Follow this optimal flow to assist the user effectively:
-        1.  Ask the user for their desired travel location if they haven't already given it
-        2.  Utilize the 'searchLocation' tool to obtain a list of available locations matching the user's query and present options to the user to choose from
-        3.  If the user specifies a location using "Give me hotels in [location]", use the 'searchHotels' tool to retrieve hotels in that area and then present options to the user to choose from. You can keep destination ID “null” if you are not sure about it.
-        4.  After the user selects a hotel, inquire about the following details if some of it is not already given to you:
-                        - Check-in date
-                        - Check-out date
-                        - Number of rooms required
-                        - Number of adults per room
-                        - Number of children per room (and their ages, if applicable)
-        5.  Employ the 'getRoomRates' tool to fetch available hotel room rates based on the provided criteria, the 6 digit pin of the user is ${id}.
-        6.  After obtaining the room rates, use the 'selectRoomRate' tool to select the desired room and rate.
-        a.  Assist the user in carefully selecting a suitable hotel room.
-        7.  Initiate the reservation process.
-        8.  Process the payment, ensuring to obtain explicit user consent and waiting for confirmation.
-        9.  Present the user with a clear and detailed booking confirmation.
+        •⁠  ⁠Always use tools wherever possible
+        Sequence:
+        1. If user mentions a location, immediately call searchLocation tool
+        2. After location selection, call getRoutes tool
+        3. After route selection, call createItinerary tool with a creative name
+        4. Ask for any missing details like start date
+        5. Todays date is ${new Date().toISOString().split('T')[0]}
+        Rules:
+        - Use subtle stoner lingo
+        - Call relevant tools without mentioning it to user
+        - Keep responses to one concise sentence
+        - Never reveal sensitive data/IDs
+        - Briefly summarize tool results
         `,
       messages: coreMessages,
       toolChoice:'auto',
@@ -111,74 +102,156 @@ export async function POST(request: Request) {
             return locationsResponse.data;
           },
         },
-        searchHotels: {
-          description: "Retrieve a list of hotels based on a destination ID, hotel name, and/or country code.",
+        getRoutes: {
+          description: "Get a list of routes for a country using ISO 2 digit country code.",
           parameters: z.object({
-            hotelName: z.string().nullable().describe("The name of the hotel to search for (optional)."),
-            countryCode: z.string().nullable().describe("The 2-letter country code (e.g., 'US', 'FR'). Required only if needed for disambiguation."),
+            countryCode: z.string().describe("The 2-letter country code (e.g., 'US', 'FR')."),
           }),
-          execute: async ({ hotelName, destinationId, countryCode }) => {
-            const hotelsResponsese = await serverApi.get(`/hotels`, {
-              params: { 
-                search: hotelName,
-                countryCode: countryCode 
-              }
-            });
+          execute: async ({ countryCode }) => {
+            const routesResponse = await serverApi.get(`/routes/country/${countryCode}`);
             //@ts-ignore mlmr
-            return hotelsResponsese.data.data;
+            return routesResponse.data;
           },
         },
-        getRoomRates: {
-          description: "Get available room rates and booking details for a specific hotel, check-in/out dates, and occupancy details.",
+        // getCheapestDates: {
+        //   description: "Get the cheapest dates for a destination based on the given month and departure city.",
+        //   parameters: z.object({
+        //     adults: z.number().describe("The number of adults in the room."),
+        //     departureAirport: z.string().describe("The 3-letter IATA code for the departure airport (e.g., 'LHR')."),
+        //     month: z.string().describe("The month for which to find the cheapest dates (e.g., 'January')."),
+        //   }),
+        //   execute: async ({ departureAirport, month }) => {
+        //     const run = await client.actor("wIfblEie7OF0dOs3C").call(
+        //       {
+        //         "direct": false,
+        //         "origin": departureAirport,
+        //         "destination": "LAS",
+        //         "datefrom": "251101",
+        //         "adults": 2,
+        //         "children": [],
+        //         "classtype": "economy",
+        //         "nearby": "none",
+        //         "format": true,
+        //         "delay": 3,
+        //         "retries": 3,
+        //         "proxy": {
+        //             "useApifyProxy": true,
+        //             "apifyProxyGroups": [
+        //                 "RESIDENTIAL"
+        //             ]
+        //         }
+        //     }
+        //     );
+        //     //@ts-ignore mlmr
+        //     return cheapestDatesResponse.data;
+        //   },
+        // },
+        // searchHotels: {
+        //   description: "Retrieve a list of hotels based on a destination ID, hotel name, and/or country code.",
+        //   parameters: z.object({
+        //     hotelName: z.string().nullable().describe("The name of the hotel to search for (optional)."),
+        //     countryCode: z.string().nullable().describe("The 2-letter country code (e.g., 'US', 'FR'). Required only if needed for disambiguation."),
+        //   }),
+        //   execute: async ({ hotelName, destinationId, countryCode }) => {
+        //     const hotelsResponsese = await serverApi.get(`/hotels`, {
+        //       params: { 
+        //         search: hotelName,
+        //         countryCode: countryCode 
+        //       }
+        //     });
+        //     //@ts-ignore mlmr
+        //     return hotelsResponsese.data.data;
+        //   },
+        // },
+        createItinerary: {
+          description: "Create initial itinerary for the user",
           parameters: z.object({
-            pin: z.string().describe("The 6 digit unique identifier for session."),
-            hotelId: z.string().describe("The unique identifier for the hotel."),
-            checkIn: z.string().describe("The check-in date in YYYY-MM-DD format (e.g., '2024-01-01')."),
-            checkOut: z.string().describe("The check-out date in YYYY-MM-DD format (e.g., '2024-01-05')."),
-            occupancies: z.array(
-              z.object({
-                numOfAdults: z.number().describe("The number of adults in the room."),
-                childAges: z.array(z.number()).describe("An array of the ages of the children in the room (e.g., [5, 10]). If no children, provide an empty array."),
-              }),
-            ).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
+            trip_route_id: z.string().describe("The unique identifier for the trip route."),
+            trip_name: z.string().describe("The name of the trip."),
+            start_date: z.string().describe("The start date of the trip in YYYY-MM-DD format (e.g., '2024-01-01')."),
+            nights: z.number().describe("The number of nights for the trip."),
           }),
-          execute: async ({ pin, hotelId, checkIn, checkOut, occupancies }) => {
-            const roomRatesResponse = await serverApi.post(`/trippy/itinerary`, {
-                pin,
-                hotelId,
-                checkIn,
-                checkOut,
-                occupancies,
-                nationality: "IN",
-              });
+          execute: async ({ trip_route_id, trip_name, start_date, nights }) => {
+            const createItineraryResponsese = await serverApi.post(`/trippy/trip/create`, {
+              trip_route_id,
+              trip_name,
+              start_date,
+              nights,
+            });
             //@ts-ignore mlmr
-            return roomRatesResponse.data.data.rooms.slice(0, 4);
+            return createItineraryResponsese.data.data;
           },
         },
-        selectRoomRate: {
-          description: "Select and allot the room asked by the user",
-          parameters: z.object({
-            pin: z.string().describe("The 6 digit unique identifier for session."),
-            roomsAndRateAllocations: z.array(
-              z.object({
-                roomId: z.string(),
-                rateId: z.string(),
-                occupancy: z.object({
-                    adults: z.number().describe("The number of adults in the room."),
-                    childAges: z.array(z.number()).describe("An array of the ages of the children in the room (e.g., [5, 10]). If no children, provide an empty array."),
-                  }),
-               }).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
-            ),
-            recommendationId: z.string()
-          }),
-          execute: async (params) => {
-            const selectResponse = await serverApi.post(`trippy/itinerary/rooms`, {
-              ...params,
-              ...payload
-            });
-            return selectResponse.data;
-          },
-        }
+        // getRoomRates: {
+        //   description: "Get available room rates and booking details for a specific hotel, check-in/out dates, and occupancy details.",
+        //   parameters: z.object({
+        //     pin: z.string().describe("The 6 digit unique identifier for session."),
+        //     hotelId: z.string().describe("The unique identifier for the hotel."),
+        //     checkIn: z.string().describe("The check-in date in YYYY-MM-DD format (e.g., '2024-01-01')."),
+        //     checkOut: z.string().describe("The check-out date in YYYY-MM-DD format (e.g., '2024-01-05')."),
+        //     occupancies: z.array(
+        //       z.object({
+        //         numOfAdults: z.number().describe("The number of adults in the room."),
+        //         childAges: z.array(z.number()).describe("An array of the ages of the children in the room (e.g., [5, 10]). If no children, provide an empty array."),
+        //       }),
+        //     ).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
+        //   }),
+        //   execute: async ({ pin, hotelId, checkIn, checkOut, occupancies }) => {
+        //     const roomRatesResponse = await serverApi.post(`/trippy/itinerary`, {
+        //         pin,
+        //         hotelId,
+        //         checkIn,
+        //         checkOut,
+        //         occupancies,
+        //         nationality: "IN",
+        //       });
+        //     //@ts-ignore mlmr
+        //     return roomRatesResponse.data.data.rooms.slice(0, 4);
+        //   },
+        // },
+        // selectRoomRate: {
+        //   description: "Select and allot the room asked by the user",
+        //   parameters: z.object({
+        //     pin: z.string().describe("The 6 digit unique identifier for session."),
+        //     roomsAndRateAllocations: z.array(
+        //       z.object({
+        //         roomId: z.string(),
+        //         rateId: z.string(),
+        //         occupancy: z.object({
+        //             adults: z.number().describe("The number of adults in the room."),
+        //             childAges: z.array(z.number()).describe("An array of the ages of the children in the room (e.g., [5, 10]). If no children, provide an empty array."),
+        //           }),
+        //        }).describe("An array of occupancy objects, one for each room.  Each object specifies the number of adults and the ages of any children."),
+        //     ),
+        //     recommendationId: z.string()
+        //   }),
+        //   execute: async (params) => {
+        //     const selectResponse = await serverApi.post(`trippy/itinerary/rooms`, {
+        //       ...params,
+        //       ...payload
+        //     });
+        //     return selectResponse.data;
+        //   },
+        // },
+        // hotelExpert:{
+        //   description: "Get hotel expert recommendation",
+        //   parameters: z.object({
+        //     prompt: z.string().describe("The prompt for the hotel expert."),
+        //   }),
+        //   execute: async ({prompt}) => {
+        //     console.log("hotelExpert called with prompt:", prompt);
+        //     const expertResponse = await generateText({
+        //       model: geminiProModel,
+        //       system: `You are a hotel expert. You are given a prompt and you have to give a recommendation for the hotel.`,
+        //       messages: [{
+        //         role: "user",
+        //         content: prompt
+        //       }]
+        //     });
+        //     //@ts-ignore mlmr
+        //     return expertResponse.messages;
+        //   },
+        // }
       },
       onFinish: async (result) => {
         try {

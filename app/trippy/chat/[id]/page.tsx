@@ -18,6 +18,12 @@ export default function Page({ params }: { params: any }) {
         const response = await api.post('/trippy/sessions/get', { pin: id });
         console.log(response.data);
         if (response.data) {
+          // Store original data in localStorage to maintain consistency
+          if (typeof window !== 'undefined') {
+            //@ts-ignore mlmr
+            localStorage.setItem(`chat_${id}`, JSON.stringify(response.data.data));
+          }
+          
           const chatData: any = {
             //@ts-ignore mlmr
             ...response.data.data,

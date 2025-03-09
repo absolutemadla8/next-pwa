@@ -1,6 +1,6 @@
 'use client'
 
-import { ListCheck, Star } from 'lucide-react'
+import { ChevronDown, ChevronUp, ListCheck, Star, Users } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import StarRating from '@/app/components/ui/StarRating'
 import { useParams } from 'next/navigation'
@@ -19,12 +19,13 @@ const Page = () => {
   const params = useParams();
   const {hotel} = useHotelStore();
   const { setGuests, guests, updateGuest, hasChanged, setInitialGuests, resetChanges } = useGuestStore();
-    const {itinerary, setRecommendationId, setRoomDetails, getTotalPrice} = useItineraryStore();
-    const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
+  const {itinerary, setRecommendationId, setRoomDetails, getTotalPrice} = useItineraryStore();
+  const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+  const [expandedRooms, setExpandedRooms] = useState<boolean[]>([]);
 
   // Added Razorpay script loader function
   const loadRazorpayScript = () => {
@@ -68,6 +69,13 @@ const Page = () => {
       }));
       
       setInitialGuests(initialGuests);
+      
+      // Initialize all rooms as expanded if single room, or only first room expanded if multiple
+      if (totalRooms === 1) {
+        setExpandedRooms([true]);
+      } else {
+        setExpandedRooms(Array(totalRooms).fill(false));
+      }
     }
   }, [session, setInitialGuests]);
 
@@ -98,9 +106,17 @@ const Page = () => {
     }
   }, [params.id]);
 
-  const roomData = session?.rooms && session.rooms.length > 0 ? session.rooms[0] : null;
   const totalRooms = session?.rooms ? session.rooms.length : 0;
-  const totalAdults = roomData ? roomData.adults * totalRooms : 0;
+  //@ts-ignore mlmr
+  const totalAdults = session?.rooms ? session.rooms.reduce((sum, room) => sum + room.adults, 0) : 0;
+
+  const toggleRoomExpand = (index: number) => {
+    setExpandedRooms(prev => {
+      const newState = [...prev];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
 
   const handleRazorpayPayment = (orderId: string, amount: number, currency: string) => {
     if (!window.Razorpay) {
@@ -157,15 +173,15 @@ const Page = () => {
       return;
     }
   
-    // Validate guest information
-    const isValid = guests.every(
-      (guest) => guest.firstName && guest.lastName && guest.email && guest.contactNumber
-    );
+    // // Validate guest information
+    // const isValid = guests.every(
+    //   (guest) => guest.firstName && guest.lastName && guest.email && guest.contactNumber
+    // );
   
-    if (!isValid) {
-      setError('Please fill in all required guest information');
-      return;
-    }
+    // if (!isValid) {
+    //   setError('Please fill in all required guest information');
+    //   return;
+    // }
   
     try {
       setLoading(true);
@@ -250,7 +266,7 @@ const Page = () => {
     );
   }
   return (
-    <div className='flex flex-col w-full min-h-screen max-h-screen overflow-scroll items-center justify-center pb-32 bg-[#F1F2F4]'>
+    <div className='flex flex-col w-full h-full items-center justify-center bg-[#F1F2F4]'>
         {/* Add Razorpay script */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
@@ -345,32 +361,92 @@ const Page = () => {
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
-                <div className='flex flex-col w-full'>
-                <span className='text-blue-500 text-sm font-normal tracking-tight'>
-                {roomData?.board_basis.description}
-                        </span>
-                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
-                        {roomData?.room_name}
-                        </h1>
-                        {!roomData.cancellation.has_free_cancellation ?
-                         <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-slate-600 text-sm'>
-                            Non Refundable
-                         </span>:
-                        <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-teal-600 text-sm'>
-                           Get 100% refund till {roomData.cancellation.free_cancellation_until ? new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                        }).replace(/ /g, ' ') + ', ' + new Date(roomData.cancellation.free_cancellation_until).toLocaleTimeString('en-GB', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                        }).toUpperCase() : ""}
-                        </span>
-}
+                
+                {/* Improved Room details section */}
+                <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-4'>
+                    <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
+                        {totalRooms > 1 ? 'Your Rooms' : 'Your Room'}
+                    </h1>
+                    
+                    {session.rooms && session.rooms.map((roomData:any, index:number) => (
+                      <div key={index} className='w-full'>
+                        <div 
+                          className={`flex flex-row items-center justify-between w-full ${index > 0 ? 'pt-2 border-t border-gray-100' : ''}`}
+                          onClick={() => totalRooms > 1 && toggleRoomExpand(index)}
+                        >
+                          <div className='flex flex-row items-center gap-x-2'>
+                            <div className='flex items-center justify-center bg-blue-100 rounded-full w-6 h-6'>
+                              <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-800 text-xs font-medium mt-0.5'>
+                                {index + 1}
+                              </span>
+                            </div>
+                            <div className='flex flex-col'>
+                              <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md font-medium'>
+                                {roomData.room_name}
+                              </span>
+                              <div className='flex flex-row items-center gap-x-2'>
+                                <span className='text-blue-500 text-xs font-normal'>
+                                  {roomData.board_basis.description}
+                                </span>
+                                <div className='flex flex-row items-center gap-x-1'>
+                                  <Users className='text-gray-500 size-3' />
+                                  <span className='text-gray-500 text-xs'>
+                                    {roomData.adults} Adult{roomData.adults > 1 ? 's' : ''}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {totalRooms > 1 && (
+                            <button className='text-blue-500 p-1 rounded hover:bg-blue-50'>
+                              {expandedRooms[index] ? 
+                                <ChevronUp className='size-4' /> : 
+                                <ChevronDown className='size-4' />
+                              }
+                            </button>
+                          )}
                         </div>
+                        
+                        {/* Expanded room details - always visible for single room or when expanded */}
+                        {(totalRooms === 1 || expandedRooms[index]) && (
+                          <div className='mt-2 pl-8'>
+                            {!roomData.cancellation.has_free_cancellation ?
+                              <div className='flex items-center py-1 px-2 bg-red-50 text-red-600 text-xs rounded-full w-fit'>
+                                Non Refundable
+                              </div> :
+                              <div className='flex items-center py-1 px-2 bg-teal-50 text-teal-600 text-xs rounded-full w-fit'>
+                                Free Cancellation till {roomData.cancellation.free_cancellation_until ? 
+                                  new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short'
+                                  }).replace(/ /g, ' ') : ""}
+                              </div>
+                            }
+                            
+                            <div className='mt-2 text-gray-600 text-sm'>
+                              {/* Room amenities could go here */}
+                              {roomData.cancellation.has_free_cancellation && (
+                                <div className='mt-1 text-xs text-gray-500'>
+                                  <span className='font-medium'>Full Details:</span> 100% refund till {roomData.cancellation.free_cancellation_until ? 
+                                    new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric'
+                                    }).replace(/ /g, ' ') + ', ' + new Date(roomData.cancellation.free_cancellation_until).toLocaleTimeString('en-GB', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      hour12: true
+                                    }).toUpperCase() : ""}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                 </div>
+                
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
                 <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
                            Guest Information
@@ -430,7 +506,6 @@ const Page = () => {
                         </span>
                     </div>
                 </div>
-                <div className='h-20' />
             </div>
         </div>
    </div>

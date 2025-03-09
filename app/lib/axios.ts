@@ -33,25 +33,49 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Import the bottom sheet store for error handling
-// We need to import it dynamically to avoid Next.js SSR issues
-import { useEffect, useRef } from 'react';
-let useBottomSheetStore: any = null;
+// Use a flag to ensure we only show one error at a time
+let isShowingError = false;
+// Use a debounce timer to reset the flag
+let errorResetTimeout: NodeJS.Timeout | null = null;
 
-// Dynamic import function for the store
-const getBottomSheetStore = async () => {
-  if (typeof window !== 'undefined' && !useBottomSheetStore) {
-    const importedModule = await import('../store/bottomSheetStore');
-    useBottomSheetStore = importedModule.default;
+// Dynamic import function for the store - memoize to prevent multiple imports
+let bottomSheetStorePromise: Promise<any> | null = null;
+const getBottomSheetStore = () => {
+  if (typeof window === 'undefined') {
+    return Promise.resolve(null);
   }
-  return useBottomSheetStore;
+  
+  if (!bottomSheetStorePromise) {
+    bottomSheetStorePromise = import('../store/bottomSheetStore')
+      .then(module => module.default)
+      .catch(err => {
+        console.error('Failed to load bottom sheet store:', err);
+        bottomSheetStorePromise = null;
+        return null;
+      });
+  }
+  
+  return bottomSheetStorePromise;
 };
 
 // Response interceptor for handling common errors
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Don't process AbortError as they're intentional cancellations
+    if (error.name === 'AbortError' || axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+    
     const originalRequest = error.config;
+    
+    // Check if this might be a CORS preflight issue (network error without response)
+    // We'll silently reject these without showing error UI to handle potential preflight cancellations
+    if (!error.response && error.message && 
+        (error.message.includes('Network Error') || error.message.includes('preflight'))) {
+      console.warn('Possible CORS preflight issue:', error.message);
+      return Promise.reject(error);
+    }
     
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -65,9 +89,20 @@ axiosInstance.interceptors.response.use(
       }
     }
     
-    // Show error bottom sheet for all API errors
-    if (typeof window !== 'undefined') {
+    // Only show error bottom sheet for API errors with actual responses
+    // This prevents showing errors for preflight issues or network problems
+    if (typeof window !== 'undefined' && !isShowingError && error.response) {
       try {
+        isShowingError = true;
+        
+        // Reset the flag after a delay
+        if (errorResetTimeout) {
+          clearTimeout(errorResetTimeout);
+        }
+        errorResetTimeout = setTimeout(() => {
+          isShowingError = false;
+        }, 2000); // Prevent showing another error for 2 seconds
+        
         const bottomSheetStore = await getBottomSheetStore();
         if (bottomSheetStore) {
           const errorData = {
@@ -80,6 +115,7 @@ axiosInstance.interceptors.response.use(
         }
       } catch (e) {
         console.error('Failed to show error bottom sheet:', e);
+        isShowingError = false;
       }
     }
     
@@ -93,7 +129,7 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Helper functions for common request types
+// Helper functions for common request types - allowing signals to be passed through
 export const api = {
   get: <T>(url: string, config = {}) => 
     axiosInstance.get<T>(url, config),

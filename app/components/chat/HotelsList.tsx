@@ -1,91 +1,135 @@
-import React, { useState, useEffect } from 'react'
-import HorizontalScroll from '../ui/HorizontalScroll'
-import StarRating from '../ui/StarRating'
-import { MapPin } from 'lucide-react'
-import TagList from '../ui/TagList'
-import { useChat } from 'ai/react'
-import StepLoader from './StepLoader'
+'use client'
+import React, { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
+import { useChat } from 'ai/react';
+import CollapsibleMessage from './collapsible-message';
+import StepLoader from './StepLoader';
+import AnimatedButton from '../ui/AnimatedButton';
+import { ToolInvocation } from 'ai';
+import { ToolArgsSection, Section, ResultItem } from './section';
+import { ToolProps } from '@/app/types/chat/tools';
+import HorizontalScroll from '../ui/HorizontalScroll';
+import StarRating from '../ui/StarRating';
 
-export function HotelsList({ results, chatId }: { results?: any, chatId: string }) {
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const { append, error, reload } = useChat({
-        id: chatId,
-        body: { id: chatId },
-        maxSteps: 5,
-    });
+interface SearchResult {
+  id: number;
+  name: string;
+  type: string;
+  fullName: string;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+}
 
-    // Define steps for the loading animation
-    const hotelSearchSteps = [
-        {
-            title: '@Stan (Accommodation specialist) Please recommend hotels',
-            description: `
-            •⁠ Fetch hotel recommendations for selected areas from online blogs, creators and recommendations by destination experts
-            •⁠ Fetch online rates from wholesale supply
-            •⁠ Fetch online rates from API supply
-            •⁠ Fetch offline deals
-            •⁠ Fetch packages and offers
-            `,
-            percentage: 40
-        },
-        {
-            title: '@Aria (Destination Expert) What activities do you recommend?',
-            description: '•⁠ Fetch online rates from wholesale supply',
-            percentage: 30
-        },
-        {
-            title: '@Eva (Events Specialist) Any cool events or experiences?',
-            description: '•⁠ Searcing for events and experiences online',
-            percentage: 30
-        },
-    ];
+interface ClusterDestination {
+  id: number;
+  name: string;
+}
 
-    // If we have results, stop loading after a delay for smoother UX
-    useEffect(() => {
-        if (results && results.length > 0) {
-            // Small delay to ensure smooth transition
-            const timeout = setTimeout(() => {
-                setIsLoading(false);
-            }, 500);
-            
-            return () => clearTimeout(timeout);
-        }
-    }, [results]);
+interface Cluster {
+  id: number;
+  name: string;
+  destinations: ClusterDestination[];
+}
 
-    if (error) {
-        return (
-            <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                <div className="text-red-600 mb-2">An error occurred while fetching hotels.</div>
-                <button 
-                    type="button" 
-                    onClick={() => reload()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
-                >
-                    Retry
-                </button>
-            </div>
-        );
+interface Country {
+  id: number;
+  name: string;
+  code: string;
+}
+
+interface Destination {
+  id: number;
+  name: string;
+  country?: {
+    name: string;
+  } | null;
+}
+
+interface LocationSearchResults {
+  clusters: Cluster[];
+  countries: Country[];
+  destinations: Destination[];
+}
+
+// Step interface for our loader
+interface Step {
+  title: string;
+  description: string;
+  percentage: number;
+}
+
+export function HotelsList({ 
+  toolName, 
+  state,
+  results,
+  args,
+  chatId,
+  isOpen, 
+  onOpenChange 
+}: ToolProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { append, isLoading: chatIsLoading } = useChat({
+    id: chatId,
+    body: { id: chatId },
+    maxSteps: 5,
+  });
+
+  const isToolLoading = state === 'call';
+  const searchResults = state === 'result' ? results : undefined;
+  const query = args?.query;
+
+  const searchSteps: Step[] = [
+    {
+      title: 'Getting list of locations',
+      description: 'Fetching list of hotels for the location from more than 275 hotel chains',
+      percentage: 25
+    },
+    {
+      title: 'Dividing locations into clusters',
+      description: 'Organizing locations into geographical clusters',
+      percentage: 25
+    },
+  ];
+
+  useEffect(() => {
+    if (!isToolLoading && searchResults) {
+      setIsLoading(false);
     }
+  }, [isToolLoading, searchResults]);
 
-    if (isLoading) {
-        return (
-            <StepLoader
-                steps={hotelSearchSteps}
-                totalTimeMs={6000}
-                onComplete={() => setIsLoading(false)}
-            />
-        );
-    }
+  const header = (
+    <ToolArgsSection
+      tool={toolName}
+      number={searchResults?.clusters?.length + searchResults?.countries?.length + searchResults?.destinations?.length || 0}
+    >
+      {"@stan I need hotels in " + query || "Search for locations"}
+    </ToolArgsSection>
+  );
 
-    if (!results || results.length === 0) {
-        return (
-            <div className="p-4 bg-slate-50 rounded-lg text-slate-600">
-                No hotels found for this location.
-            </div>
-        );
-    }
-
-    return (
-        <HorizontalScroll>
+  return (
+    <CollapsibleMessage
+      role="assistant"
+      isCollapsible={true}
+      header={header}
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+    >
+      <Section title="@stan" tool={toolName}>
+        {(chatIsLoading && isToolLoading) || isLoading ? (
+          <StepLoader
+            steps={searchSteps}
+            totalTimeMs={2000}
+            onComplete={() => setIsLoading(false)}
+          />
+        ) : (
+            <div className="mb-4">
+            <div className="">
+            <p style={{ fontFamily: 'var(--font-domine)'}} 
+                className="text-lg text-blue-950 font-medium mb-2">
+                Yo, dude! Just blazed through some searches and found these totally chill hotels for your trip!
+              </p>
+            <HorizontalScroll>
             {results.map((result:any, index:number) => (
                 <div
                     key={index}
@@ -113,5 +157,10 @@ export function HotelsList({ results, chatId }: { results?: any, chatId: string 
                 </div>
             ))}
         </HorizontalScroll>
-    )
+        </div>
+        </div>
+        )}
+      </Section>
+    </CollapsibleMessage>
+  );
 }

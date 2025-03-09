@@ -1,6 +1,7 @@
 "use client"
 import HotelGallery from '@/app/components/stays/HotelGallery'
 import { useHotelStore } from '@/app/store/hotelsSearchStore'
+import { IconArrowBack, IconArrowLeft } from '@tabler/icons-react'
 import React from 'react'
 
 const Page = () => {
@@ -42,8 +43,22 @@ const Page = () => {
     console.log('Processed image URLs:', allImages);
     
     return (
-        <div className='relative flex flex-col w-full overflow-scroll items-start justify-start bg-[#F1F2F4]'>
-            <HotelGallery images={allImages} />
+        <div className='relative flex flex-col w-full items-start justify-start bg-gradient-to-b from-gray-50 to-gray-100 h-full'>
+            <div className="w-full sticky top-0 z-10 bg-white shadow-sm px-4 py-3 flex items-center">
+                <button 
+                    onClick={() => window.history.back()} 
+                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors mr-3"
+                >
+                    <IconArrowLeft className='text-blue-950' size={20} />
+                </button>
+                <h1 className="text-lg text-blue-950 truncate w-[80%]" style={{ fontFamily: 'var(--font-nohemi)' }}>
+                    {hotel?.name || 'Hotel Gallery'}
+                </h1>
+            </div>
+            
+            <div className="w-full flex-1 pb-8">
+                <HotelGallery images={allImages} />
+            </div>
         </div>
     )
 }

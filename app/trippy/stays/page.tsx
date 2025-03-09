@@ -34,7 +34,7 @@ const Page = () => {
               title: 'Search Locations',
               minHeight: '90%',
             })} className='flex flex-col items-start justify-center bg-white rounded-lg px-4 w-full h-14'>
-              <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md'>{itinerary.locationName || "Select a location"}</h2>
+              <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md truncate w-[90%]'>{itinerary.locationName || "Select a location"}</h2>
             </div>
             <div onClick={() => openSheet('dateRange', { 
               title: 'Check in & Check out',

@@ -23,12 +23,12 @@ const HorizontalScroll = ({ children, className = '' }: HorizontalScrollProps) =
   };
 
   return (
-    <div className="w-full overflow-x-auto scrollbar-hide">
+    <div className="w-full scrollbar-hide overflow-x-auto px-2">
       <motion.div 
         variants={container}
         initial="hidden"
         animate="show"
-        className={`flex flex-row gap-2 pb-4 ${className}`}
+        className={`flex flex-row gap-2 ${className}`}
       >
         <div className='' />
         {React.Children.map(children, (child) => (

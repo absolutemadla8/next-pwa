@@ -1,4 +1,4 @@
-// store/useBottomSheetStore.ts
+// store/bottomSheetStore.ts
 'use client';
 
 import { create } from 'zustand';
@@ -86,4 +86,30 @@ const useBottomSheetStore = create<BottomSheetState>((set) => ({
   }),
 }));
 
-export default useBottomSheetStore;
+// Create a store singleton that can be imported in non-React contexts (like axios.ts)
+const bottomSheetStore = {
+  showError: (error: ErrorData) => {
+    if (typeof window !== 'undefined') {
+      // Only use the store on the client-side
+      useBottomSheetStore.getState().showError(error);
+    }
+  },
+  openSheet: (id: BottomSheetId, config?: Partial<SheetConfig>) => {
+    if (typeof window !== 'undefined') {
+      useBottomSheetStore.getState().openSheet(id, config);
+    }
+  },
+  closeSheet: () => {
+    if (typeof window !== 'undefined') {
+      useBottomSheetStore.getState().closeSheet();
+    }
+  },
+  toggleSheet: (id: BottomSheetId, config?: Partial<SheetConfig>) => {
+    if (typeof window !== 'undefined') {
+      useBottomSheetStore.getState().toggleSheet(id, config);
+    }
+  }
+};
+
+// Export both the hook (for React components) and the singleton (for non-React contexts)
+export { useBottomSheetStore as default, bottomSheetStore };

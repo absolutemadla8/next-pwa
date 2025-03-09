@@ -9,7 +9,14 @@ import React from 'react'
 
 const Page = () => {
   const router = useRouter();
-  const {itinerary, getTotalAdults, getTotalChildren, getTotalRooms, getOccupancies, getNumberOfNights} = useItineraryStore();
+  const {
+    itinerary,
+    getTotalRooms, 
+    getOccupancies, 
+    getNumberOfNights,
+    addRoomToItinerary,
+    increaseAdultsInRoom
+  } = useItineraryStore();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [hotels, setHotels] = React.useState([]);
@@ -22,12 +29,30 @@ const Page = () => {
         return;
       }
 
+      // Default occupancy if no rooms are configured
+      let occupancies = getOccupancies();
+      
+      // If no rooms are configured, create a default occupancy with 2 adults
+      if (occupancies.length === 0) {
+        occupancies = [{ numOfAdults: 2, childAges: [] }];
+        
+        // Add a default room to the itinerary (not required for the API call)
+        // This will ensure the UI is consistent when the user returns
+        if (itinerary.rooms.length === 0) {
+          addRoomToItinerary();
+          // By default the room is created with 1 adult, so we need to increase it to 2
+          if (itinerary.rooms.length > 0) {
+            increaseAdultsInRoom(itinerary.rooms[0].id);
+          }
+        }
+      }
+
       const searchParams = {
         checkIn: itinerary.checkIn.toISOString().split('T')[0],
         checkOut: itinerary.checkOut.toISOString().split('T')[0],
         nationality: 'IN',
         locationId: itinerary.locationId,
-        occupancies: getOccupancies(),
+        occupancies: occupancies,
         page: 1
       };
 
@@ -53,14 +78,14 @@ const Page = () => {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-screen bg-[#F1F2F4] w-full">
+        <div className="flex items-center justify-center min-h-screen bg-[#F1F2F4] w-full">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       );
     }
 
   return (
-    <div className='flex flex-col items-start justify-start w-full overflow-scroll'>
+    <div className='flex flex-col items-start justify-start w-full h-full'>
         <div className='flex w-full sticky top-0 z-10'>
           <StayInformationHeader />
         </div>

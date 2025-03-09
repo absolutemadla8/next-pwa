@@ -94,27 +94,42 @@ export function convertToUIMessages(
     }
 
     let textContent = "";
-    let toolInvocations: Array<ToolInvocation> = [];
+    // Check if toolInvocations already exists in the message (from saved state)
+    let toolInvocations: Array<ToolInvocation> = (message as any).toolInvocations || [];
 
-    if (typeof message.content === "string") {
-      textContent = message.content;
-    } else if (Array.isArray(message.content)) {
-      for (const content of message.content) {
-        if (content.type === "text") {
-          textContent += content.text;
-        } else if (content.type === "tool-call") {
-          toolInvocations.push({
-            state: "call",
-            toolCallId: content.toolCallId,
-            toolName: content.toolName,
-            args: content.args,
-          });
+    // If no existing toolInvocations, extract them from content
+    if (toolInvocations.length === 0) {
+      if (typeof message.content === "string") {
+        textContent = message.content;
+      } else if (Array.isArray(message.content)) {
+        for (const content of message.content) {
+          if (content.type === "text") {
+            textContent += content.text;
+          } else if (content.type === "tool-call") {
+            toolInvocations.push({
+              state: "call",
+              toolCallId: content.toolCallId,
+              toolName: content.toolName,
+              args: content.args,
+            });
+          }
+        }
+      }
+    } else {
+      // If we already have toolInvocations, just get the text content
+      if (typeof message.content === "string") {
+        textContent = message.content;
+      } else if (Array.isArray(message.content)) {
+        for (const content of message.content) {
+          if (content.type === "text") {
+            textContent += content.text;
+          }
         }
       }
     }
 
     chatMessages.push({
-      id: generateId(),
+      id: (message as any).id || generateId(),
       role: message.role,
       content: textContent,
       toolInvocations,
