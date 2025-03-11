@@ -162,7 +162,9 @@ export default function MapSearchPage() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1">
-        <APIProvider apiKey={'AIzaSyBZlx3n_vpB4OYtaKTssbEZg-FDdl8H-Ys'}>
+        <APIProvider 
+        //@ts-ignore mlmr
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
           <Map 
             mapId={'DEMO_MAP_ID'} 
             defaultCenter={center} 
