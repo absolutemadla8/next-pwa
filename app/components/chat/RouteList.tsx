@@ -155,7 +155,7 @@ export function RouteList({
                         <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-white">{route.name}</h3>
                         <div className="flex items-center text-blue-800 bg-blue-100 px-2 py-1 rounded-full">
                           <Calendar className="h-3 w-3 mr-1" />
-                          <span className="text-xs font-normal">{route.nights} Night{route.nights > 1 ? 's' : ''}</span>
+                          <span className="text-xs font-normal truncate">{route.nights} Night{route.nights > 1 ? 's' : ''}</span>
                         </div>
                       </div>
                       <div className="flex items-center text-xs text-slate-200">

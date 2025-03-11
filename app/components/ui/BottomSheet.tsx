@@ -24,7 +24,6 @@ const BottomSheet = ({
   maxHeight = '90vh'
 }: BottomSheetProps) => {
   const { sessionPin } = useVoiceChatStore();
-  const [isDragging, setIsDragging] = useState(false);
 
   // Prevent body scrolling when sheet is open
   useEffect(() => {
@@ -57,17 +56,7 @@ const BottomSheet = ({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            drag="y"
-            dragConstraints={{ top: 0 }}
-            dragElastic={0.2}
-            onDragStart={() => setIsDragging(true)}
-            onDragEnd={(_, info) => {
-              setIsDragging(false);
-              if (info.offset.y > 200 && onClose) {
-                onClose();
-              }
-            }}
+            transition={{ type: 'spring', damping: 40, stiffness: 600 }}
             style={{ 
               minHeight: minHeight, 
               maxHeight: maxHeight 
@@ -101,8 +90,7 @@ const BottomSheet = ({
 
               {/* Content with separate scrolling */}
               <div 
-                className={`mt-4 pt-2 pb-8 overflow-y-auto flex-grow ${isDragging ? 'pointer-events-none' : ''}`}
-                onClick={(e) => isDragging ? e.stopPropagation() : null}
+                className="mt-4 pt-2 pb-8 overflow-y-auto flex-grow"
               >
                 {children}
               </div>

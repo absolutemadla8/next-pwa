@@ -51,6 +51,21 @@ const Page = () => {
     loadRazorpayScript();
   }, []);
 
+  // State to track if each guest form is valid
+  const [formValidity, setFormValidity] = useState<boolean[]>([]);
+  
+  // Memoized validation callback
+  const handleValidationChange = React.useCallback((idx: number, isValid: boolean) => {
+    setFormValidity(prev => {
+      // Skip update if value hasn't changed to prevent infinite loops
+      if (prev[idx] === isValid) return prev;
+      
+      const newState = [...prev];
+      newState[idx] = isValid;
+      return newState;
+    });
+  }, []);
+
   useEffect(() => {
     if (session && session.rooms) {
       // Initialize guests based on room count
@@ -69,6 +84,9 @@ const Page = () => {
       }));
       
       setInitialGuests(initialGuests);
+      
+      // Initialize form validity tracking
+      setFormValidity(Array(totalRooms).fill(false));
       
       // Initialize all rooms as expanded if single room, or only first room expanded if multiple
       if (totalRooms === 1) {
@@ -118,7 +136,7 @@ const Page = () => {
     });
   };
 
-  const handleRazorpayPayment = (orderId: string, amount: number, currency: string) => {
+  const handleRazorpayPayment = React.useCallback((orderId: string, amount: number, currency: string) => {
     if (!window.Razorpay) {
       setError('Payment gateway not loaded. Please refresh the page and try again.');
       return;
@@ -160,9 +178,10 @@ const Page = () => {
       console.error("Razorpay initialization error:", err);
       setError('Failed to initialize payment gateway. Please try again.');
     }
-  };
+  }, [guests, setError]);
 
-  const submitBooking = async () => {
+  // Use useCallback to memoize the submitBooking function
+  const submitBooking = React.useCallback(async () => {
     if (!session || !params.id) {
       setError('Missing session data or booking reference');
       return;
@@ -173,15 +192,23 @@ const Page = () => {
       return;
     }
   
-    // // Validate guest information
-    // const isValid = guests.every(
-    //   (guest) => guest.firstName && guest.lastName && guest.email && guest.contactNumber
-    // );
+    // Check if all forms are valid according to our form validation state
+    const areAllFormsValid = formValidity.every(isValid => isValid);
+    
+    if (!areAllFormsValid) {
+      setError('Please complete all required guest information correctly');
+      return;
+    }
+    
+    // Additional validation on the raw data as a secondary check
+    const isDataValid = guests.every(
+      (guest) => guest.firstName && guest.lastName && guest.email && guest.contactNumber
+    );
   
-    // if (!isValid) {
-    //   setError('Please fill in all required guest information');
-    //   return;
-    // }
+    if (!isDataValid) {
+      setError('Please fill in all required guest information');
+      return;
+    }
   
     try {
       setLoading(true);
@@ -190,11 +217,25 @@ const Page = () => {
       const roomAllocationPayload: RoomAllocationPayload = {
         traceId: session.traceId,
         //@ts-ignore can't be fixed will do later
-        roomsAllocations: Array.from({ length: session.roomAllocations.length}).map((_, index) => ({
+        roomsAllocations: Array.from({ length: session.roomAllocations.length}).map((_, index) => {
+          // Ensure each guest has the required fields filled in
+          const guestData = {
+            ...guests[index],
+            // Ensure the guest type is "adult" - this was missing in the initial form data
+            type: 'adult',
+            // Ensure the guest data is properly structured
+            firstName: guests[index].firstName.trim(),
+            lastName: guests[index].lastName.trim(),
+            email: guests[index].email.trim(),
+            contactNumber: guests[index].contactNumber.trim()
+          };
+          
+          return {
             rateId: String(session.roomAllocations[index].rate_id),
             roomId: String(session.roomAllocations[index].room_id),
-            guests: [guests[index]]
-          }))
+            guests: [guestData]
+          };
+        })
       };
   
       const roomAllocationResponse = await api.post(
@@ -232,7 +273,7 @@ const Page = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session, params.id, isRazorpayLoaded, formValidity, guests, handleRazorpayPayment]);
 
   React.useEffect(() => {
     // Set up bottom order bar with the combined function
@@ -240,7 +281,7 @@ const Page = () => {
     setHandleCreateItinerary(submitBooking);
     setInfoTitle('inclusive of all taxes');
     setInfoSubtitle(`₹${session?.finalRate ? session.finalRate : 0} total` || 'Guests not Selected');
-  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, session])
+  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, session, submitBooking])
 
   if (loading) {
     return (
@@ -459,6 +500,7 @@ const Page = () => {
            updateGuest={updateGuest}
            isPanCardRequired={session?.is_pan_card_required || false}
            isPassportRequired={session?.is_passport_required || false}
+           onValidationChange={handleValidationChange}
          />
           ))}
                 </div>

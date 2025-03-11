@@ -300,12 +300,12 @@ export function SelectedHotels({
                             delay: hotelIndex * 0.15,
                             ease: "easeOut" 
                           }}
-                          className='flex flex-col items-start justify-start w-64 bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300'>
-                          <div className="relative w-full h-36">
+                          className='flex flex-col items-start justify-start w-64 bg-white rounded-lg overflow-hidden transition-shadow duration-300'>
+                          <div className="relative w-full h-36 overflow-hidden rounded-lg">
                             <img 
-                              src={hotel?.hero_image?.url || "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png"} 
+                              src={hotel?.images[0].url || "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png"} 
                               alt={hotel.name} 
-                              className='w-full h-36 object-cover' 
+                              className='w-full h-36 object-cover rounded-lg overflow-hidden' 
                             />
                             {hotel.type !== 'PRIMARY' && showOptionText && (
                               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-start justify-start p-3">

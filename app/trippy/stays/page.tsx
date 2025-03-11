@@ -7,7 +7,6 @@ import { formatDate } from '@/app/lib/utils'
 import { ArrowRight } from 'lucide-react'
 import { api } from '@/app/lib/axios'
 import { useRouter } from 'next/navigation';
-import { useHotelStore } from '@/app/store/hotelsSearchStore'
 
 const Page = () => {
   const router = useRouter();

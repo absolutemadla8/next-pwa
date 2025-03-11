@@ -16,6 +16,7 @@ import ErrorSheet from '../components/ui/ErrorSheet';
 import PassportExpiryPicker from '../components/ui/PassportExpiryPicker';
 import AmenitiesBottomSheet from '../components/stays/AmenitiesBottomSheet';
 import PoliciesBottomSheet from '../components/stays/PoliciesBottomSheet';
+import HotelFilterBottomSheet from '../components/stays/HotelFilterBottomSheet';
 import useItineraryStore from '../store/itineraryStore';
 import BottomNavigation from '../components/trippy/BottomNavigation';
 import { IconApps, IconBubbleText, IconBuildings, IconDiscount, IconHome, IconNavigationDiscount, IconSparkles, IconUserCircle } from '@tabler/icons-react';
@@ -121,7 +122,7 @@ export default function TrippyLayout({
       </main>
 
       {/* Bottom Navigation */}
-      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search' || pathname === '/trippy/deals') ?
+      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search' || pathname === '/trippy/deals' || pathname === '/trippy/stays/search/map') ?
       <div className='flex items-center w-full h-[9vh]'>
         <BottomNavigation navItems={navigationItems} />
       </div>
@@ -278,6 +279,18 @@ export default function TrippyLayout({
         showPin={sheetConfig.showPin}
       >
         <PoliciesBottomSheet />
+      </BottomSheet>
+      
+      {/* Hotel Filter Bottom Sheet */}
+      <BottomSheet
+        isOpen={activeSheet === 'filter'}
+        onClose={closeSheet}
+        title={sheetConfig.title}
+        minHeight={sheetConfig.minHeight}
+        maxHeight={sheetConfig.maxHeight}
+        showPin={sheetConfig.showPin}
+      >
+        <HotelFilterBottomSheet />
       </BottomSheet>
     </div>
   );

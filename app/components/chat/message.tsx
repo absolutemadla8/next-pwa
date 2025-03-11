@@ -15,6 +15,7 @@ import { SessionCheckout } from "./SessionCheckout";
 import { RouteList } from "./RouteList";
 import { useChat } from "ai/react";
 import { SelectedHotels } from "./SelectedHotels";
+import { LabelSearchResults } from "./LabelSearchResults";
 
 export const Message = ({
   chatId,
@@ -71,6 +72,9 @@ export const Message = ({
                     toolName === "getRoutes"? (
                       <RouteList isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ) :
+                    toolName === "getLabels"? (
+                      <LabelSearchResults isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ):
                     toolName === "createItinerary" ? (
                       <SelectedHotels isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ):
@@ -98,6 +102,9 @@ export const Message = ({
                     toolName === "getRoutes"? (
                       <RouteList toolName={toolName} chatId={chatId} />
                     ) :
+                    toolName === "getLabels"? (
+                      <LabelSearchResults toolName={toolName} chatId={chatId} />
+                    ):
                     toolName === "createItinerary" ? (
                       <SelectedHotels toolName={toolName} chatId={chatId}/>
                     ):

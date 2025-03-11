@@ -86,8 +86,8 @@ const DealCard: React.FC<DealCardProps> = ({ deal, onFavoritePress, onPress }) =
           </h3>
           
           <div className="flex flex-row items-center justify-between w-full">
-            <div className="bg-gradient-to-r from-[#E9F2FF] to-[#CCE0FF] py-1 px-3 rounded-md flex flex-row items-center gap-x-1 w-56 truncate text-ellipsis">
-              <span className="font-semibold text-[#1D4F7B] text-xs">
+            <div className="bg-gradient-to-r from-[#E9F2FF] to-[#CCE0FF] py-1 px-3 rounded-md flex flex-row items-center gap-x-1 w-56 overflow-clip">
+              <span className="font-semibold text-[#1D4F7B] text-xs w-[98%] truncate text-ellipsis">
                 {deal.itineraries[0]?.name}
               </span>
             </div>

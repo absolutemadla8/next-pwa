@@ -1,9 +1,12 @@
 'use client'
 import HotelCard from '@/app/components/stays/HotelCard'
+import HotelFilterBottomSheet from '@/app/components/stays/HotelFilterBottomSheet'
 import StayInformationHeader from '@/app/components/stays/StayInformationHeader'
 import { api } from '@/app/lib/axios'
 import { formatDate } from '@/app/lib/utils'
+import { useHotelSearchStore } from '@/app/store/hotelsSearchStore'
 import useItineraryStore from '@/app/store/itineraryStore'
+import { IconMap } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
@@ -17,9 +20,9 @@ const Page = () => {
     addRoomToItinerary,
     increaseAdultsInRoom
   } = useItineraryStore();
+  const {hotels, setHotels} = useHotelSearchStore();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [hotels, setHotels] = React.useState([]);
 
   React.useEffect(() => {
     const searchHotels = async () => {
@@ -104,6 +107,17 @@ const Page = () => {
             />
           ))}
         </div>
+        <div className='absolute w-full bottom-20 flex flex-col items-center justify-center pb-2'>
+        <button 
+            className='px-4 py-2 bg-gray-800 text-white rounded-full flex items-center'
+            onClick={() => router.push('/trippy/stays/search/map')}
+          >
+           <IconMap className='mr-2'/>
+            <span className='text-sm tracking-tight'>
+            Map View
+            </span>
+          </button>
+          </div>
     </div>
   )
 }

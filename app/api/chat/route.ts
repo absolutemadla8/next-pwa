@@ -76,7 +76,8 @@ export async function POST(request: Request) {
         Sequence:
         1. If user mentions a location, immediately call searchLocation tool
         2. After location selection, call getRoutes tool
-        3. After route selection, call createItinerary tool with a creative name
+        3. After route selection, call getLabels tool to get definite labels for the itinerary creation
+        3. After route selection, call createItinerary tool with a creative name and use label slugs recieved from getLabels tool.
         4. Ask for any missing details like start date
         5. Todays date is ${new Date().toISOString().split('T')[0]}
         Rules:
@@ -111,6 +112,19 @@ export async function POST(request: Request) {
             const routesResponse = await serverApi.get(`/routes/country/${countryCode}`);
             //@ts-ignore mlmr
             return routesResponse.data;
+          },
+        },
+        getLabels: {
+          description: "Get a list of labels in the server from the preferences of user.",
+          parameters: z.object({
+            labels: z.array(z.string()).describe("An array of labels for the trip on basis of user preferences (e.g., ['romantic', 'luxe'])."),
+          }),
+          execute: async ({ labels }) => {
+            const labelsResponse = await serverApi.post(`/labels/search`, {
+              keywords: labels
+            });
+            //@ts-ignore mlmr
+            return labelsResponse.data;
           },
         },
         // getCheapestDates: {
@@ -170,13 +184,15 @@ export async function POST(request: Request) {
             trip_name: z.string().describe("The name of the trip."),
             start_date: z.string().describe("The start date of the trip in YYYY-MM-DD format (e.g., '2024-01-01')."),
             nights: z.number().describe("The number of nights for the trip."),
+            labels: z.array(z.string()).describe("An array of labels slugs recieved for user's preferences from getLabels tool."),
           }),
-          execute: async ({ trip_route_id, trip_name, start_date, nights }) => {
+          execute: async ({ trip_route_id, trip_name, start_date, nights, labels }) => {
             const createItineraryResponsese = await serverApi.post(`/trippy/trip/create`, {
               trip_route_id,
               trip_name,
               start_date,
               nights,
+              labels
             });
             //@ts-ignore mlmr
             return createItineraryResponsese.data.data;

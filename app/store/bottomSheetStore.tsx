@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 
 // Define all possible bottom sheet IDs
-type BottomSheetId = 'dateRange' | 'search' | 'roomConfig' | 'error' | 'passportExpiry' | 'amenities' | 'policies' | null;
+type BottomSheetId = 'dateRange' | 'search' | 'roomConfig' | 'error' | 'passportExpiry' | 'amenities' | 'policies' | 'filter' | null;
 
 // Define configuration options for bottom sheets
 interface SheetConfig {

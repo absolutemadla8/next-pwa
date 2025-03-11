@@ -36,8 +36,8 @@ export function Chat({
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 
   return (
-    <div className="flex flex-row justify-center h-dvh max-h-full bg-gradient bg-gradient-to-b from-blue-100 to-violet-100 w-full md:max-w-md">
-      <div className="flex flex-col justify-between items-center w-full md:max-w-[500px] h-full">
+    <div className="flex flex-row justify-center h-dvh max-h-full bg-gradient bg-gradient-to-b from-blue-100 to-violet-100">
+      <div className="flex flex-col justify-between items-center w-full md:max-w-md mx-auto h-full">
         <div
           ref={messagesContainerRef}
           className="flex-1 flex flex-col gap-4 w-full overflow-y-auto px-4 md:px-0 py-10"
@@ -62,7 +62,7 @@ export function Chat({
         </div>
 
         <div className="relative flex flex-col w-full md:w-md px-4 md:px-0 pb-4 items-center justify-center">
-        <div className='absolute bottom-0 left-0 right-0 flex flex-col items-center justify-center md:max-w-md bg-gradient-to-t from-white via-white to-transparent px-4 pt-4 pb-8 z-20'>
+        <div className='absolute bottom-0 left-0 right-0 flex flex-col items-center justify-center md:max-w-md mx-auto bg-gradient-to-t from-white via-white to-transparent px-4 pt-4 pb-8 z-20'>
           <form className="flex flex-row gap-2 relative items-end w-full">
             <MultimodalInput
               input={input}
