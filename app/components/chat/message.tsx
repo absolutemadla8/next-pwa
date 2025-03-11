@@ -16,6 +16,9 @@ import { RouteList } from "./RouteList";
 import { useChat } from "ai/react";
 import { SelectedHotels } from "./SelectedHotels";
 import { LabelSearchResults } from "./LabelSearchResults";
+import { SelectedActivities } from "./SelectedActivities";
+import { ItineraryMessage } from "./ItineraryMessage";
+import { HumanRefer } from "./humanRefer";
 
 export const Message = ({
   chatId,
@@ -48,14 +51,6 @@ export const Message = ({
       </div>
 
       <div className="flex flex-col gap-2 w-full">
-        {content && typeof content === "string" && (
-          <div
-          style={{ fontFamily: role === "assistant" ? 'var(--font-domine)' : ''}}
-          className={`text-blue-950 flex flex-col gap-4 ${role === "assistant" ? "text-lg" : "text-sm tracking-tight bg-white rounded-lg p-2 border border-slate-200"}`}>
-            <Markdown>{content}</Markdown>
-          </div>
-        )}
-
         {toolInvocations && (
           <div className="flex flex-col gap-4">
             {toolInvocations.map((toolInvocation) => {
@@ -78,9 +73,18 @@ export const Message = ({
                     toolName === "createItinerary" ? (
                       <SelectedHotels isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ):
+                    toolName === "addActivities" ? (
+                      <SelectedActivities isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ):
                     toolName === "searchHotels"? (
                       <HotelsList isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ) :
+                    toolName === "getTrip" ? (
+                      <ItineraryMessage isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ) :
+                    toolName === "referToHuman" ? (
+                      <HumanRefer isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ):
                     toolName === "getRoomRates" ? (
                       <RoomRates results={result} chatId={chatId} />
                     )
@@ -132,6 +136,14 @@ export const Message = ({
             {attachments.map((attachment) => (
               <PreviewAttachment key={attachment.url} attachment={attachment} />
             ))}
+          </div>
+        )}
+
+        {content && typeof content === "string" && (
+          <div
+          style={{ fontFamily: role === "assistant" ? 'var(--font-domine)' : ''}}
+          className={`text-blue-950 flex flex-col gap-4 ${role === "assistant" ? "text-lg" : "text-sm tracking-tight bg-white rounded-lg p-2 border border-slate-200"}`}>
+            <Markdown>{content}</Markdown>
           </div>
         )}
       </div>

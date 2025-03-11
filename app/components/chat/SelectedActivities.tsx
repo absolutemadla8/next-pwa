@@ -152,7 +152,7 @@ const TypingEffect = ({ text }: { text: string }) => {
   );
 };
 
-export function SelectedHotels({ 
+export function SelectedActivities({ 
   toolName, 
   state,
   results,
@@ -162,9 +162,9 @@ export function SelectedHotels({
   onOpenChange 
 }: ToolProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedHotels, setSelectedHotels] = useState<Record<string, boolean>>({});
+  const [selectedActivities, setSelectedActivities] = useState<Record<string, boolean>>({});
   const [showOptionText, setShowOptionText] = useState<boolean>(false);
-  const [animatingHotels, setAnimatingHotels] = useState<Record<string, boolean>>({});
+  const [animatingActivities, setAnimatingActivities] = useState<Record<string, boolean>>({});
   
   const { append, isLoading: chatIsLoading } = useChat({
     id: chatId,
@@ -185,33 +185,33 @@ export function SelectedHotels({
 
   // Effect to auto-select primary hotels after 1 second
   useEffect(() => {
-    if (!isLoading && searchResults?.itinerary?.destinations) {
-      const newSelectedHotels: Record<string, boolean> = {};
+    if (!isLoading && searchResults?.destinations) {
+      const newSelectedActivities: Record<string, boolean> = {};
       const animatingIds: Record<string, boolean> = {};
       
       const timer = setTimeout(() => {
         //@ts-ignore mlmr
-        searchResults.itinerary.destinations.forEach(dest => {
-             //@ts-ignore mlmr
-          dest.hotels.forEach(hotel => {
-            if (hotel.type === 'PRIMARY') {
-              animatingIds[hotel.id] = true;
+        searchResults.destinations.forEach(dest => {
+          //@ts-ignore mlmr
+          dest.activities?.forEach(activity => {
+            if (activity.type === 'PRIMARY') {
+              animatingIds[activity.id] = true;
               
               // Set selected state after animation starts with staggered delay
-              const staggerDelay = 800 + (hotel.day_number * 600) + (Math.random() * 300);
+              const staggerDelay = 800 + (Math.random() * 300);
               setTimeout(() => {
-                setSelectedHotels(prev => ({
+                setSelectedActivities(prev => ({
                   ...prev,
-                  [hotel.id]: true
+                  [activity.id]: true
                 }));
               }, staggerDelay);
             }
           });
         });
         
-        setAnimatingHotels(animatingIds);
+        setAnimatingActivities(animatingIds);
         
-        // Show "Marked as option" text after primary hotels are selected
+        // Show "Marked as option" text after primary activities are selected
         // Use a longer delay to ensure all selections have completed
         setTimeout(() => {
           setShowOptionText(true);
@@ -252,7 +252,7 @@ export function SelectedHotels({
         }, 0) || 0
       }
     >
-      {"@stan Select hotels for the user" + query || "Search for locations"}
+      {"@eva Add activites for the user" + query || "Search for locations"}
     </ToolArgsSection>
   );
 
@@ -264,7 +264,7 @@ export function SelectedHotels({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
     >
-      <Section title="@stan" tool={toolName}>
+      <Section title="@eva" tool={toolName}>
         {(chatIsLoading && isToolLoading) || isLoading ? (
           <StepLoader
             steps={searchSteps}
@@ -281,7 +281,7 @@ export function SelectedHotels({
               <div className='flex flex-col gap-y-4 w-full'>
                 
                 { //@ts-ignore mlmr
-                searchResults?.itinerary?.destinations?.map((dest, index) => (
+                searchResults?.destinations?.map((dest, index) => (
                   <div key={index} className='flex flex-col gap-y-2 w-full'>
                     <h1 style={{ fontFamily: 'var(--font-nohemi)'}}
                       className="text-md text-blue-950 font-medium mb-2">
@@ -290,7 +290,7 @@ export function SelectedHotels({
                     <HorizontalScroll>
                       {
                        //@ts-ignore mlmr
-                      dest?.hotels?.map((hotel, hotelIndex) => (
+                      dest?.activities?.map((activity, hotelIndex) => (
                         <motion.div
                           key={hotelIndex}
                           initial={{ opacity: 0, y: 20 }}
@@ -303,11 +303,11 @@ export function SelectedHotels({
                           className='flex flex-col items-start justify-start w-64 bg-white rounded-lg overflow-hidden transition-shadow duration-300'>
                           <div className="relative w-full h-36 overflow-hidden rounded-lg">
                             <img 
-                              src={hotel?.images[0].url || "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png"} 
-                              alt={hotel.name} 
+                              src={activity?.images[0].url || "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png"} 
+                              alt={activity.title} 
                               className='w-full h-36 object-cover rounded-lg overflow-hidden' 
                             />
-                            {hotel.type !== 'PRIMARY' && showOptionText && (
+                            {activity.type !== 'PRIMARY' && (
                               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-start justify-start p-3">
                                 <div className="px-2 py-1 rounded text-blue-950 bg-white font-medium">
                                   <TypingText text="Marked as option" />
@@ -321,16 +321,16 @@ export function SelectedHotels({
                                 style={{ fontFamily: 'var(--font-nohemi)' }} 
                                 className='text-lg text-blue-950 w-[68%] truncate'
                               >
-                                 {hotel.name}
+                                 {activity.title}
                               </h1>
                             </div>
-                            <span className='text-xs text-slate-600 font-normal tracking-tight truncate w-full'>
-                              { hotel?.location || `Day ${hotel.day_number}`}
+                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-xs text-slate-600 font-normal tracking-tight truncate w-full'>
+                              { activity?.duration } Minutes
                             </span>
                           </div>
                           <div className="mt-auto p-2 w-full">
                             <AnimatePresence mode="wait">
-                              {selectedHotels[hotel.id] ? (
+                              {selectedActivities[activity.id] ? (
                                 <motion.button 
                                   className="w-full py-2 px-4 bg-green-500 text-white rounded-lg flex items-center justify-center"
                                   initial={{ scale: 0.9, opacity: 0 }}

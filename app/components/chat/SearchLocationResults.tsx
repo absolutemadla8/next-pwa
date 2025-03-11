@@ -152,7 +152,7 @@ export function SearchLocationResults({
                   className="flex items-center justify-between w-full p-3 h-16 text-left bg-white pl-8"
                   onClick={() => append({
                     role: "user",
-                    content: `Give me hotels in ${destination.name}, ${cluster.name}!`,
+                    content: `Create an itinerary for ${destination.name}, ${cluster.name}!`,
                   })}
                 >
                   <ResultItem 
@@ -176,7 +176,7 @@ export function SearchLocationResults({
               className="flex items-center justify-between w-full p-3 h-16 text-left bg-white"
               onClick={() => append({
                 role: "user",
-                content: `Give me hotels in ${country.name}!`,
+                content: `Create an itinerary for ${country.name}!`,
               })}
             >
               <ResultItem 
@@ -199,7 +199,7 @@ export function SearchLocationResults({
               className="flex items-center justify-between w-full p-3 h-16 text-left bg-white"
               onClick={() => append({
                 role: "user",
-                content: `Give me hotels in ${destination.name}${destination.country ? `, ${destination.country.name}` : ''}!`,
+                content: `Create an itinerary for ${destination.name}${destination.country ? `, ${destination.country.name}` : ''}!`,
               })}
             >
               <ResultItem 

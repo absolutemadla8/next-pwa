@@ -78,9 +78,14 @@ export async function POST(request: Request) {
         2. After location selection, call getRoutes tool
         3. After route selection, call getLabels tool to get definite labels for the itinerary creation
         3. After route selection, call createItinerary tool with a creative name and use label slugs recieved from getLabels tool.
-        4. Ask for any missing details like start date
-        5. Todays date is ${new Date().toISOString().split('T')[0]}
+        4. After itinerary creation, call addActivities tool to add activities in the itinerary and use label slugs recieved from getLabels tool.
+        5  After adding activites, use tool getTrip tool to get the entire trip itinerary.
+        6. After activities are added use tool referToHuman and tell the user that everything is done and you will now refer this itinerary to a human agent to review.
+        6. Ask for any missing details like start date
+        7. Todays date is ${new Date().toISOString().split('T')[0]}
         Rules:
+        - After if a single route is available then don't wait for user's response immediately call getLabels.
+        - After route selection, all tools calls should be run back to back without user's input.
         - Use subtle stoner lingo
         - Call relevant tools without mentioning it to user
         - Keep responses to one concise sentence
@@ -198,6 +203,45 @@ export async function POST(request: Request) {
             return createItineraryResponsese.data.data;
           },
         },
+        addActivities: {
+          description: "Add activities to the created itinerary",
+          parameters: z.object({
+            itineraryId: z.string().describe("The unique identifier for the itinerary."),
+            labels: z.array(z.string()).describe("An array of labels slugs recieved for user's preferences from getLabels tool."),
+          }),
+          execute: async ({ itineraryId, labels }) =>{
+            const addActivitiesResponse = await serverApi.post(`/trippy/trip/activities`, {
+              itineraryId,
+              labels
+            });
+            //@ts-ignore mlmr
+            return addActivitiesResponse.data.data;
+          }
+        },
+        getTrip:{
+          description: "Get the entire trip itinerary",
+          parameters: z.object({
+            itineraryId: z.string().describe("The unique identifier for the itinerary."),
+          }),
+          execute: async ({ itineraryId }) =>{
+            const tripItineraryResponse = await serverApi.get(`/itineraries/${itineraryId}/trip`);
+            //@ts-ignore mlmr
+            return tripItineraryResponse.data;
+          }
+        },
+        referToHuman:{
+          description: "This is to get a refered advisor in the trip",
+          parameters: z.object({
+            itineraryId: z.string().describe("The unique identifier for the itinerary."),
+          }),
+          execute: async ({ itineraryId }) =>{
+            const tripItineraryResponse = await serverApi.post(`/itineraries/advisor`,{
+              itinerary_id:itineraryId
+            });
+            //@ts-ignore mlmr
+            return tripItineraryResponse.data;
+          }
+        }
         // getRoomRates: {
         //   description: "Get available room rates and booking details for a specific hotel, check-in/out dates, and occupancy details.",
         //   parameters: z.object({

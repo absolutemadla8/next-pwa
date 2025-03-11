@@ -61,14 +61,16 @@ export function Section({ title, tool, children }: SectionProps) {
     switch (tool) {
       case 'searchLocation':
         return "text-blue-600";
-      case 'searchHotels':
+      case 'getRoutes':
+        return "text-blue-600";
+      case 'getLabels':
+        return "text-violet-600";
+      case 'createItinerary':
         return "text-rose-600";
-      case 'searchFlights':
-        return "text-emerald-950";
-      case 'checkAvailability':
-        return "text-amber-950";
-      case 'searchPricing':
-        return "text-rose-950";
+      case 'addActivities':
+        return "text-indigo-600";
+      case 'getTrip':
+        return "text-violet-600";
       default:
         return "text-blue-950";
     }
