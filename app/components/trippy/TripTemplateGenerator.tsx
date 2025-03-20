@@ -268,7 +268,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
                     <ListboxOption 
                       key="empty" 
                       value="" 
-                      className="cursor-default select-none relative py-2 pl-10 pr-4 text-gray-900 hover:bg-blue-100"
+                      className="cursor-default select-none relative py-2 px-4 text-gray-900 hover:bg-blue-100"
                     >
                       {({ selected, active }) => (
                         <span style={{ fontFamily: 'var(--font-nohemi)' }} className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
@@ -280,7 +280,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
                       <ListboxOption 
                         key={dest} 
                         value={dest} 
-                        className="cursor-default select-none relative py-2 pl-10 pr-4 text-gray-900 hover:bg-blue-100"
+                        className="cursor-default select-none relative py-2 px-4 text-gray-900 hover:bg-blue-100"
                       >
                         {({ selected, active }) => (
                           <span style={{ fontFamily: 'var(--font-nohemi)' }} className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
@@ -315,16 +315,16 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
                   </span>
                 </button>
                 {showMonthDropdown && (
-                  <div className="absolute z-10 mt-1 w-64 bg-white border border-gray-100 rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5">
-                    <div className="flex flex-wrap gap-1">
+                  <div className="absolute z-10 mt-1 w-full left-0 bg-white border border-gray-100 rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5 max-h-60 overflow-y-auto">
+                    <div className="grid grid-cols-3 gap-2">
                       {monthOptions.map(month => (
                         <button
                           key={month}
                           onClick={() => handleMultiSelectChange(month, months, setMonths)}
-                          className={`px-2 py-1 rounded text-xs ${
+                          className={`px-3 py-2 rounded-md text-sm flex items-center justify-center ${
                             months.includes(month) 
                               ? 'bg-blue-500 text-white' 
-                              : 'bg-gray-200 text-gray-700'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
                           {month}
@@ -360,15 +360,15 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
                 </button>
                 {showLuxeDropdown && (
                   <div className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="grid grid-cols-2 gap-2">
                       {luxeLevels.map(level => (
                         <button
                           key={level}
                           onClick={() => handleMultiSelectChange(level, luxeOptions, setLuxeOptions)}
-                          className={`px-2 py-1 rounded text-xs ${
+                          className={`px-3 py-2 rounded-md text-sm flex items-center justify-center ${
                             luxeOptions.includes(level) 
                               ? 'bg-blue-500 text-white' 
-                              : 'bg-gray-200 text-gray-700'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
                           {level}
@@ -401,16 +401,16 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
                   </span>
                 </button>
                 {showVibeDropdown && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5">
-                    <div className="flex flex-wrap gap-1">
+                  <div className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg p-2 ring-1 ring-black ring-opacity-5 max-h-60 overflow-y-auto">
+                    <div className="flex flex-col space-y-2">
                       {vibes.map(vibe => (
                         <button
                           key={vibe}
                           onClick={() => handleMultiSelectChange(vibe, vibeOptions, setVibeOptions)}
-                          className={`px-2 py-1 rounded text-xs ${
+                          className={`px-3 py-2 rounded-md text-sm text-left ${
                             vibeOptions.includes(vibe) 
                               ? 'bg-blue-500 text-white' 
-                              : 'bg-gray-200 text-gray-700'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
                           {vibe}

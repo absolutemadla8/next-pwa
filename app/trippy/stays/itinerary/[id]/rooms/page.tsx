@@ -10,6 +10,7 @@ import { SelectRoomRatesPayload } from '@/app/types/roomRate'
 import { api } from '@/app/lib/axios'
 import { formatDate } from '@/app/lib/utils'
 import useBottomOrderStore from '@/app/store/bottomOrderStore'
+import { validateRateSelection, getCompatibleRates } from '@/app/lib/roomValidation';
 
 const Page = () => {
   const params = useParams();
@@ -21,10 +22,9 @@ const Page = () => {
     type, 
     compatibleRates,
     selectedRateIds,
+    recommendations,
     addSelectedRateId,
     clearSelectedRateIds,
-    fetchCompatibleRates,
-    validateRateSelection,
     setCompatibleRates
   } = useRoomStore();
   
@@ -32,6 +32,7 @@ const Page = () => {
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [isMultiRoom, setIsMultiRoom] = useState(false);
   const [error, setError] = useState('');
+  const [currentRecommendationId, setCurrentRecommendationId] = useState('');
   const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const {itinerary, setRecommendationId, setRoomDetails, getTotalPrice} = useItineraryStore();
   const router = useRouter();
@@ -83,6 +84,9 @@ const Page = () => {
       // Update total price
       const totalPrice = getTotalPrice();
       setSelectedPrice(totalPrice);
+      
+      // Store the current recommendation ID
+      setCurrentRecommendationId(recommendationId);
       return;
     }
     
@@ -126,6 +130,11 @@ const Page = () => {
       setRecommendationId(recommendationId);
     }
     
+    // Store the current recommendation ID if this is the first room
+    if (currentRoomIndex === 0) {
+      setCurrentRecommendationId(recommendationId);
+    }
+    
     // Update total price
     const totalPrice = getTotalPrice();
     setSelectedPrice(totalPrice);
@@ -135,13 +144,16 @@ const Page = () => {
       try {
         setLoading(true);
         
-        // Get compatible rates for the next room
-        const compatRates = await fetchCompatibleRates(rateId, selectedRateIds);
+        // Get compatible rates for the next room using our utility function
+        const compatRates = getCompatibleRates(updatedRateIds, rooms, recommendations);
+        
+        // Update compatible rates in the store
+        setCompatibleRates(compatRates);
         
         // Move to the next room
         setCurrentRoomIndex(currentRoomIndex + 1);
       } catch (error) {
-        console.error("Error fetching compatible rates:", error);
+        console.error("Error getting compatible rates:", error);
       } finally {
         setLoading(false);
       }
@@ -167,14 +179,20 @@ const Page = () => {
           allRateIds = allRateIds.slice(0, itinerary.rooms.length);
         }
         
-        // Validate the complete selection
-        const isValid = await validateRateSelection(allRateIds);
+        // Validate the complete selection using our utility function
+        const validation = validateRateSelection(allRateIds, recommendations);
         
-        if (!isValid) {
+        if (!validation.valid) {
           console.error("Invalid rate selection combination");
           setError("This room selection is not compatible with your previous selections. Please try a different option.");
           setLoading(false);
           return;
+        }
+        
+        // If we have a valid recommendation ID, store it
+        if (validation.recommendationId) {
+          setCurrentRecommendationId(validation.recommendationId);
+          setRecommendationId(validation.recommendationId);
         }
         
         // Selection is valid, update the store for consistent state
@@ -199,8 +217,22 @@ const Page = () => {
     price: number,
     bookNow = false // Optional parameter to indicate if we should proceed to booking
   ) => {
-    // For single room or direct booking, use this approach
-    if (!isMultiRoom || !bookNow) {
+    // For single room selection, update the itinerary directly
+    if (!isMultiRoom) {
+      // Update room details in the itinerary store for all rooms in single selection mode
+      itinerary.rooms.forEach(room => {
+        setRoomDetails(room.id, { rateId, roomId, price });
+      });
+      
+      // Set the recommendation ID for the itinerary
+      setRecommendationId(recommendationId);
+      setCurrentRecommendationId(recommendationId);
+      
+      // Update total price
+      const totalPrice = getTotalPrice();
+      setSelectedPrice(totalPrice);
+    } else if (!bookNow) {
+      // For multi-room selection without booking, use the existing handleRateSelection
       await handleRateSelection(roomId, rateId, recommendationId, price);
     }
     
@@ -212,11 +244,11 @@ const Page = () => {
           return;
         }
         setLoading(true);
-
-        // Get all selected rate IDs
+  
+        // Get all selected rate IDs - handle both single and multi-room cases
         let allRateIds = isMultiRoom 
-          ? [...selectedRateIds] // Make a copy to avoid mutating the original
-          : itinerary.rooms.map(room => String(room.rateId));
+          ? [...selectedRateIds] // Use selected rate IDs for multi-room
+          : [rateId]; // For single room, just use the selected rate ID
           
         // Make sure we have exactly the right number of rate IDs for multi-room selection
         if (isMultiRoom) {
@@ -246,44 +278,42 @@ const Page = () => {
         }
         
         // Validate the selection before proceeding (for multiple rooms)
-        if (allRateIds.length > 1) {
-          const isValid = await validateRateSelection(allRateIds);
+        if (isMultiRoom && allRateIds.length > 1) {
+          const validation = validateRateSelection(allRateIds, recommendations);
           
-          if (!isValid) {
+          if (!validation.valid) {
             console.error('Rate selection validation failed');
             setError('Your room selection is not valid. Please try selecting different room types that are compatible with each other.');
             setLoading(false);
             return;
           }
+          
+          // If we have a valid recommendation ID, use it
+          if (validation.recommendationId) {
+            recommendationId = validation.recommendationId;
+          }
         }
-
-        // Make sure we have correct mapping between room rates and itinerary rooms
-        if (isMultiRoom && allRateIds.length !== itinerary.rooms.length) {
-          console.error('Rate IDs count does not match room count');
-          setError(`You need to select rates for all ${itinerary.rooms.length} rooms. Please complete the room selection.`);
-          setLoading(false);
-          return;
-        }
-        
+  
+        // Create the payload for booking
         const payload: SelectRoomRatesPayload = {
           roomsAndRateAllocations: itinerary.rooms.map((room, index) => ({
-            rateId: String(isMultiRoom ? allRateIds[index] : room.rateId),
-            roomId: String(room.roomId || roomId), // Fallback to selected roomId if not set in room
+            rateId: String(isMultiRoom ? allRateIds[index] : rateId),
+            roomId: String(isMultiRoom ? room.roomId : roomId),
             occupancy: {
               adults: room.adults,
               childAges: room.children.map(child => child.age)
             }
           })),
           traceId,
-          recommendationId: String(recommendationId),
+          recommendationId: String(recommendationId || currentRecommendationId),
           items: [{
             code: type.code,
             type: 'HOTEL'
           }]
         };
-
+  
         const response = await api.post(`/hotels/itineraries/${itineraryId}/select-roomrates`, payload);
-
+  
         //@ts-ignore mlmr
         if (response?.data.status === 'success') {
           router.push(`/trippy/stays/itinerary/session/${params.id}`)
@@ -338,14 +368,13 @@ const Page = () => {
         // If we're going back to the first room, show the original rooms
         setCompatibleRates([]);
       } else if (currentRoomIndex > 1) {
-        // If we're going back to an intermediate room, fetch compatible rates
+        // If we're going back to an intermediate room, get compatible rates
         // based on selections up to that point
-        const previousSelections = selectedRateIds.slice(0, newPreviousIndex);
-        const lastSelectedRate = selectedRateIds[newPreviousIndex - 1]; // The rate ID from the room before the one we're going back to
-        
-        if (lastSelectedRate) {
-          // Fetch compatible rates based on previous selections
-          fetchCompatibleRates(lastSelectedRate, previousSelections.slice(0, -1));
+        const previousSelections = updatedRateIds.slice(0, newPreviousIndex);
+        if (previousSelections.length > 0) {
+          // Get compatible rates based on previous selections
+          const compatRates = getCompatibleRates(previousSelections, rooms, recommendations);
+          setCompatibleRates(compatRates);
         }
       }
     }
@@ -357,13 +386,13 @@ const Page = () => {
     setHandleCreateItinerary(() => handleRoomSelectAndBook(
       itinerary.rooms[0]?.roomId || '',
       itinerary.rooms[0]?.rateId || '',
-      itinerary.recommendationId || '',
+      itinerary.recommendationId || currentRecommendationId,
       getTotalPrice(),
       true // Pass true to initiate booking
     ));
     setInfoTitle('inclusive of all taxes');
     setInfoSubtitle(`Rs.${getTotalPrice()} total` || 'Guests not Selected');
-  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice, selectedRateIds])
+  }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, itinerary, getTotalPrice, selectedRateIds, currentRecommendationId])
 
   if (loading) {
     return (

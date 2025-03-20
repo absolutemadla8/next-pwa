@@ -1,9 +1,6 @@
 export interface CreateItineraryPayload {
-    checkIn: string;
-    checkOut: string;
-    nationality: string;
     hotelId: string;
-    occupancies: Array<{ numOfAdults: number; childAges?: number[] }>;
+    traceId: string;
   }
 
 // Type for Room Area

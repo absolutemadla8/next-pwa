@@ -72,7 +72,7 @@ export function HotelsList({
   const { append, isLoading: chatIsLoading } = useChat({
     id: chatId,
     body: { id: chatId },
-    maxSteps: 5,
+    maxSteps: 10,
   });
 
   const isToolLoading = state === 'call';

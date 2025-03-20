@@ -21,7 +21,7 @@ const Page = () => {
   const params = useParams();
   const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
   const { itinerary, getOccupancies, getTotalAdults, getTotalChildren, getTotalRooms } = useItineraryStore();
-  const {setRooms, setItineraryId, setType, setTraceId,setSessionId} = useRoomStore();
+  const {setRooms, setRecommendations, setItineraryId, setType, setSessionId, traceId} = useRoomStore();
   const {hotel, setHotel} = useHotelStore();
   const { openSheet } = useBottomSheetStore();
   const [isCreating, setIsCreating] = React.useState(false);
@@ -40,11 +40,8 @@ const Page = () => {
 
     try {
       const payload: CreateItineraryPayload = {
-        checkIn: itinerary.checkIn.toISOString().split('T')[0],
-        checkOut: itinerary.checkOut.toISOString().split('T')[0],
-        nationality: 'IN',
         hotelId: params.id as string,
-        occupancies: getOccupancies(),
+        traceId: traceId,
       };
 
       const response = await api.post('/hotels/itineraries/create', payload);
@@ -56,12 +53,13 @@ const Page = () => {
         setSessionId(response.data.data.sessionId);
         //@ts-ignore mlmr
         setRooms(response.data.data.rooms);
+         //@ts-ignore mlmr
+        setRecommendations(response.data.data.recommendations);
         //@ts-ignore mlmr
         setItineraryId(response.data.data.itineraryCode);
         //@ts-ignore mlmr
         setType(response.data.data.item)
-        //@ts-ignore mlmr
-        setTraceId(response.data.data.traceId)
+        
         router.push(`/trippy/stays/itinerary/${sessionId}/rooms`);
       } else {
         throw new Error('Failed to create itinerary');

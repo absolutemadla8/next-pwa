@@ -86,8 +86,30 @@ const HotelFilterBottomSheet = () => {
     // Close the bottom sheet
     closeSheet();
     
-    // Here you would typically trigger a search with the new filters
-    // This could be done by calling a function from another store or service
+    // Get the active inclusions (facilities)
+    const selectedFacilities = inclusions
+      .filter(inclusion => inclusion.selected)
+      .map(inclusion => inclusion.name);
+    
+    // Prepare the filter object to send to the backend
+    const filters = {
+      priceRange: {
+        min: priceRange.currentMin,
+        max: priceRange.currentMax
+      },
+      starRatings: starRatings.length > 0 ? starRatings : undefined,
+      facilities: selectedFacilities.length > 0 ? selectedFacilities : undefined,
+      rateOptions: {
+        // Check if specific inclusions are selected
+        freeBreakfast: inclusions.find(inc => inc.id === 'breakfast')?.selected || false,
+        freeCancellation: false // Default, can be added as an inclusion option later
+      }
+    };
+    
+    // Trigger hotel search with the new filters
+    if (typeof sheetConfig?.onApplyFilters === 'function') {
+      sheetConfig.onApplyFilters(filters);
+    }
   };
 
   // Animation variants for filter items

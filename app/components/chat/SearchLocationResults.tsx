@@ -74,7 +74,7 @@ export function SearchLocationResults({
       id: chatId,
       appendOnly: true // Specify that messages should be appended to existing chat
     },
-    maxSteps: 5,
+    maxSteps: 10,
     onFinish: () => {
       // Prevent URL change to maintain the same chat session
       window.history.replaceState({}, "", `/trippy/chat/${chatId}`);

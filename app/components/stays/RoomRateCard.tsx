@@ -159,6 +159,11 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
     return rates.find(rate => rate.rateId === rateId) || null;
   };
 
+  // Check if rate is selected in the itinerary
+  const isRateSelectedInItinerary = (rateId: string) => {
+    return itinerary.rooms[roomIndex]?.rateId === rateId;
+  };
+
   // If no room or no rates, return empty
   if (!room || !room.rates || room.rates.length === 0 || 
       (Object.keys(boardTypeRates).length === 0 && onlyRefundableRates.length === 0)) {
@@ -202,8 +207,15 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
         
         if (!selectedRate) return null;
         
+        const isRateSelected = selectedRateId === selectedRate.rateId || isRateSelectedInItinerary(selectedRate.rateId);
+        
         return (
-          <div key={boardType} className='flex flex-col items-start justify-start w-full bg-white overflow-hidden p-4 border-t border-slate-300'>
+          <div 
+            key={boardType} 
+            className={`flex flex-col items-start justify-start w-full overflow-hidden p-4 border-t border-slate-300 ${
+              isRateSelected ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'bg-white'
+            }`}
+          >
             {/* Board Type Header */}
             <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full lowercase'>
               {selectedRate.boardBasis.description}
@@ -266,8 +278,8 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Book Now Button */}
             <div className='w-full pt-3'>
               <AnimatedButton 
-                variant={selectedRateId && selectedRateId === selectedRate.rateId ? 'success' : 'primary'}
-                className='w-full' 
+                variant={isRateSelected ? 'success' : 'primary'}
+                className={`w-full ${isRateSelected ? 'bg-green-600 hover:bg-green-700' : ''}`} 
                 onClick={() => onBookNow(
                   room.roomId || room.id, 
                   selectedRate.rateId, 
@@ -276,8 +288,8 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
                 )}
               >
                 {isMultiRoom 
-                  ? (selectedRateId && selectedRateId === selectedRate.rateId ? 'Selected' : 'Book Now')
-                  : (itinerary.rooms.some(room => room.rateId === selectedRate.rateId) ? 'Selected' : 'Book Now')
+                  ? (isRateSelected ? '✓ Selected' : 'Select')
+                  : (isRateSelected ? '✓ Selected' : 'Book Now')
                 }
               </AnimatedButton>
             </div>
@@ -286,76 +298,87 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
       })}
       
       {/* Separate cards for refundable-only rates */}
-      {onlyRefundableRates.map((rate) => (
-        <div key={rate.rateId} className='flex flex-col items-start justify-start w-full bg-white rounded-xl overflow-hidden p-4 border border-blue-600'>
-          {/* Board Type Header with Refundable Indicator */}
-          <div className='flex flex-row items-center justify-between w-full'>
-            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
-              {rate.boardBasis.description}
-            </h1>
-            <span className='text-xs text-green-600 font-medium px-2 py-1 rounded-full bg-green-50 border border-green-200'>
-              Refundable
-            </span>
-          </div>
-          
-          {/* Cancellation Info */}
-          <div className='flex flex-row items-center justify-start gap-x-1 mt-1'>
-            <span className='text-xs text-slate-700 font-normal tracking-tight truncate'>
-              Free cancellation till
-            </span>
-            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-xs text-green-600 font-normal tracking-tight truncate mt-[1px]'>
-              {getCancellationDate(rate)}
-            </span>
-          </div>
-          
-          {/* Inclusions - show if available */}
-          {rate.includes && rate.includes.length > 0 && (
-            <div className='flex flex-col w-full mt-3'>
-              <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-sm text-blue-950 mb-1'>
-                Includes:
-              </h2>
-              <div className='flex flex-row flex-wrap gap-x-2 gap-y-1'>
-                {rate.includes.map((inclusion: string, index: number) => (
-                  <span key={index} className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded'>
-                    {inclusion}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Price Information */}
-          <div className='flex flex-col items-start justify-start pt-3'>
-            <div className='flex flex-row items-center justify-start gap-x-2'>
+      {onlyRefundableRates.map((rate) => {
+        const isRateSelected = selectedRateId === rate.rateId || isRateSelectedInItinerary(rate.rateId);
+        
+        return (
+          <div 
+            key={rate.rateId} 
+            className={`flex flex-col items-start justify-start w-full overflow-hidden p-4 ${
+              isRateSelected 
+                ? 'bg-blue-50 border-2 border-blue-600 rounded-xl' 
+                : 'bg-white border border-blue-600 rounded-xl'
+            }`}
+          >
+            {/* Board Type Header with Refundable Indicator */}
+            <div className='flex flex-row items-center justify-between w-full'>
               <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
-                Rs.{rate.finalRate.toLocaleString()}
+                {rate.boardBasis.description}
               </h1>
-              <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
-                room per night
+              <span className='text-xs text-green-600 font-medium px-2 py-1 rounded-full bg-green-50 border border-green-200'>
+                Refundable
               </span>
             </div>
-            <span className='text-xs text-teal-600 font-normal tracking-tight truncate'>
-              Inclusive of taxes and fee
-            </span>
+            
+            {/* Cancellation Info */}
+            <div className='flex flex-row items-center justify-start gap-x-1 mt-1'>
+              <span className='text-xs text-slate-700 font-normal tracking-tight truncate'>
+                Free cancellation till
+              </span>
+              <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-xs text-green-600 font-normal tracking-tight truncate mt-[1px]'>
+                {getCancellationDate(rate)}
+              </span>
+            </div>
+            
+            {/* Inclusions - show if available */}
+            {rate.includes && rate.includes.length > 0 && (
+              <div className='flex flex-col w-full mt-3'>
+                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-sm text-blue-950 mb-1'>
+                  Includes:
+                </h2>
+                <div className='flex flex-row flex-wrap gap-x-2 gap-y-1'>
+                  {rate.includes.map((inclusion: string, index: number) => (
+                    <span key={index} className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded'>
+                      {inclusion}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Price Information */}
+            <div className='flex flex-col items-start justify-start pt-3'>
+              <div className='flex flex-row items-center justify-start gap-x-2'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
+                  Rs.{rate.finalRate.toLocaleString()}
+                </h1>
+                <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
+                  room per night
+                </span>
+              </div>
+              <span className='text-xs text-teal-600 font-normal tracking-tight truncate'>
+                Inclusive of taxes and fee
+              </span>
+            </div>
+            
+            {/* Book Now Button */}
+            <div className='w-full pt-3'>
+              <AnimatedButton 
+                variant={isRateSelected ? 'success' : 'secondary'}
+                className={`w-full ${isRateSelected ? 'bg-green-600 hover:bg-green-700' : ''}`} 
+                onClick={() => onBookNow(
+                  room.roomId || room.id, 
+                  rate.rateId, 
+                  rate.recommendationId || room.bestRate?.recommendationId, 
+                  rate.finalRate
+                )}
+              >
+                {isRateSelected ? '✓ Selected' : (isMultiRoom ? 'Select' : 'Book Now')}
+              </AnimatedButton>
+            </div>
           </div>
-          
-          {/* Book Now Button */}
-          <div className='w-full pt-3'>
-            <AnimatedButton 
-              variant={selectedRateId === rate.rateId || itinerary.rooms[roomIndex]?.rateId === rate.rateId ? 'success' : 'secondary'}
-              className='w-full' 
-              onClick={() => onBookNow(
-                room.roomId || room.id, 
-                rate.rateId, 
-                rate.recommendationId || room.bestRate?.recommendationId, 
-                rate.finalRate
-              )}
-            >
-              {selectedRateId === rate.rateId || itinerary.rooms[roomIndex]?.rateId === rate.rateId ? 'Selected' : 'Book Now'}
-            </AnimatedButton>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

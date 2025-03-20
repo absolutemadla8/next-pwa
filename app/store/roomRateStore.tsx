@@ -1,6 +1,4 @@
 import {create} from 'zustand';
-import { RoomData } from '../types/itinerary';
-import { api } from '../lib/axios';
 
 // Define the Zustand store
 export const useRoomStore = create<{
@@ -14,6 +12,7 @@ export const useRoomStore = create<{
         code:string;
     };
     compatibleRates: any[]; // Compatible rooms for next selection
+    recommendations: any[]; // Recommendations for rooms
     setRooms: (rooms: any[]) => void; // Function to set rooms
     setTraceId: (traceId: string) => void; // Function to set traceId
     setItineraryId: (itineraryId: string) => void; // Function to set itineraryId
@@ -23,9 +22,8 @@ export const useRoomStore = create<{
     addSelectedRateId: (rateId: string) => void; // Add a rate ID to the selection
     clearSelectedRateIds: () => void; // Clear selected rate IDs
     getSelectedRateIds: () => string[]; // Get all selected rate IDs
-    fetchCompatibleRates: (rateId: string, previousRateIds?: string[]) => Promise<any[]>; // Get compatible rates
-    validateRateSelection: (rateIds: string[]) => Promise<boolean>; // Validate final selection
     setCompatibleRates: (rates: any[]) => void; // Set compatible rates
+    setRecommendations: (recommendations: any[]) => void; // Set recommendations
 }>((set, get) => ({
     rooms: [], // Initial state: empty array of rooms
     itineraryId: '', // Initial empty string for itineraryId
@@ -37,6 +35,7 @@ export const useRoomStore = create<{
         code: ''
     },
     compatibleRates: [], // Initial empty array for compatible rates
+    recommendations: [], // Initial empty array for recommendations
 
     // Function to set rooms
     setRooms: (rooms: any[]) => {
@@ -90,76 +89,8 @@ export const useRoomStore = create<{
         set({ compatibleRates: rates });
     },
     
-    // Function to fetch compatible rates
-    fetchCompatibleRates: async (rateId: string, previousRateIds = []) => {
-        try {
-            console.log(`Fetching compatible rates for rate: ${rateId}, previous rates: ${previousRateIds.join(',')}`);
-            
-            // Construct the API request
-            const payload = {
-                rateId: rateId,
-                previousRateIds: previousRateIds
-            };
-            
-            const sessionId = get().sessionId;
-            const response = await api.post(`/hotels/session/${sessionId}/compatible-rates`, payload);
-            
-            if (response?.data) {
-                //@ts-ignore mlmr
-                if (response.data.compatibleRecommendations && 
-                     //@ts-ignore mlmr
-                    response.data.compatibleRecommendations.length > 0 && 
-                     //@ts-ignore mlmr
-                    response.data.compatibleRecommendations[0].rooms) {
-                     //@ts-ignore mlmr
-                    const compatibleRooms = response.data.compatibleRecommendations[0].rooms;
-                    console.log("Compatible rates received from recommendations:", compatibleRooms);
-                    get().setCompatibleRates(compatibleRooms);
-                    return compatibleRooms;
-                } 
-                // Fallback to direct rooms array if present
-                 //@ts-ignore mlmr
-                else if (response.data.rooms) {
-                     //@ts-ignore mlmr
-                    console.log("Compatible rates received directly:", response.data.rooms);
-                     //@ts-ignore mlmr
-                    get().setCompatibleRates(response.data.rooms);
-                     //@ts-ignore mlmr
-                    return response.data.rooms;
-                }
-            }
-            
-            console.error("Invalid response format for compatible rates");
-            return [];
-        } catch (error) {
-            console.error("Error fetching compatible rates:", error);
-            return [];
-        }
-    },
-    
-    // Function to validate rate selection
-    validateRateSelection: async (rateIds: string[]) => {
-        try {
-            console.log(`Validating rate selection: ${rateIds.join(',')}`);
-            
-            // Construct the API request
-            const payload = {
-                selectedRateIds: rateIds
-            };
-            
-            const sessionId = get().sessionId;
-            const response = await api.post(`/hotels/session/${sessionId}/validate-selection`, payload);
-            
-            if (response?.data) {
-                console.log("Rate validation result:", response.data);
-                //@ts-expect-error mlmr
-                return response.data.valid === true;
-            }
-            
-            return false;
-        } catch (error) {
-            console.error("Error validating rate selection:", error);
-            return false;
-        }
+    // Function to set recommendations
+    setRecommendations: (recommendations: any[]) => {
+        set({ recommendations });
     }
 }));

@@ -30,7 +30,7 @@ const SimpleRoomRateCard: React.FC<RoomRateCardProps> = ({ chatId, room, onSelec
         recommendationId: String(itinerary.recommendationId),
       }
     },
-    maxSteps: 5,
+    maxSteps: 10,
   });
 
   // Get first image URL

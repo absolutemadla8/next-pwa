@@ -66,7 +66,7 @@ export function HumanRefer({
       id: chatId,
       appendOnly: true
     },
-    maxSteps: 5,
+    maxSteps: 10,
     onFinish: () => {
       window.history.replaceState({}, "", `/trippy/chat/${chatId}`);
     }

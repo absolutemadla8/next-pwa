@@ -6,9 +6,41 @@ import { api } from '@/app/lib/axios'
 import { formatDate } from '@/app/lib/utils'
 import { useHotelSearchStore } from '@/app/store/hotelsSearchStore'
 import useItineraryStore from '@/app/store/itineraryStore'
-import { IconMap } from '@tabler/icons-react'
+import { bottomSheetStore } from '@/app/store/bottomSheetStore'
+import { FilterData } from '@/app/store/bottomSheetStore'
+import { IconFilter, IconMap } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { useRoomStore } from '@/app/store/roomRateStore'
+
+// Helper function to count active filters
+const countActiveFilters = (filters: FilterData): number => {
+  let count = 0;
+  
+  // Count price range filter if it's not at default values
+  if (filters.priceRange && 
+      (filters.priceRange.min > 0 || filters.priceRange.max < 50000)) {
+    count++;
+  }
+  
+  // Count star ratings
+  if (filters.starRatings && filters.starRatings.length > 0) {
+    count++;
+  }
+  
+  // Count facilities
+  if (filters.facilities && filters.facilities.length > 0) {
+    count++;
+  }
+  
+  // Count rate options
+  if (filters.rateOptions) {
+    if (filters.rateOptions.freeBreakfast) count++;
+    if (filters.rateOptions.freeCancellation) count++;
+  }
+  
+  return count;
+}
 
 const Page = () => {
   const router = useRouter();
@@ -21,63 +53,94 @@ const Page = () => {
     increaseAdultsInRoom
   } = useItineraryStore();
   const {hotels, setHotels} = useHotelSearchStore();
+  const {setTraceId} = useRoomStore();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [activeFilters, setActiveFilters] = React.useState<FilterData | null>(null);
+
+  // Function to search hotels with filters
+  const searchHotels = React.useCallback(async (filters?: FilterData) => {
+    setLoading(true);
+    
+    if (!itinerary.locationId || !itinerary.checkIn || !itinerary.checkOut) {
+      setError('Please select location and dates');
+      setLoading(false);
+      return;
+    }
+
+    // Default occupancy if no rooms are configured
+    let occupancies = getOccupancies();
+    
+    // If no rooms are configured, create a default occupancy with 2 adults
+    if (occupancies.length === 0) {
+      occupancies = [{ numOfAdults: 2, childAges: [] }];
+      
+      // Add a default room to the itinerary (not required for the API call)
+      // This will ensure the UI is consistent when the user returns
+      if (itinerary.rooms.length === 0) {
+        addRoomToItinerary();
+        // By default the room is created with 1 adult, so we need to increase it to 2
+        if (itinerary.rooms.length > 0) {
+          increaseAdultsInRoom(itinerary.rooms[0].id);
+        }
+      }
+    }
+
+    const searchParams: any = {
+      checkIn: itinerary.checkIn.toISOString().split('T')[0],
+      checkOut: itinerary.checkOut.toISOString().split('T')[0],
+      nationality: 'IN',
+      locationId: itinerary.locationId,
+      occupancies: occupancies,
+      page: 1
+    };
+    
+    // Add filters if they exist
+    if (filters) {
+      searchParams.filterBy = filters;
+      searchParams.onlyFilter = true; // Only filter from cache, don't make new API call
+      setActiveFilters(filters);
+    }
+
+    try {
+      const response = await api.post('/hotels/search-hotels', searchParams);
+      //@ts-ignore mlmr
+      if (response.data.status === 'success') {
+         //@ts-ignore mlmr
+        setHotels(response.data.data.results || []);
+        //@ts-ignore mlmr
+        setTraceId(response.data.data.traceId);
+      } else {
+        setError('Failed to fetch hotels');
+      }
+    } catch (error) {
+      console.error('Error searching hotels:', error);
+      setError('An error occurred while searching hotels');
+    } finally {
+      setLoading(false);
+    }
+  }, [itinerary.locationId, itinerary.checkIn, itinerary.checkOut, getOccupancies, addRoomToItinerary, increaseAdultsInRoom]);
+
+  // Handle filter application
+  const handleApplyFilters = React.useCallback((filters: FilterData) => {
+    searchHotels(filters);
+  }, [searchHotels]);
+
+  // Open filter bottom sheet
+  const openFilterSheet = () => {
+    bottomSheetStore.openSheet('filter', {
+      title: 'Filter Hotels',
+      minHeight: '60vh',
+      maxHeight: '90vh',
+      showPin: false,
+      onApplyFilters: handleApplyFilters
+    });
+  };
 
   React.useEffect(() => {
-    const searchHotels = async () => {
-      if (!itinerary.locationId || !itinerary.checkIn || !itinerary.checkOut) {
-        setError('Please select location and dates');
-        setLoading(false);
-        return;
-      }
-
-      // Default occupancy if no rooms are configured
-      let occupancies = getOccupancies();
-      
-      // If no rooms are configured, create a default occupancy with 2 adults
-      if (occupancies.length === 0) {
-        occupancies = [{ numOfAdults: 2, childAges: [] }];
-        
-        // Add a default room to the itinerary (not required for the API call)
-        // This will ensure the UI is consistent when the user returns
-        if (itinerary.rooms.length === 0) {
-          addRoomToItinerary();
-          // By default the room is created with 1 adult, so we need to increase it to 2
-          if (itinerary.rooms.length > 0) {
-            increaseAdultsInRoom(itinerary.rooms[0].id);
-          }
-        }
-      }
-
-      const searchParams = {
-        checkIn: itinerary.checkIn.toISOString().split('T')[0],
-        checkOut: itinerary.checkOut.toISOString().split('T')[0],
-        nationality: 'IN',
-        locationId: itinerary.locationId,
-        occupancies: occupancies,
-        page: 1
-      };
-
-      try {
-        const response = await api.post('/hotels/search-hotels', searchParams);
-        //@ts-ignore mlmr
-        if (response.data.status === 'success') {
-           //@ts-ignore mlmr
-          setHotels(response.data.data.results || []);
-        } else {
-          setError('Failed to fetch hotels');
-        }
-      } catch (error) {
-        console.error('Error searching hotels:', error);
-        setError('An error occurred while searching hotels');
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    // Initial search without filters
     searchHotels();
-  }, [itinerary.locationId, itinerary.checkIn, itinerary.checkOut]);
+  }, [itinerary.locationId, itinerary.checkIn, itinerary.checkOut, searchHotels]);
 
   if (loading) {
     return (
@@ -86,6 +149,14 @@ const Page = () => {
         </div>
       );
     }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F1F2F4] w-full">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col items-start justify-start w-full h-full'>
@@ -107,17 +178,34 @@ const Page = () => {
             />
           ))}
         </div>
-        <div className='absolute w-full bottom-20 flex flex-col items-center justify-center pb-2'>
-        <button 
+        <div className='absolute w-full bottom-20 flex flex-row items-center justify-center gap-4 pb-2'>
+          <button 
+            className='px-4 py-2 bg-gray-800 text-white rounded-full flex items-center relative'
+            onClick={openFilterSheet}
+          >
+            <IconFilter className='mr-2'/>
+            <span className='text-sm tracking-tight'>
+              Filter
+            </span>
+            {activeFilters && countActiveFilters(activeFilters) > 0 && (
+              <div className='absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center'>
+                {countActiveFilters(activeFilters)}
+              </div>
+            )}
+          </button>
+          <button 
             className='px-4 py-2 bg-gray-800 text-white rounded-full flex items-center'
             onClick={() => router.push('/trippy/stays/search/map')}
           >
-           <IconMap className='mr-2'/>
+            <IconMap className='mr-2'/>
             <span className='text-sm tracking-tight'>
-            Map View
+              Map View
             </span>
           </button>
-          </div>
+        </div>
+        
+        {/* Render the filter bottom sheet */}
+        <HotelFilterBottomSheet />
     </div>
   )
 }

@@ -23,7 +23,7 @@ export function Chat({
       id,
       body: { id },
       initialMessages,
-      maxSteps: 1,
+      maxSteps: 10,
       onFinish: () => {
         console.log("messages", messages);
         window.history.replaceState({}, "", `/trippy/chat/${id}`);

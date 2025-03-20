@@ -7,6 +7,7 @@ import HorizontalScroll from '@/app/components/ui/HorizontalScroll';
 import SeeMoreText from '@/app/components/ui/SeeMoreText';
 import StarRating from '@/app/components/ui/StarRating';
 import { api } from '@/app/lib/axios';
+import useBottomOrderStore from '@/app/store/bottomOrderStore';
 import { useDealStore } from '@/app/store/dealStore';
 import { IconCircleCheckFilled } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
@@ -14,6 +15,7 @@ import React from 'react';
 
 const Page = () => {
     const params = useParams();
+    const {setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle} = useBottomOrderStore();
     const {deal, setDeal} = useDealStore();
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
@@ -42,6 +44,13 @@ const Page = () => {
             fetchDealData();
         }
       }, [params.id]);
+
+      React.useEffect(() => {
+        setButtonText('Select Dates');
+        setHandleCreateItinerary(()=>{});
+        setInfoTitle(`inclusive of all taxes`);
+        setInfoSubtitle(`Rs.${deal?.deposit_amount} deposit`);
+      }, [setButtonText, setHandleCreateItinerary, setInfoSubtitle, setInfoTitle, deal])
     
       if (loading) {
       return (

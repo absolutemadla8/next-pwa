@@ -180,100 +180,122 @@ const Page = () => {
     }
   }, [guests, setError]);
 
-  // Use useCallback to memoize the submitBooking function
-  const submitBooking = React.useCallback(async () => {
-    if (!session || !params.id) {
-      setError('Missing session data or booking reference');
-      return;
-    }
-    
-    if (!isRazorpayLoaded) {
-      setError('Payment gateway is still loading. Please wait a moment and try again.');
-      return;
-    }
+  // Fix for the submitBooking function in the session page
+const submitBooking = React.useCallback(async () => {
+  if (!session || !params.id) {
+    setError('Missing session data or booking reference');
+    return;
+  }
   
-    // Check if all forms are valid according to our form validation state
-    const areAllFormsValid = formValidity.every(isValid => isValid);
+  if (!isRazorpayLoaded) {
+    setError('Payment gateway is still loading. Please wait a moment and try again.');
+    return;
+  }
+
+  // Check if all forms are valid according to our form validation state
+  const areAllFormsValid = formValidity.every(isValid => isValid);
+  
+  if (!areAllFormsValid) {
+    setError('Please complete all required guest information correctly');
+    return;
+  }
+  
+  // Additional validation on the raw data as a secondary check
+  const isDataValid = guests.every(
+    (guest) => guest.firstName && guest.lastName && guest.email && guest.contactNumber
+  );
+
+  if (!isDataValid) {
+    setError('Please fill in all required guest information');
+    return;
+  }
+
+  try {
+    setLoading(true);
     
-    if (!areAllFormsValid) {
-      setError('Please complete all required guest information correctly');
-      return;
+    // Step 1: Allocate Rooms
+    // Check if roomAllocations exists in session, otherwise look for rooms
+    const roomAllocationData = session.roomAllocations || session.rooms;
+    
+    if (!roomAllocationData || roomAllocationData.length === 0) {
+      throw new Error('No room allocation data found in session');
     }
     
-    // Additional validation on the raw data as a secondary check
-    const isDataValid = guests.every(
-      (guest) => guest.firstName && guest.lastName && guest.email && guest.contactNumber
+    const roomAllocationPayload = {
+      traceId: session.traceId,
+      roomsAllocations: roomAllocationData.map((roomData:any, index:number) => {
+        // Ensure each guest has the required fields filled in
+        const guestData = {
+          ...guests[index],
+          // Ensure the guest type is "adult" - this was missing in the initial form data
+          type: 'adult',
+          // Ensure the guest data is properly structured
+          firstName: guests[index].firstName.trim(),
+          lastName: guests[index].lastName.trim(),
+          email: guests[index].email.trim(),
+          contactNumber: guests[index].contactNumber.trim()
+        };
+        
+        // Get rate_id and room_id using the appropriate property names
+        // This handles both roomAllocations and rooms data structures
+        const rateId = roomData.rate_id || roomData.rateId;
+        const roomId = roomData.room_id || roomData.roomId;
+        
+        if (!rateId || !roomId) {
+          console.error('Missing rate_id or room_id in room allocation data:', roomData);
+          throw new Error('Missing rate or room information');
+        }
+        
+        return {
+          rateId: String(rateId),
+          roomId: String(roomId),
+          guests: [guestData]
+        };
+      })
+    };
+
+    console.log('Room allocation payload:', roomAllocationPayload);
+
+    const roomAllocationResponse = await api.post(
+      `/hotels/itineraries/${session.itineraryCode}/rooms-allocations`,
+      roomAllocationPayload
     );
-  
-    if (!isDataValid) {
-      setError('Please fill in all required guest information');
-      return;
-    }
-  
-    try {
-      setLoading(true);
-      
-      // Step 1: Allocate Rooms
-      const roomAllocationPayload: RoomAllocationPayload = {
-        traceId: session.traceId,
-        //@ts-ignore can't be fixed will do later
-        roomsAllocations: Array.from({ length: session.roomAllocations.length}).map((_, index) => {
-          // Ensure each guest has the required fields filled in
-          const guestData = {
-            ...guests[index],
-            // Ensure the guest type is "adult" - this was missing in the initial form data
-            type: 'adult',
-            // Ensure the guest data is properly structured
-            firstName: guests[index].firstName.trim(),
-            lastName: guests[index].lastName.trim(),
-            email: guests[index].email.trim(),
-            contactNumber: guests[index].contactNumber.trim()
-          };
-          
-          return {
-            rateId: String(session.roomAllocations[index].rate_id),
-            roomId: String(session.roomAllocations[index].room_id),
-            guests: [guestData]
-          };
-        })
-      };
-  
-      const roomAllocationResponse = await api.post(
-        `/hotels/itineraries/${session.itineraryCode}/rooms-allocations`,
-        roomAllocationPayload
-      );
+    
+    //@ts-ignore can't be fixed will do later
+    if (roomAllocationResponse.data.status !== 'success') {
       //@ts-ignore can't be fixed will do later
-      if (roomAllocationResponse.data.status !== 'success') {
-        //@ts-ignore can't be fixed will do later
-        throw new Error(roomAllocationResponse.data.message || 'Failed to allocate rooms');
-      }
-  
-      // Step 2: Generate Order
-      const orderResponse = await api.post(`/hotels/itineraries/${params.id}/order`);
-  //@ts-ignore can't be fixed will do later
-      if (orderResponse.data.status !== 'success') {
-        //@ts-ignore can't be fixed will do later
-        throw new Error(orderResponse.data.message || 'Failed to create order');
-      }
-  //@ts-ignore can't be fixed will do later
-      const orderData = orderResponse.data.data;
-      const razorpayOrderId = orderData.id; // Extract Razorpay Order ID
-  
-      if (!razorpayOrderId) {
-        throw new Error('Razorpay order ID missing in response');
-      }
-  
-      // Step 3: Proceed with Razorpay Payment
-      handleRazorpayPayment(razorpayOrderId, orderData.amount, orderData.currency);
-  
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || err.message || 'An unexpected error occurred';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      throw new Error(roomAllocationResponse.data.message || 'Failed to allocate rooms');
     }
-  }, [session, params.id, isRazorpayLoaded, formValidity, guests, handleRazorpayPayment]);
+
+    // Step 2: Generate Order
+    const orderResponse = await api.post(`/hotels/itineraries/${params.id}/order`);
+    
+    //@ts-ignore can't be fixed will do later
+    if (orderResponse.data.status !== 'success') {
+      //@ts-ignore can't be fixed will do later
+      throw new Error(orderResponse.data.message || 'Failed to create order');
+    }
+    
+    //@ts-ignore can't be fixed will do later
+    const orderData = orderResponse.data.data;
+    const razorpayOrderId = orderData.id; // Extract Razorpay Order ID
+
+    if (!razorpayOrderId) {
+      throw new Error('Razorpay order ID missing in response');
+    }
+
+    // Step 3: Proceed with Razorpay Payment
+    handleRazorpayPayment(razorpayOrderId, orderData.amount, orderData.currency);
+
+  } catch (err: any) {
+    console.error('Error during booking:', err);
+    const errorMessage =
+      err.response?.data?.message || err.message || 'An unexpected error occurred';
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+}, [session, params.id, isRazorpayLoaded, formValidity, guests, handleRazorpayPayment]);
 
   React.useEffect(() => {
     // Set up bottom order bar with the combined function
@@ -404,89 +426,89 @@ const Page = () => {
                 </div>
                 
                 {/* Improved Room details section */}
-                <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-4'>
-                    <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
-                        {totalRooms > 1 ? 'Your Rooms' : 'Your Room'}
-                    </h1>
-                    
-                    {session.rooms && session.rooms.map((roomData:any, index:number) => (
-                      <div key={index} className='w-full'>
-                        <div 
-                          className={`flex flex-row items-center justify-between w-full ${index > 0 ? 'pt-2 border-t border-gray-100' : ''}`}
-                          onClick={() => totalRooms > 1 && toggleRoomExpand(index)}
-                        >
-                          <div className='flex flex-row items-center gap-x-2'>
-                            <div className='flex items-center justify-center bg-blue-100 rounded-full w-6 h-6'>
-                              <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-800 text-xs font-medium mt-0.5'>
-                                {index + 1}
-                              </span>
-                            </div>
-                            <div className='flex flex-col'>
-                              <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md font-medium'>
-                                {roomData.room_name}
-                              </span>
-                              <div className='flex flex-row items-center gap-x-2'>
-                                <span className='text-blue-500 text-xs font-normal'>
-                                  {roomData.board_basis.description}
-                                </span>
-                                <div className='flex flex-row items-center gap-x-1'>
-                                  <Users className='text-gray-500 size-3' />
-                                  <span className='text-gray-500 text-xs'>
-                                    {roomData.adults} Adult{roomData.adults > 1 ? 's' : ''}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {totalRooms > 1 && (
-                            <button className='text-blue-500 p-1 rounded hover:bg-blue-50'>
-                              {expandedRooms[index] ? 
-                                <ChevronUp className='size-4' /> : 
-                                <ChevronDown className='size-4' />
-                              }
-                            </button>
-                          )}
-                        </div>
-                        
-                        {/* Expanded room details - always visible for single room or when expanded */}
-                        {(totalRooms === 1 || expandedRooms[index]) && (
-                          <div className='mt-2 pl-8'>
-                            {!roomData.cancellation.has_free_cancellation ?
-                              <div className='flex items-center py-1 px-2 bg-red-50 text-red-600 text-xs rounded-full w-fit'>
-                                Non Refundable
-                              </div> :
-                              <div className='flex items-center py-1 px-2 bg-teal-50 text-teal-600 text-xs rounded-full w-fit'>
-                                Free Cancellation till {roomData.cancellation.free_cancellation_until ? 
-                                  new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
-                                    day: '2-digit',
-                                    month: 'short'
-                                  }).replace(/ /g, ' ') : ""}
-                              </div>
-                            }
-                            
-                            <div className='mt-2 text-gray-600 text-sm'>
-                              {/* Room amenities could go here */}
-                              {roomData.cancellation.has_free_cancellation && (
-                                <div className='mt-1 text-xs text-gray-500'>
-                                  <span className='font-medium'>Full Details:</span> 100% refund till {roomData.cancellation.free_cancellation_until ? 
-                                    new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
-                                      day: '2-digit',
-                                      month: 'short',
-                                      year: 'numeric'
-                                    }).replace(/ /g, ' ') + ', ' + new Date(roomData.cancellation.free_cancellation_until).toLocaleTimeString('en-GB', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                      hour12: true
-                                    }).toUpperCase() : ""}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                </div>
+                <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl shadow-sm gap-y-4'>
+  <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-lg'>
+    {totalRooms > 1 ? 'Your Rooms' : 'Your Room'}
+  </h1>
+  
+  {session.rooms && session.rooms.map((roomData:any, index:number) => (
+    <div key={index} className='w-full'>
+      <div 
+        className={`flex flex-row items-center justify-between w-full ${index > 0 ? 'pt-2 border-t border-gray-100' : ''}`}
+        onClick={() => totalRooms > 1 && toggleRoomExpand(index)}
+      >
+        <div className='flex flex-row items-center gap-x-2'>
+          <div className='flex items-center justify-center bg-gradient-to-r from-[#E9F2FF] to-[#CCE0FF] rounded-full w-6 h-6'>
+            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-[#1D4F7B] text-xs font-normal mt-0.5'>
+              {index + 1}
+            </span>
+          </div>
+          <div className='flex flex-col'>
+            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md font-normal'>
+              {roomData.room_name}
+            </span>
+            <div className='flex flex-row items-center gap-x-2'>
+              <span className='text-[#0C66E4] text-xs font-medium'>
+                {roomData.board_basis.description}
+              </span>
+              <div className='flex flex-row items-center gap-x-1'>
+                <Users className='text-[#44546F] size-3' />
+                <span className='text-[#44546F] text-xs'>
+                  {roomData.adults} Adult{roomData.adults > 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {totalRooms > 1 && (
+          <button className='text-[#0C66E4] p-1 rounded hover:bg-[#E9F2FF] transition-colors duration-200'>
+            {expandedRooms[index] ? 
+              <ChevronUp className='size-4' /> : 
+              <ChevronDown className='size-4' />
+            }
+          </button>
+        )}
+      </div>
+      
+      {/* Expanded room details - always visible for single room or when expanded */}
+      {(totalRooms === 1 || expandedRooms[index]) && (
+        <div className='mt-2 pl-8'>
+          {!roomData.cancellation.has_free_cancellation ?
+            <div className='flex items-center py-1 px-2 bg-red-50 text-red-600 text-xs rounded-full w-fit'>
+              Non Refundable
+            </div> :
+            <div className='flex items-center py-1 px-2 bg-[#E6FFFA] text-[#2C7A7B] text-xs rounded-full w-fit'>
+              Free Cancellation till {roomData.cancellation.free_cancellation_until ? 
+                new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short'
+                }).replace(/ /g, ' ') : ""}
+            </div>
+          }
+          
+          <div className='mt-2 text-[#44546F] text-sm'>
+            {/* Room amenities could go here */}
+            {roomData.cancellation.has_free_cancellation && (
+              <div className='mt-1 text-xs text-[#718096]'>
+                <span className='font-medium'>Full Details:</span> 100% refund till {roomData.cancellation.free_cancellation_until ? 
+                  new Date(roomData.cancellation.free_cancellation_until).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }).replace(/ /g, ' ') + ', ' + new Date(roomData.cancellation.free_cancellation_until).toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  }).toUpperCase() : ""}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
                 
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
                 <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>

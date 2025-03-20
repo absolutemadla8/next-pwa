@@ -27,6 +27,18 @@ const DEFAULT_COLORS = {
   }
 };
 
+// Helper function to create a timezone-agnostic date representation (year, month, day)
+const createDateKey = (date: Date): string => {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+};
+
+// Helper function to create date with no time component
+const normalizeDate = (date: Date): Date => {
+  const normalizedDate = new Date(date);
+  normalizedDate.setHours(0, 0, 0, 0);
+  return normalizedDate;
+};
+
 const CalendarList: React.FC<CalendarListProps> = ({
   minDate = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
   maxDate = new Date(new Date().getFullYear(), new Date().getMonth() + 12, 0),
@@ -44,15 +56,22 @@ const CalendarList: React.FC<CalendarListProps> = ({
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
   const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  
+  // Cache date keys for faster comparison
+  const [selectedDateKeys, setSelectedDateKeys] = useState<Set<string>>(new Set());
 
   // Initialize state with proper date conversion
   useEffect(() => {
     if (initialSelectedDates && initialSelectedDates.length > 0) {
-      // Ensure dates are properly converted if they're strings
+      // Ensure dates are properly normalized
       const processedDates = initialSelectedDates.map(date => 
-        date instanceof Date ? date : new Date(date)
+        normalizeDate(date instanceof Date ? date : new Date(date))
       );
       setSelectedDates(processedDates);
+      
+      // Cache date keys
+      const dateKeys = new Set(processedDates.map(date => createDateKey(date)));
+      setSelectedDateKeys(dateKeys);
 
       // For range mode, set the range start if we have initial dates
       if (mode === 'range' && processedDates.length === 1) {
@@ -100,30 +119,43 @@ const CalendarList: React.FC<CalendarListProps> = ({
     // Fill in the days of the month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       const currentDate = new Date(year, month, i);
+      // Ensure the time is set to noon to avoid timezone issues
+      currentDate.setHours(12, 0, 0, 0);
       days.push(currentDate);
     }
 
     return days;
   };
 
-  // Check if dates are the same day
+  // Check if dates are the same day (timezone-agnostic)
   const isSameDay = (date1: Date, date2: Date): boolean => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
+    return createDateKey(date1) === createDateKey(date2);
   };
 
   // Check if a date is selected
   const isDateSelected = (date: Date | null): boolean => {
     if (!date) return false;
+    
+    const dateKey = createDateKey(date);
 
     // For range mode during selection process
     if (mode === 'range' && rangeStart && hoverDate && selectedDates.length === 1) {
-      const start = rangeStart < hoverDate ? rangeStart : hoverDate;
-      const end = rangeStart < hoverDate ? hoverDate : rangeStart;
-      return date >= start && date <= end;
+      const startKey = createDateKey(rangeStart);
+      const hoverKey = createDateKey(hoverDate);
+      
+      // Construct simple date strings for comparison (YYYY-MM-DD)
+      const startDate = `${rangeStart.getFullYear()}-${String(rangeStart.getMonth() + 1).padStart(2, '0')}-${String(rangeStart.getDate()).padStart(2, '0')}`;
+      const endDate = `${hoverDate.getFullYear()}-${String(hoverDate.getMonth() + 1).padStart(2, '0')}-${String(hoverDate.getDate()).padStart(2, '0')}`;
+      const currentDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      
+      // Check if date is within range (inclusive)
+      return (startDate <= currentDate && currentDate <= endDate) || 
+             (endDate <= currentDate && currentDate <= startDate);
+    }
+
+    // Fast check using the cached date keys
+    if (selectedDateKeys.has(dateKey)) {
+      return true;
     }
 
     // Regular selection check
@@ -144,6 +176,11 @@ const CalendarList: React.FC<CalendarListProps> = ({
       return isSameDay(date, rangeStart);
     }
 
+    // If hovering during range selection
+    if (rangeStart && hoverDate) {
+      return isSameDay(date, rangeStart) || isSameDay(date, hoverDate);
+    }
+
     return false;
   };
 
@@ -156,73 +193,116 @@ const CalendarList: React.FC<CalendarListProps> = ({
 
     // Check for temporary hover range first
     if (rangeStart && hoverDate) {
-      start = rangeStart < hoverDate ? rangeStart : hoverDate;
-      end = rangeStart < hoverDate ? hoverDate : rangeStart;
+      // Create simple date strings for comparison
+      const rangeStartStr = `${rangeStart.getFullYear()}-${String(rangeStart.getMonth() + 1).padStart(2, '0')}-${String(rangeStart.getDate()).padStart(2, '0')}`;
+      const hoverDateStr = `${hoverDate.getFullYear()}-${String(hoverDate.getMonth() + 1).padStart(2, '0')}-${String(hoverDate.getDate()).padStart(2, '0')}`;
+      
+      if (rangeStartStr <= hoverDateStr) {
+        start = rangeStart;
+        end = hoverDate;
+      } else {
+        start = hoverDate;
+        end = rangeStart;
+      }
     }
     // Then check for finalized range
     else if (selectedDates.length === 2) {
-      start = selectedDates[0];
-      end = selectedDates[1];
+      const startDateStr = `${selectedDates[0].getFullYear()}-${String(selectedDates[0].getMonth() + 1).padStart(2, '0')}-${String(selectedDates[0].getDate()).padStart(2, '0')}`;
+      const endDateStr = `${selectedDates[1].getFullYear()}-${String(selectedDates[1].getMonth() + 1).padStart(2, '0')}-${String(selectedDates[1].getDate()).padStart(2, '0')}`;
+      
+      if (startDateStr <= endDateStr) {
+        start = selectedDates[0];
+        end = selectedDates[1];
+      } else {
+        start = selectedDates[1];
+        end = selectedDates[0];
+      }
     } else {
       return false;
     }
 
     if (!start || !end) return false;
 
-    const dateTime = date.getTime();
-    return dateTime > start.getTime() && dateTime < end.getTime();
+    // Create simple date strings for comparison
+    const startStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
+    const endStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    
+    // Check if date is strictly between start and end (exclusive)
+    return startStr < dateStr && dateStr < endStr;
   };
 
   // Check if date is before min date or after max date
   const isDateDisabled = (date: Date | null): boolean => {
     if (!date) return true;
     
-    // Start of day comparison to allow selecting today
-    const dateAtStartOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const minDateAtStartOfDay = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
-    const maxDateAtStartOfDay = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
+    // Normalize dates for consistent comparison
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const normalizedMinDate = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+    const normalizedMaxDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
     
-    return dateAtStartOfDay < minDateAtStartOfDay || dateAtStartOfDay > maxDateAtStartOfDay;
+    // Create simple date strings for comparison
+    const dateStr = `${normalizedDate.getFullYear()}-${String(normalizedDate.getMonth() + 1).padStart(2, '0')}-${String(normalizedDate.getDate()).padStart(2, '0')}`;
+    const minDateStr = `${normalizedMinDate.getFullYear()}-${String(normalizedMinDate.getMonth() + 1).padStart(2, '0')}-${String(normalizedMinDate.getDate()).padStart(2, '0')}`;
+    const maxDateStr = `${normalizedMaxDate.getFullYear()}-${String(normalizedMaxDate.getMonth() + 1).padStart(2, '0')}-${String(normalizedMaxDate.getDate()).padStart(2, '0')}`;
+    
+    return dateStr < minDateStr || dateStr > maxDateStr;
   };
 
   // Handle date click based on mode
   const handleDateClick = (date: Date): void => {
     if (isDateDisabled(date)) return;
 
-    let newSelectedDates = [...selectedDates];
+    // Create a new normalized date (noon time to avoid timezone issues)
+    const clickedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0);
+    let newSelectedDates: Date[] = [];
 
     if (mode === 'single') {
-      newSelectedDates = [date];
+      newSelectedDates = [clickedDate];
     } else if (mode === 'multiple') {
-      // Check if date is already selected
-      const isAlreadySelected = newSelectedDates.some(selectedDate => 
-        isSameDay(selectedDate, date)
-      );
+      // Check if date is already selected using our date key comparison
+      const clickedDateKey = createDateKey(clickedDate);
+      const isAlreadySelected = selectedDateKeys.has(clickedDateKey);
 
       if (isAlreadySelected) {
         // Remove date if already selected
-        newSelectedDates = newSelectedDates.filter(selectedDate => 
-          !isSameDay(selectedDate, date)
+        newSelectedDates = selectedDates.filter(selectedDate => 
+          !isSameDay(selectedDate, clickedDate)
         );
       } else {
         // Add date if not already selected
-        newSelectedDates.push(date);
+        newSelectedDates = [...selectedDates, clickedDate];
       }
     } else if (mode === 'range') {
       if (!rangeStart || selectedDates.length === 2) {
         // Start new range
-        newSelectedDates = [date];
-        setRangeStart(date);
+        newSelectedDates = [clickedDate];
+        setRangeStart(clickedDate);
       } else {
         // Complete the range
-        const start = rangeStart < date ? rangeStart : date;
-        const end = rangeStart < date ? date : rangeStart;
+        // Create simple date strings for comparison
+        const rangeStartStr = `${rangeStart.getFullYear()}-${String(rangeStart.getMonth() + 1).padStart(2, '0')}-${String(rangeStart.getDate()).padStart(2, '0')}`;
+        const clickedDateStr = `${clickedDate.getFullYear()}-${String(clickedDate.getMonth() + 1).padStart(2, '0')}-${String(clickedDate.getDate()).padStart(2, '0')}`;
+        
+        let start: Date, end: Date;
+        
+        if (rangeStartStr <= clickedDateStr) {
+          start = rangeStart;
+          end = clickedDate;
+        } else {
+          start = clickedDate;
+          end = rangeStart;
+        }
+        
+        // For the onChange callback, just return the boundaries
         newSelectedDates = [start, end];
         setRangeStart(null);
       }
     }
 
+    // Update selected dates and cache
     setSelectedDates(newSelectedDates);
+    setSelectedDateKeys(new Set(newSelectedDates.map(date => createDateKey(date))));
 
     // Call onChange with new selected dates
     if (onChange) {
@@ -234,7 +314,8 @@ const CalendarList: React.FC<CalendarListProps> = ({
   const handleMouseEnter = (date: Date, id: string): void => {
     setHoveredElement(id);
     if (mode === 'range' && rangeStart && !isDateDisabled(date)) {
-      setHoverDate(date);
+      // Normalize the hovered date
+      setHoverDate(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0));
     }
   };
 
@@ -294,6 +375,9 @@ const CalendarList: React.FC<CalendarListProps> = ({
               const dateId = `date-${dateKey}`;
               const isHovered = hoveredElement === dateId;
 
+              // For debugging, add a data attribute with the date
+              const dateDebug = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
               // Container styles
               const containerStyles: React.CSSProperties = {
                 transition: 'all 0.2s ease',
@@ -350,6 +434,7 @@ const CalendarList: React.FC<CalendarListProps> = ({
                   onClick={() => !isDisabled && handleDateClick(date)}
                   onMouseEnter={() => handleMouseEnter(date, dateId)}
                   onMouseLeave={handleMouseLeave}
+                  data-date={dateDebug}
                 >
                   <div style={dateNumberStyles}>
                     {date.getDate()}

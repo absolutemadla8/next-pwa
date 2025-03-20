@@ -14,11 +14,12 @@ import AnimatedButton from "../ui/AnimatedButton";
 import { SessionCheckout } from "./SessionCheckout";
 import { RouteList } from "./RouteList";
 import { useChat } from "ai/react";
-import { SelectedHotels } from "./SelectedHotels";
+import { CreatedItinerary} from "./CreatedItinerary";
 import { LabelSearchResults } from "./LabelSearchResults";
 import { SelectedActivities } from "./SelectedActivities";
 import { ItineraryMessage } from "./ItineraryMessage";
 import { HumanRefer } from "./humanRefer";
+import { SelectedHotels } from "./SelectedHotels";
 
 export const Message = ({
   chatId,
@@ -36,7 +37,7 @@ export const Message = ({
   const { append, error, reload } = useChat({
     id: chatId,
     body: { id: chatId },
-    maxSteps: 5,
+    maxSteps: 10,
   });
   return (
     <motion.div
@@ -71,6 +72,9 @@ export const Message = ({
                       <LabelSearchResults isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ):
                     toolName === "createItinerary" ? (
+                      <CreatedItinerary isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
+                    ):
+                    toolName === "addHotels"? (
                       <SelectedHotels isOpen={true} onOpenChange={()=>{}} toolName={toolName} args={args} state={state} chatId={chatId} results={result} />
                     ):
                     toolName === "addActivities" ? (
@@ -110,7 +114,7 @@ export const Message = ({
                       <LabelSearchResults toolName={toolName} chatId={chatId} />
                     ):
                     toolName === "createItinerary" ? (
-                      <SelectedHotels toolName={toolName} chatId={chatId}/>
+                      <CreatedItinerary toolName={toolName} chatId={chatId}/>
                     ):
                     toolName === "searchHotels"? (
                       <HotelsList toolName={toolName} chatId={chatId} />

@@ -9,7 +9,7 @@ export function RoomRates({ results, chatId }: { results?: any, chatId: string }
   const { append, error, reload } = useChat({
     id: chatId,
     body: { id: chatId },
-    maxSteps: 5,
+    maxSteps: 10,
   });
   {error && (
     <>

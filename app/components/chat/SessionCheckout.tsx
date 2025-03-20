@@ -9,7 +9,7 @@ export function SessionCheckout({ results, chatId }: { results?: any, chatId: st
     const { append, reload, error } = useChat({
         id: chatId,
         body: { id: chatId },
-        maxSteps: 5,
+        maxSteps: 10,
       });
   return (
         <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>

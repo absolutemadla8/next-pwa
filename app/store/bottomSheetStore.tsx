@@ -6,12 +6,27 @@ import { create } from 'zustand';
 // Define all possible bottom sheet IDs
 type BottomSheetId = 'dateRange' | 'search' | 'roomConfig' | 'error' | 'passportExpiry' | 'amenities' | 'policies' | 'filter' | null;
 
+// Define filter data structure
+export interface FilterData {
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  starRatings?: number[];
+  facilities?: string[];
+  rateOptions?: {
+    freeBreakfast?: boolean;
+    freeCancellation?: boolean;
+  };
+}
+
 // Define configuration options for bottom sheets
 interface SheetConfig {
   title: string;
   minHeight: string;
   maxHeight: string;
   showPin: boolean;
+  onApplyFilters?: (filters: FilterData) => void;
 }
 
 // Interface for error data

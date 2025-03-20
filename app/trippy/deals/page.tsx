@@ -16,6 +16,24 @@ const Page = () => {
     
     return () => clearInterval(interval)
   }, [])
+
+  const topDestinations = [
+    {
+      "id": "1",
+      "name":"Maldives",
+      "heroImage":"https://often-public-assets.blr1.cdn.digitaloceanspaces.com/maldives.webp"
+    },
+    {
+      "id": "2",
+      "name":"Singapore",
+      "heroImage":"https://often-public-assets.blr1.cdn.digitaloceanspaces.com/Singapore.webp"
+    },
+    {
+      "id": "3",
+      "name":"Thailand",
+      "heroImage":"https://often-public-assets.blr1.cdn.digitaloceanspaces.com/Thailand.webp"
+    }
+  ]
   
   return (
     <div className='flex flex-col items-start justify-start w-full h-full bg-[#F1F2F4]'>
@@ -50,12 +68,14 @@ const Page = () => {
                 <hr className='w-1/2 border-[0.5px] border-slate-500 mt-3' />
             </div>
             <HorizontalScroll>
-                <div className='flex flex-col items-center justify-center w-36 h-fit'>
-                    <img src="" className='w-full h-44 object-cover rounded-lg' />
+              {topDestinations.map((dest:any, index:number)=>(
+                <div key={index} className='flex flex-col items-center justify-center w-36 h-fit'>
+                    <img src={dest.heroImage} className='w-full h-44 object-cover rounded-lg' />
                     <div className='flex flex-col items-center justify-center w-full pt-2'>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md'>Maldives</h2>
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md'>{dest.name}</h2>
                     </div>
                 </div>
+                ))}
             </HorizontalScroll>
             </div>
             <div className='flex flex-col w-full'>
