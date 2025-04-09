@@ -102,7 +102,7 @@ export default function LoginContent() {
                       style={{ fontFamily: 'var(--font-nohemi)' }}
                       className="relative w-full px-4 py-3 bg-transparent rounded-md text-primary text-left"
                     >
-                      {`+${isdCode}`} <span className='text-lg'>{isdCode === '91' ? '🇮🇳' : isdCode === '44' ? '🇬🇧' : '🇺🇸'}</span>
+                      {`+${isdCode}`} <span className='text-xl'>{isdCode === '91' ? '🇮🇳' : isdCode === '44' ? '🇬🇧' : '🇺🇸'}</span>
                     </ListboxButton>
                     <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#F4F2EB] py-1 shadow-lg ring-1 ring-white ring-opacity-5 focus:outline-none">
                       {countryCodeOptions.map((code) => (
@@ -137,7 +137,7 @@ export default function LoginContent() {
                 <input
                   type="tel"
                   style={{ fontFamily: 'var(--font-nohemi)' }}
-                  className="w-full p-3 rounded-lg tracking-wider text-primary bg-transparent placeholder-text-primary/40"
+                  className="w-full p-3 rounded-lg tracking-wider text-primary bg-transparent placeholder-text-primary/40 text-xl"
                   value={contactNumber}
                   onChange={(e) => handlePhoneInput(e.target.value)}
                   placeholder="9999999999"
