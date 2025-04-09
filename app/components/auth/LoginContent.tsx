@@ -100,7 +100,7 @@ export default function LoginContent() {
                   <div className="relative">
                     <ListboxButton
                       style={{ fontFamily: 'var(--font-nohemi)' }}
-                      className="relative w-full px-4 py-3 bg-transparent rounded-md text-primary text-left"
+                      className="relative w-full px-4 py-3 bg-transparent rounded-md text-primary text-left text-xl"
                     >
                       {`+${isdCode}`} <span className='text-xl'>{isdCode === '91' ? '🇮🇳' : isdCode === '44' ? '🇬🇧' : '🇺🇸'}</span>
                     </ListboxButton>
@@ -158,7 +158,7 @@ export default function LoginContent() {
             text="Send Verification Code"
             loadingText="Sending..."
             icon={<ArrowRight size={20} className='text-white' />}
-            className="w-full p-3 bg-transparent bg-[#1999F5] text-white rounded mt-4 font-semibold"
+            className="w-full p-3 bg-[#1999F5] text-white rounded mt-4 font-semibold"
           />
         </div>
       </form>
