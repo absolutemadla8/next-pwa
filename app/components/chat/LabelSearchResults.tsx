@@ -122,7 +122,7 @@ export function LabelSearchResults({
         ) : (
           <div className="mb-4 space-y-4">
             <div style={{ fontFamily: 'var(--font-domine)'}} 
-              className="text-lg text-blue-950 font-medium mb-2">
+              className="text-lg text-primary font-medium mb-2">
               {searchResults?.data?.length > 0 
                 ? `Found ${searchResults.data.length} label${searchResults.data.length > 1 ? 's' : ''} matching your preferences:`
                 : "No labels found for the user's preferences. Please try another destination."}
@@ -130,7 +130,7 @@ export function LabelSearchResults({
             <div className='flex flex-row items-center justify-start w-full flex-wrap gap-x-2'>
                 {searchResults?.data?.map((label, index) => (
                   <div key={index} className='flex flex-row items-center justify-center gap-x-1 p-2 rounded-full bg-slate-100'>
-                    <p className='text-sm text-blue-950 tracking-tight'>{label.name}</p>
+                    <p className='text-sm text-primary tracking-tight'>{label.name}</p>
                   </div>
                 ))}
             </div>

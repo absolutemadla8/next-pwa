@@ -93,75 +93,16 @@ const StayInformationHeader = () => {
         animate="visible"
         className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-b-lg overflow-hidden'
       >
-        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md'>
+        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-md'>
           {itinerary.locationName}
         </h2>
         <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-slate-600 font-normal text-sm'>
           {itinerary.checkIn ? formatDate(itinerary.checkIn) : 'No date selected'} - {itinerary.checkOut ? formatDate(itinerary.checkOut) : 'No date selected'}
         </h2>
-        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-sm'>
+        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-sm'>
           {getTotalAdults() + getTotalChildren()} Guests, {getTotalRooms()} Room
         </h2>
       </motion.div>
-      <div className='flex w-full pt-2'>
-        <HorizontalScroll>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate={isVisible ? "visible" : "hidden"}
-            className="flex gap-x-2 px-1"
-          >
-            <motion.div 
-              variants={filterVariants} 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleOpenFilter}
-              className='flex flex-row items-center justify-center gap-x-1 w-32 truncate bg-white rounded-full p-2 shadow-sm cursor-pointer'
-            >
-              <IconAdjustmentsHorizontal className='text-blue-950' size={16} />
-              <span className='text-blue-950 text-sm tracking-tight' style={{ fontFamily: 'var(--font-nohemi)' }}>
-                Filters
-              </span>
-            </motion.div>
-            <motion.div 
-              variants={filterVariants} 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleOpenFilter}
-              className='flex flex-row items-center justify-center gap-x-1 w-32 truncate bg-white rounded-full p-2 shadow-sm cursor-pointer'
-            >
-              <IconStar className='text-blue-950' size={16} />
-              <span className='text-blue-950 text-sm tracking-tight' style={{ fontFamily: 'var(--font-nohemi)' }}>
-                Star Rating
-              </span>
-            </motion.div>
-            <motion.div 
-              variants={filterVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleOpenFilter}
-              className='flex flex-row items-center justify-center w-32 gap-x-1 truncate bg-white rounded-full p-2 shadow-sm cursor-pointer'
-            >
-              <IconToolsKitchen3 className='text-blue-950' size={16} />
-              <span className='text-blue-950 text-sm tracking-tight' style={{ fontFamily: 'var(--font-nohemi)' }}>
-                Inclusions
-              </span>
-            </motion.div>
-            <motion.div 
-              variants={filterVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleOpenFilter}
-              className='flex flex-row items-center justify-center w-32 gap-x-1 truncate bg-white rounded-full p-2 shadow-sm cursor-pointer'
-            >
-              <IconAdjustmentsHorizontal className='text-blue-950' size={16} />
-              <span className='text-blue-950 text-sm tracking-tight' style={{ fontFamily: 'var(--font-nohemi)' }}>
-                Price Range
-              </span>
-            </motion.div>
-          </motion.div>
-        </HorizontalScroll>
-      </div>
     </div>
   );
 };

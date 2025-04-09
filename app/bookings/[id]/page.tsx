@@ -79,7 +79,7 @@ const Page = () => {
                         <span className='text-slate-600 text-sm font-normal tracking-tight'>
                             Order ID
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {order.razorpay_order_id}
                         </h2>
                         <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-slate-600 text-sm font-normal'>
@@ -92,7 +92,7 @@ const Page = () => {
                         <span className='text-slate-600 text-sm font-normal tracking-tight'>
                            Hotel Confirmation Number
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {JSON.parse(order.booking_details[0].other_details).providerConfirmationNumber}
                         </h2>
                         <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-slate-600 text-sm font-normal'>
@@ -107,7 +107,7 @@ const Page = () => {
                            <img src='https://aktt5yjwyc.ufs.sh/f/VfNn67L471Nr09H0PGyN69PzLBI5kGd34SqJQVxpOwXWubog' className='w-14 h-6 object-contain' /> 
                         </div>
                         <div className='flex flex-col w-full'>
-                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg truncate w-full'>
+                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg truncate w-full'>
                             {order.hotel_details.name ? order.hotel_details.name : ""}
                         </h1>
                         <span className='text-slate-600 text-sm font-normal tracking-tight w-full'>
@@ -122,7 +122,7 @@ const Page = () => {
                         <span className='text-gray-800 text-sm font-normal'>
                             Check-in
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {order.hotel_details.checkin ? new Date(order.hotel_details.checkin).toLocaleDateString('en-GB', {
   day: '2-digit',
   month: 'short',
@@ -137,7 +137,7 @@ const Page = () => {
                         <span className='text-gray-800 text-sm font-normal'>
                             Check out
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {order.hotel_details.checkout ? new Date(order.hotel_details.checkout).toLocaleDateString('en-GB', {
   day: '2-digit',
   month: 'short',
@@ -155,7 +155,7 @@ const Page = () => {
                         <span className='text-gray-800 text-sm font-normal'>
                             Guests & Room
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {order.common_details.adults} Adults
                         </h2>
                         </div>

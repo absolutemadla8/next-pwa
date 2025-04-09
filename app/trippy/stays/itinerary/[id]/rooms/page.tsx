@@ -304,19 +304,16 @@ const Page = () => {
               childAges: room.children.map(child => child.age)
             }
           })),
-          traceId,
-          recommendationId: String(recommendationId || currentRecommendationId),
-          items: [{
-            code: type.code,
-            type: 'HOTEL'
-          }]
+          journeyId:traceId,
+          recommendationId: String(recommendationId || currentRecommendationId)
         };
   
-        const response = await api.post(`/hotels/itineraries/${itineraryId}/select-roomrates`, payload);
+        const response = await api.post(`/hotels/itinerary/${itineraryId}/select-rooms`, payload);
   
         //@ts-ignore mlmr
         if (response?.data.status === 'success') {
-          router.push(`/trippy/stays/itinerary/session/${params.id}`)
+           //@ts-ignore mlmr
+          router.push(`/trippy/stays/itinerary/session/${response.data.data.bookingId}`)
         }
         console.log('Room selection response:', response);
       } catch (error) {

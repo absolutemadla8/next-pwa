@@ -171,9 +171,9 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
   }
 
   return (
-    <div className='flex flex-col items-start justify-start w-full bg-white rounded-xl overflow-hidden gap-y-1'>
+    <div className='flex flex-col items-start justify-start w-full rounded-xl overflow-hidden'>
       {/* Room Information Section - Common for all rates */}
-      <div className='flex flex-col items-start justify-start w-full bg-white rounded-xl overflow-hidden border-2 border-white'>
+      <div className='flex flex-col items-start justify-start w-full bg-white rounded-xl overflow-hidden border border-slate-300'>
         <img src={getImageUrl()} alt={room.type} className='w-full h-32 object-cover' />
         <div className='flex flex-col items-start justify-start p-4 gap-y-2'>
           <div className='flex flex-row items-start justify-start gap-x-4'>
@@ -190,7 +190,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
               </span>
             </div>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full lowercase'>
+          <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary w-full lowercase'>
             {room.type || room.roomType}
           </h1>
           <span className='text-xs text-slate-600 font-normal tracking-tight line-clamp-6'>
@@ -217,7 +217,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             }`}
           >
             {/* Board Type Header */}
-            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-full lowercase'>
+            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary w-full lowercase'>
               {selectedRate.boardBasis.description}
             </h1>
             
@@ -247,7 +247,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Inclusions - show if available */}
             {selectedRate.includes && selectedRate.includes.length > 0 && (
               <div className='flex flex-col w-full mt-3'>
-                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-sm text-blue-950 mb-1'>
+                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-sm text-primary mb-1'>
                   Includes:
                 </h2>
                 <div className='flex flex-row flex-wrap gap-x-2 gap-y-1'>
@@ -263,7 +263,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Price Information */}
             <div className='flex flex-col items-start justify-start pt-3'>
               <div className='flex flex-row items-center justify-start gap-x-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary'>
                   Rs.{selectedRate.finalRate.toLocaleString()}
                 </h1>
                 <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
@@ -278,7 +278,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Book Now Button */}
             <div className='w-full pt-3'>
               <AnimatedButton 
-                variant={isRateSelected ? 'success' : 'primary'}
+                variant={isRateSelected ? 'success' : 'secondary'}
                 className={`w-full ${isRateSelected ? 'bg-green-600 hover:bg-green-700' : ''}`} 
                 onClick={() => onBookNow(
                   room.roomId || room.id, 
@@ -288,8 +288,8 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
                 )}
               >
                 {isMultiRoom 
-                  ? (isRateSelected ? '✓ Selected' : 'Select')
-                  : (isRateSelected ? '✓ Selected' : 'Book Now')
+                  ? (isRateSelected ? 'Selected' : 'Select')
+                  : (isRateSelected ? 'Selected' : 'Book Now')
                 }
               </AnimatedButton>
             </div>
@@ -307,12 +307,12 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             className={`flex flex-col items-start justify-start w-full overflow-hidden p-4 ${
               isRateSelected 
                 ? 'bg-blue-50 border-2 border-blue-600 rounded-xl' 
-                : 'bg-white border border-blue-600 rounded-xl'
+                : 'bg-white border border-slate-300 border-t-0 rounded-xl'
             }`}
           >
             {/* Board Type Header with Refundable Indicator */}
             <div className='flex flex-row items-center justify-between w-full'>
-              <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
+              <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary'>
                 {rate.boardBasis.description}
               </h1>
               <span className='text-xs text-green-600 font-medium px-2 py-1 rounded-full bg-green-50 border border-green-200'>
@@ -333,7 +333,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Inclusions - show if available */}
             {rate.includes && rate.includes.length > 0 && (
               <div className='flex flex-col w-full mt-3'>
-                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-sm text-blue-950 mb-1'>
+                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-sm text-primary mb-1'>
                   Includes:
                 </h2>
                 <div className='flex flex-row flex-wrap gap-x-2 gap-y-1'>
@@ -349,11 +349,11 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
             {/* Price Information */}
             <div className='flex flex-col items-start justify-start pt-3'>
               <div className='flex flex-row items-center justify-start gap-x-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary'>
                   Rs.{rate.finalRate.toLocaleString()}
                 </h1>
                 <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
-                  room per night
+                  total per room
                 </span>
               </div>
               <span className='text-xs text-teal-600 font-normal tracking-tight truncate'>
@@ -373,7 +373,7 @@ const RoomRateCard: React.FC<RoomRateCardProps> = ({
                   rate.finalRate
                 )}
               >
-                {isRateSelected ? '✓ Selected' : (isMultiRoom ? 'Select' : 'Book Now')}
+                {isRateSelected ? 'Selected' : (isMultiRoom ? 'Select' : 'Book Now')}
               </AnimatedButton>
             </div>
           </div>

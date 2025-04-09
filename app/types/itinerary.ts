@@ -1,6 +1,6 @@
 export interface CreateItineraryPayload {
     hotelId: string;
-    traceId: string;
+    journeyId: string;
   }
 
 // Type for Room Area

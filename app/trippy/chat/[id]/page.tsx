@@ -46,7 +46,7 @@ export default function Page({ params }: { params: any }) {
   }, [id]);
 
   if (loading) {
-    return <div className="text-sm text-blue-950">Loading...</div>;
+    return <div className="text-sm text-primary">Loading...</div>;
   }
 
   if (!chat) {

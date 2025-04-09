@@ -146,7 +146,7 @@ export const Message = ({
         {content && typeof content === "string" && (
           <div
           style={{ fontFamily: role === "assistant" ? 'var(--font-domine)' : ''}}
-          className={`text-blue-950 flex flex-col gap-4 ${role === "assistant" ? "text-lg" : "text-sm tracking-tight bg-white rounded-lg p-2 border border-slate-200"}`}>
+          className={`text-primary flex flex-col gap-4 ${role === "assistant" ? "text-lg" : "text-sm tracking-tight bg-white rounded-lg p-2 border border-slate-200"}`}>
             <Markdown>{content}</Markdown>
           </div>
         )}

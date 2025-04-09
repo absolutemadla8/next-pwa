@@ -217,7 +217,7 @@ const DealsListSection: React.FC<DealsListSectionProps> = ({
   return (
     <div className="w-full px-4">
       <div className="flex flex-row items-start justify-between w-full pb-4">
-        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 font-normal text-lg">
+        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary font-normal text-lg">
           {country ? `Deals in ${country}` : 'Featured Deals'}
         </h2>
         {deals.length > 5 && (

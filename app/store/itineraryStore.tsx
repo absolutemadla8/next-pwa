@@ -31,7 +31,7 @@ interface Itinerary {
 // Define the type for the store state and actions
 interface ItineraryStore {
   itinerary: Itinerary; // The current itinerary
-  setLocationDetails: (locationDetails: Pick<Itinerary, 'locationId' | 'locationName' | 'type' | 'city' | 'state' | 'country' | 'travclanScore' | 'hotelId'>) => void; // Set location details
+  setLocationDetails: (locationDetails: Pick<Itinerary, 'locationId' | 'locationName' | 'type' | 'city' | 'state' | 'country' | 'travclanScore' | 'hotelId'> & { rooms?: Room[] }) => void; // Set location details
   setRecommendationId: (recommendationId: string | null) => void; // Set recommendation ID for the itinerary
   setRoomDetails: (roomId: string, details: Pick<Room, 'rateId' | 'roomId' | 'price'>) => void; // Set room details for a specific room
   addRoomToItinerary: () => void; // Add a room to the itinerary
@@ -84,12 +84,23 @@ export const useItineraryStore = create<ItineraryStore>()(
         checkOut: null,
       },
 
-      setLocationDetails: (locationDetails) => set((state) => ({
-        itinerary: {
-          ...state.itinerary,
-          ...locationDetails
-        }
-      })),
+      setLocationDetails: (locationDetails) => set((state) => {
+        // Create a new array of rooms with rateId and roomId set to null if no rooms are provided
+        const updatedRooms = locationDetails.rooms || state.itinerary.rooms.map(room => ({
+          ...room,
+          rateId: null,
+          roomId: null,
+          price: 0 // Also reset the price
+        }));
+        
+        return {
+          itinerary: {
+            ...state.itinerary,
+            ...locationDetails,
+            rooms: updatedRooms
+          }
+        };
+      }),
 
       setRecommendationId: (recommendationId) => set((state) => ({
         itinerary: {
@@ -116,7 +127,7 @@ export const useItineraryStore = create<ItineraryStore>()(
         }
       })),
 
-      // Add a room to the itinerary
+      // Add a room to the itinerary with 2 adults as default
       addRoomToItinerary: () =>
         set((state) => ({
           itinerary: {
@@ -125,8 +136,8 @@ export const useItineraryStore = create<ItineraryStore>()(
               ...state.itinerary.rooms,
               {
                 id: `room-${Date.now()}`,
-                adults: 1,
-                children: [],
+                adults: 2, // Default to 2 adults instead of 1
+                children: [], // Default to 0 children
                 rateId: null,
                 roomId: null,
                 price: 0,
@@ -272,7 +283,8 @@ export const useItineraryStore = create<ItineraryStore>()(
             state.itinerary.checkOut = new Date(state.itinerary.checkOut);
           }
           
-          // Make sure rooms array exists
+          // Make sure rooms array exists but don't create empty array if there's already data
+          // This prevents rooms from being reset on rehydration
           if (!state.itinerary.rooms) {
             state.itinerary.rooms = [];
           }

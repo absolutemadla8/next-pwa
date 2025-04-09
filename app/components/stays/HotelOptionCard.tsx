@@ -61,7 +61,7 @@ const HotelOptionCard: React.FC<HotelOptionCardProps> = ({
         <div className="space-y-1">
           <h3 
             style={{ fontFamily: 'var(--font-nohemi)' }}
-            className="text-blue-950 font-medium text-base truncate"
+            className="text-primary font-medium text-base truncate"
           >
             {hotel?.name ?? 'Hotel Name'}
           </h3>
@@ -77,7 +77,7 @@ const HotelOptionCard: React.FC<HotelOptionCardProps> = ({
           <p className="text-rose-600 text-xs font-medium">Room Type</p>
           <p 
             style={{ fontFamily: 'var(--font-nohemi)' }}
-            className="text-blue-950 text-sm line-clamp-2"
+            className="text-primary text-sm line-clamp-2"
           >
             {room?.name ?? 'Standard Room'}
           </p>

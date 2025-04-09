@@ -43,7 +43,7 @@ const Page = () => {
               <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-white font-normal text-md'>OftenTravel</h2>
             </div>
             <div className='flex flex-row items-center justify-start bg-white rounded-lg px-4 w-full h-14'>
-              <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md flex items-center'>
+              <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-md flex items-center'>
                 Search a deal for&nbsp;
                 <div className="inline-block h-7 w-24 overflow-hidden">
                   <motion.div
@@ -64,7 +64,7 @@ const Page = () => {
         <div className='flex flex-col items-start justify-start w-full gap-y-4'>
             <div className='flex flex-col items-start justify-start w-full bg-white py-4'>
             <div className='flex flex-row items-start justify-between w-full px-4 pb-4'>
-                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-lg w-1/2 pr-4'>Explore top destinations</h2>
+                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-lg w-1/2 pr-4'>Explore top destinations</h2>
                 <hr className='w-1/2 border-[0.5px] border-slate-500 mt-3' />
             </div>
             <HorizontalScroll>
@@ -72,7 +72,7 @@ const Page = () => {
                 <div key={index} className='flex flex-col items-center justify-center w-36 h-fit'>
                     <img src={dest.heroImage} className='w-full h-44 object-cover rounded-lg' />
                     <div className='flex flex-col items-center justify-center w-full pt-2'>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-md'>{dest.name}</h2>
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-md'>{dest.name}</h2>
                     </div>
                 </div>
                 ))}
@@ -82,22 +82,22 @@ const Page = () => {
             <HorizontalScroll>
                 <div className='flex flex-col items-center justify-center px-4 py-2 max-w-28 rounded-lg h-fit border border-slate-400'>
                     <div className='flex flex-col items-center justify-center w-full'>
-                        <h2 className='text-blue-950 font-normal text-sm tracking-tight truncate'>Country</h2>
+                        <h2 className='text-primary font-normal text-sm tracking-tight truncate'>Country</h2>
                     </div>
                 </div>
                 <div className='flex flex-col items-center justify-center px-4 py-2 max-w-28 rounded-lg h-fit border border-slate-400'>
                     <div className='flex flex-col items-center justify-center w-full'>
-                        <h2 className='text-blue-950 font-normal text-sm tracking-tight truncate'>Occasion</h2>
+                        <h2 className='text-primary font-normal text-sm tracking-tight truncate'>Occasion</h2>
                     </div>
                 </div>
                 <div className='flex flex-col items-center justify-center px-4 py-2 max-w-28 rounded-lg h-fit border border-slate-400'>
                     <div className='flex flex-col items-center justify-center w-full'>
-                        <h2 className='text-blue-950 font-normal text-sm tracking-tight truncate'>Visa Type</h2>
+                        <h2 className='text-primary font-normal text-sm tracking-tight truncate'>Visa Type</h2>
                     </div>
                 </div>
                 <div className='flex flex-col items-center justify-center px-4 py-2 max-w-28 rounded-lg h-fit border border-slate-400'>
                     <div className='flex flex-col items-center justify-center w-full'>
-                        <h2 className='text-blue-950 font-normal text-sm tracking-tight truncate'>Property Type</h2>
+                        <h2 className='text-primary font-normal text-sm tracking-tight truncate'>Property Type</h2>
                     </div>
                 </div>
             </HorizontalScroll>

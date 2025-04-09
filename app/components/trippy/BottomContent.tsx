@@ -26,7 +26,7 @@ export default function BottomContent() {
         </div>
         <div className='flex flex-col items-center justify-center p-6 bg-white w-full rounded-t-xl z-1'>
           <button onClick={() => setIsOpen(true)} className="flex flex-row items-center justify-between w-full">
-            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-blue-950">Trippy ActionSheet</h2>
+            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-primary">Trippy ActionSheet</h2>
             
             {sessionPin ? (
               <div className="flex justify-center space-x-1">

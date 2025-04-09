@@ -38,7 +38,7 @@ const PolicyList: React.FC<PolicyListProps> = ({
           key={policy.id || `policy-${index}`} 
           className="policy-item border-b border-gray-100 pb-4 last:border-0"
         >
-          <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-md text-blue-950 mb-2">{policy.type}</h3>
+          <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-md text-primary mb-2">{policy.type}</h3>
           <p className="text-slate-700 text-sm font-normal tracking-tight">{policy.text}</p>
         </div>
       ))}

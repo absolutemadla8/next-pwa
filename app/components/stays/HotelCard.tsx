@@ -26,11 +26,11 @@ const HotelCard: React.FC<HotelCardProps> = ({
   onClickHotel
 }) => {
   return (
-    <div onClick={onClickHotel} className='flex flex-col items-start justify-start w-full h-fit rounded-xl bg-white shadow-md shadow-slate-200 overflow-hidden'>
+    <div onClick={onClickHotel} className='flex flex-col items-start justify-start w-full h-fit bg-white overflow-hidden'>
         <ImageCarousel images={images} alt={name} />
         <div className='flex flex-col items-start justify-start w-full p-4'>
             <div className='flex flex-row items-start justify-between w-full'>
-            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-[68%] truncate'>
+            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary w-[68%] truncate'>
                 {name}
             </h1>
             <StarRating rating={rating} size={5} />
@@ -39,18 +39,19 @@ const HotelCard: React.FC<HotelCardProps> = ({
                 {location}
             </span>
             <div className='flex flex-row items-start justify-start pt-2'>
-                <MapPin size={16} className='fill-blue-950' />
-                <span className='text-xs text-blue-950 font-normal tracking-tight truncate'>
+                <MapPin size={16} className='fill-primary' />
+                <span className='text-xs text-primary font-normal tracking-tight truncate'>
                    {distance}
                 </span>
             </div>
             <TagList tags={amenities} />
+            <div className='flex flex-row items-start justify-between w-full'>
             <div className='flex flex-col items-start justify-start pt-2'>
             <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
                    Starting from
                 </span>
                 <div className='flex flex-row items-center justify-start gap-x-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary'>
                 Rs.{price.toLocaleString()}
             </h1>
             <span className='text-xs text-slate-600 font-normal tracking-tight truncate'>
@@ -60,6 +61,10 @@ const HotelCard: React.FC<HotelCardProps> = ({
             <span className='text-xs text-teal-600 font-normal tracking-tight truncate'>
                    Inclusive of taxes and fee
                 </span>
+            </div>
+            <button className='text-sm text-white font-medium bg-primary px-4 py-2 rounded-md'>
+                View Offer
+            </button>
             </div>
         </div>
     </div>

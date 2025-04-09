@@ -138,7 +138,7 @@ export function SearchLocationResults({
         {/* Clusters Section */}
         {searchResults.clusters?.map((cluster:any) => (
           <div key={cluster.id} className="group">
-            <div className="p-3 flex items-center gap-2 text-blue-950 bg-slate-50">
+            <div className="p-3 flex items-center gap-2 text-primary bg-slate-50">
               <span style={{ fontFamily: 'var(--font-nohemi)' }}
                     className="font-medium">
                 {cluster.name}
@@ -236,7 +236,7 @@ export function SearchLocationResults({
           <div className="mb-4">
             <div className="">
               <p style={{ fontFamily: 'var(--font-domine)'}} 
-                className="text-lg text-blue-950 font-medium mb-2">
+                className="text-lg text-primary font-medium mb-2">
                 Hey, I would need to know the exact location you&apos;re looking for.
               </p>
               {renderResults()}

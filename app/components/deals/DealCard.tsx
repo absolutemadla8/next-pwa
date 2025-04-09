@@ -81,7 +81,7 @@ const DealCard: React.FC<DealCardProps> = ({ deal, onFavoritePress, onPress }) =
       <div className="flex flex-col items-start justify-start gap-y-3 p-4 w-full">
         {/* Title and rating - now more prominent */}
         <div className="flex flex-col w-full mb-2">
-          <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="font-normal text-blue-950 text-lg leading-tight mb-2">
+          <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="font-normal text-primary text-lg leading-tight mb-2">
             {deal.name}
           </h3>
           

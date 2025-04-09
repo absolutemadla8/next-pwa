@@ -4,7 +4,7 @@ import LoginContent from '../components/auth/LoginContent';
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="flex h-screen overflow-hidden items-center justify-center">Loading...</div>}>
       <LoginContent />
     </Suspense>
   );

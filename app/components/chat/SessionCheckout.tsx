@@ -31,9 +31,9 @@ export function SessionCheckout({ results, chatId }: { results?: any, chatId: st
                             <ListCheck className='text-white size-4' />
                         </div>
                         <div className='flex flex-col mb-2'>
-                        <span className='flex flex-row items-center justify-start gap-x-1 text-blue-950 text-sm font-normal tracking-tight'>
+                        <span className='flex flex-row items-center justify-start gap-x-1 text-primary text-sm font-normal tracking-tight'>
                             To Pay
-                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-sm'>
+                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-sm'>
                             Rs. {results?.finalRate? (+results.finalRate).toFixed() : 0}
                         </span>
                         </span>

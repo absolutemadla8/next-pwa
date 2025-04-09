@@ -175,7 +175,7 @@ const GuestForm: React.FC<GuestFormProps> = ({
               >
                 <span className="invisible size-2 rounded-full bg-white group-data-[checked]:visible" />
               </Radio>
-              <Label className="text-sm font-normal text-blue-950">{title}</Label>
+              <Label className="text-sm font-normal text-primary">{title}</Label>
             </Field>
           ))}
         </RadioGroup>

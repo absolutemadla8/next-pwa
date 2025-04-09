@@ -30,7 +30,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   // Variant styles
   const variantStyles = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
-    secondary: "bg-blue-950 hover:bg-blue-900 text-white",
+    secondary: "bg-primary hover:bg-blue-900 text-white",
     success: "bg-green-600 hover:bg-green-700 text-white",
     danger: "bg-red-600 hover:bg-red-700 text-white",
     bland: "bg-white hover:text-blue-700 text-blue-600",

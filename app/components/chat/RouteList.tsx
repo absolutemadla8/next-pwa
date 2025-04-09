@@ -137,7 +137,7 @@ export function RouteList({
         ) : (
           <div className="mb-4 space-y-4">
             <div style={{ fontFamily: 'var(--font-domine)'}} 
-              className="text-lg text-blue-950 font-medium mb-2">
+              className="text-lg text-primary font-medium mb-2">
               {searchResults?.data?.length > 0 
                 ? `Found ${searchResults.data.length} route${searchResults.data.length > 1 ? 's' : ''} for you:`
                 : "No routes found for this location. Please try another destination."}

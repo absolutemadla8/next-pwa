@@ -30,7 +30,7 @@ const DateRangeEvent: React.FC<DateRangeEventProps> = ({
                 cursor-pointer border border-transparent active:bg-blue-100'
       onClick={handleClick}
     >
-      <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-sm'>
+      <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-sm'>
         {dateRange}
       </h2>
       <h2 className='text-slate-600 font-normal text-xs tracking-tight'>

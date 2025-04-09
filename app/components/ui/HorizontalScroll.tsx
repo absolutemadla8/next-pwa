@@ -23,7 +23,7 @@ const HorizontalScroll = ({ children, className = '' }: HorizontalScrollProps) =
   };
 
   return (
-    <div className="w-full scrollbar-hide overflow-x-auto px-2">
+    <div className="w-full scrollbar-hide overflow-x-auto">
       <motion.div 
         variants={container}
         initial="hidden"

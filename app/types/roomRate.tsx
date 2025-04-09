@@ -14,7 +14,6 @@ export interface RoomRateAllocation {
   
   export interface SelectRoomRatesPayload {
     roomsAndRateAllocations: RoomRateAllocation[];
-    traceId?: string;
+    journeyId: string;
     recommendationId: string;
-    items?: Item[];
   }

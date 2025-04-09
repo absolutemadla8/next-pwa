@@ -1,10 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import type { LottieComponentProps } from 'lottie-react';
-import loadingAnimation from '@/app/lottie/travelloader.json';
-
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+import React from 'react';
 
 interface LoadingButtonProps {
   loading: boolean;
@@ -13,6 +9,7 @@ interface LoadingButtonProps {
   loadingText?: string;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
+  icon?: React.ReactNode;
 }
 
 export default function LoadingButton({
@@ -21,26 +18,22 @@ export default function LoadingButton({
   text,
   loadingText = 'Loading...',
   className = '',
-  type = 'button'
+  type = 'button',
+  icon
 }: LoadingButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={loading}
-      className={`relative ${className}`}
+      className={`flex items-center justify-between px-4 py-3 w-full ${className}`}
     >
+      <span className="text-left">{loading ? loadingText : text}</span>
+      
       {loading ? (
-        <div className="flex items-center justify-center">
-          <Lottie
-            animationData={loadingAnimation}
-            style={{ width: 24, height: 24, backgroundColor:"white", padding:"1px", borderRadius:"10%" }}
-            loop={true}
-          />
-          <span className="ml-2">{loadingText}</span>
-        </div>
+        <div className="animate-spin h-5 w-5 border-2 border-t-transparent border-blue-500 rounded-full"></div>
       ) : (
-        text
+        icon && <span>{icon}</span>
       )}
     </button>
   );

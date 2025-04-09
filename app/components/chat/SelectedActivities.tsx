@@ -234,7 +234,7 @@ export function SelectedActivities({
           <div className="mb-4">
             <div className="">
               <p style={{ fontFamily: 'var(--font-domine)'}} 
-                className="text-lg text-blue-950 font-medium mb-4">
+                className="text-lg text-primary font-medium mb-4">
                 Here are the recommended activities for your Thailand adventure:
               </p>
               <div className='flex flex-col gap-y-6 w-full'>
@@ -247,7 +247,7 @@ export function SelectedActivities({
                         {index + 1}
                       </div>
                       <h1 style={{ fontFamily: 'var(--font-nohemi)'}}
-                        className="text-lg text-blue-950 font-medium">
+                        className="text-lg text-primary font-medium">
                         {dest.name} - {dest.nights} {dest.nights === 1 ? 'night' : 'nights'}
                       </h1>
                     </div>
@@ -275,7 +275,7 @@ export function SelectedActivities({
                               />
                               {activity.type !== 'PRIMARY' && showOptionText && (
                                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-start justify-start p-3">
-                                  <div className="px-2 py-1 rounded text-blue-950 bg-white font-medium">
+                                  <div className="px-2 py-1 rounded text-primary bg-white font-medium">
                                     <TypingText text="Marked as option" />
                                   </div>
                                 </div>
@@ -285,7 +285,7 @@ export function SelectedActivities({
                               <div className='flex flex-row items-center justify-between w-full'>
                                 <h1 
                                   style={{ fontFamily: 'var(--font-nohemi)' }} 
-                                  className='text-md text-blue-950 w-[90%] truncate font-medium'
+                                  className='text-md text-primary w-[90%] truncate font-medium'
                                 >
                                   {activity.title}
                                 </h1>

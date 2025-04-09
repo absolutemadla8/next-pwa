@@ -188,7 +188,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
   return (
     <div className="w-full space-y-2 mb-4">
       <div className="px-4 flex justify-between items-center">
-        <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-sm font-medium pb-1">
+        <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-sm font-medium pb-1">
           Trip templates
         </h3>
         <button 
@@ -204,7 +204,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
           <div className="flex flex-row flex-wrap justify-between items-center gap-2 mb-2">
             {/* Duration Filter */}
             <div className="w-[30%]">
-              <label className="block text-xs font-medium mb-1 text-blue-950">Duration</label>
+              <label className="block text-xs font-medium mb-1 text-primary">Duration</label>
               <Listbox value={duration} onChange={setDuration}>
                 <div className="relative mt-1">
                   <ListboxButton
@@ -250,7 +250,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
             
             {/* Destination Filter */}
             <div className="w-[30%]">
-              <label className="block text-xs font-medium mb-1 text-blue-950 ">Destination</label>
+              <label className="block text-xs font-medium mb-1 text-primary ">Destination</label>
               <Listbox value={destination} onChange={setDestination}>
                 <div className="relative mt-1">
                   <ListboxButton
@@ -296,7 +296,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
             
             {/* Month Filter (multi-select dropdown) */}
             <div className="w-[30%] relative dropdown-container">
-              <label className="block text-xs font-medium mb-1 text-blue-950">Month(s)</label>
+              <label className="block text-xs font-medium mb-1 text-primary">Month(s)</label>
               <div className="relative">
                 <button
                   onClick={() => {
@@ -340,7 +340,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
           <div className="flex flex-row flex-wrap justify-between items-center gap-2">
             {/* Luxe Filter (multi-select dropdown) */}
             <div className="w-[48%] relative dropdown-container">
-              <label className="block text-xs font-medium mb-1 text-blue-950">Luxe Level(s)</label>
+              <label className="block text-xs font-medium mb-1 text-primary">Luxe Level(s)</label>
               <div className="relative">
                 <button
                   onClick={() => {
@@ -382,7 +382,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
             
             {/* Vibe Filter (multi-select dropdown) */}
             <div className="w-[48%] relative dropdown-container">
-              <label className="block text-xs font-medium mb-1 text-blue-950">Vibe(s)</label>
+              <label className="block text-xs font-medium mb-1 text-primary">Vibe(s)</label>
               <div className="relative">
                 <button
                   onClick={() => {
@@ -438,7 +438,7 @@ const TripTemplateGenerator = ({ onSelectTemplate }: { onSelectTemplate: (templa
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <span style={{ fontFamily: 'var(--font-nohemi)' }} className="text-md text-blue-950 mr-1">
+                    <span style={{ fontFamily: 'var(--font-nohemi)' }} className="text-md text-primary mr-1">
                       {template.duration}N {template.destination}
                     </span>
                   </div>

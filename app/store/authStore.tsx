@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthStore>()(
       // Actions
       login: async (phone_number: string) => {
         try {
-          const response = await axios.post(`${API_URL}/auth/send-otp`, { phone_number });
+          const response = await axios.post(`${API_URL}/auth/request-otp`, { phone: phone_number });
           
           // Save phone number for OTP verification
           set({ phoneNumber: phone_number });
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthStore>()(
 
           const response = await axios.post(`${API_URL}/auth/verify-otp`, {
             otp,
-            phone_number: phoneNumber,
+            phone: phoneNumber,
           });
 
           const { token, user } = response.data;
@@ -152,7 +152,7 @@ export const useAuthStore = create<AuthStore>()(
 
       fetchUserInfo: async () => {
         try {
-          const response = await axios.get(`${API_URL}/user`);
+          const response = await axios.get(`${API_URL}/auth/me`);
           const userData = response.data;
           
           set({ user: userData });

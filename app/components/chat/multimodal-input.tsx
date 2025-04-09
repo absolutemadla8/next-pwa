@@ -172,7 +172,7 @@ export function MultimodalInput({
                       content: suggestedAction.action,
                     });
                   }}
-                  className=" bg-gradient-to-r border border-white from-blue-200 to-violet-200 w-full text-left text-blue-950 p-4 rounded-lg font-semibold transition-colors flex flex-col"
+                  className=" bg-gradient-to-r border border-white from-blue-200 to-violet-200 w-full text-left text-primary p-4 rounded-lg font-semibold transition-colors flex flex-col"
                 >
                   <span className="font-semibold tracking-tight truncate">{suggestedAction.title}</span>
                   <span className="font-normal text-blue-800 tracking-tight text-sm truncate">
@@ -219,7 +219,7 @@ export function MultimodalInput({
         value={input}
         onChange={handleInput}
         style={{ fontFamily: 'var(--font-nohemi)' }}
-        className="text-md max-h-14 rounded-lg overflow-scroll max-w-[80%] resize-none text-base bg-muted shadow-sm p-4 border border-slate-200 text-blue-950"
+        className="text-md max-h-14 rounded-lg overflow-scroll max-w-[80%] resize-none text-base bg-muted shadow-sm p-4 border border-slate-200 text-primary"
         rows={3}
         onKeyDown={(event) => {
           if (event.key === "Enter") {

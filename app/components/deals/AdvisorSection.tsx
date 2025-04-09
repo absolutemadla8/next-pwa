@@ -36,7 +36,7 @@ const AdvisorSection: React.FC<AdvisorSectionProps> = ({ advisor }) => {
         </div>
 
         <div className="flex flex-col gap-1 flex-1">
-          <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-lg">
+          <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-lg">
             {advisor.name}
           </h3>
           <span className="text-blue-600 text-xs font-medium tracking-tight">

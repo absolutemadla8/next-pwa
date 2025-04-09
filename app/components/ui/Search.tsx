@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useItineraryStore } from '@/app/store/itineraryStore';
 import { Bed, MapPin, Plane, Train, Building } from 'lucide-react';
-import axios from 'axios';
 import { api } from '@/app/lib/axios';
 import useBottomSheetStore from '@/app/store/bottomSheetStore';
 
@@ -13,8 +12,11 @@ interface SearchResult {
   city?: string | null;
   state?: string | null;
   country?: string | null;
-  travclanScore: number;
-  referenceId?: string;
+  coordinates?: {
+    lat: number;
+    long: number;
+  };
+  source?: string;
 }
 
 export default function LocationSearch() {
@@ -31,13 +33,14 @@ export default function LocationSearch() {
       
       setIsLoading(true);
       try {
-        const response = await api.get(`/hotels/search-locations`, {
-            params: { search_keyword: keyword },
-          });
+        const response = await api.post(`/hotels/search/locations`, {
+          search_keyword: keyword,
+        });
+        
         //@ts-ignore mlmr
         if (response?.data?.status === 'success') {
           //@ts-ignore mlmr
-          setResults(response?.data.data);
+          setResults(response.data.data);
           setIsError(false);
         } else {
           setIsError(true);
@@ -59,6 +62,7 @@ export default function LocationSearch() {
       case 'Airport': return <Plane className="w-5 h-5" />;
       case 'TrainStation': return <Train className="w-5 h-5" />;
       case 'City': return <Building className="w-5 h-5" />;
+      case 'State': return <Building className="w-5 h-5" />;
       default: return <MapPin className="w-5 h-5" />;
     }
   };
@@ -71,8 +75,8 @@ export default function LocationSearch() {
       city: item.city || undefined,
       state: item.state || undefined,
       country: item.country || undefined,
-      travclanScore: item.travclanScore,
-      hotelId: item.referenceId ? Number(item.referenceId) : null,
+      // Set hotelId to the item's id if the type is Hotel, otherwise null
+      hotelId: item.type === 'Hotel' ? item.id : null
     });
     setKeyword('');
     
@@ -83,15 +87,15 @@ export default function LocationSearch() {
   return (
     <div className="relative w-full mx-auto">
       <div className='flex px-4'>
-      <input
-        type="text"
-        value={keyword}
-        style={{ fontFamily: 'var(--font-nohemi)' }}
-        onChange={(e) => setKeyword(e.target.value)}
-        placeholder="Search locations, hotels, or airports..."
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-blue-950"
-      />
-</div>
+        <input
+          type="text"
+          value={keyword}
+          style={{ fontFamily: 'var(--font-nohemi)' }}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="Search locations, hotels, or airports..."
+          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-primary"
+        />
+      </div>
       {(isLoading || results.length > 0 || isError) && (
         <div className="absolute z-10 w-full mt-1 bg-white h-screen overflow-y-auto">
           {isLoading ? (
@@ -105,11 +109,11 @@ export default function LocationSearch() {
                 onClick={() => handleItemClick(item)}
                 className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
               >
-                <div className="flex-shrink-0 mr-3 text-blue-950">
+                <div className="flex-shrink-0 mr-3 text-primary">
                   {getIcon(item.type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="font-medium text-blue-950 truncate">{item.name}</h3>
+                  <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="font-medium text-primary truncate">{item.name}</h3>
                   <p className="text-sm text-slate-600 tracking-tight truncate">
                     {item.fullName}
                   </p>

@@ -1,5 +1,6 @@
-import { Delete, Minus, MinusCircle, Plus, X } from 'lucide-react';
-import React from 'react';
+import { ChevronDown, Delete, Minus, MinusCircle, Plus, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react';
 
 // Define types for our data structures
 interface Child {
@@ -17,7 +18,6 @@ interface Itinerary {
   rooms: Room[];
 }
 
-// Props interface for the component
 interface RoomConfigurationProps {
   itinerary: Itinerary;
   addRoomToItinerary: () => void;
@@ -26,6 +26,7 @@ interface RoomConfigurationProps {
   decreaseAdultsInRoom: (roomId: string) => void;
   addChildToRoom: (roomId: string, age: number) => void;
   removeChildFromRoom: (roomId: string, childIndex: number) => void;
+  onClose?: () => void; // Optional onClose prop for the DONE button
 }
 
 const RoomConfiguration: React.FC<RoomConfigurationProps> = ({ 
@@ -35,8 +36,9 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
   increaseAdultsInRoom, 
   decreaseAdultsInRoom, 
   addChildToRoom, 
-  removeChildFromRoom 
-}) => {
+  removeChildFromRoom,
+  onClose
+ }) => {
   const handleAgeChange = (roomId: string, index: number, age: string): void => {
     const numericAge = parseInt(age) || 0;
     if (numericAge >= 0 && numericAge <= 17) {
@@ -46,10 +48,10 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
   };
 
   return (
-    <div className="bg-gray-100 px-4 rounded-lg">
+    <div className="bg-gray-100 px-4 rounded-lg pb-24">
       <div className="space-y-4">
         {itinerary.rooms.map((room, roomIndex) => (
-          <div key={room.id} className="bg-white rounded-xl p-4">
+          <div key={room.id} className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
             <div className="flex justify-between items-center pb-3 mb-4 border-b border-gray-200">
               <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className=" text-gray-800">Room {roomIndex + 1}</h3>
               {itinerary.rooms.length > 1 && (
@@ -64,13 +66,13 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
             </div>
 
             {/* Adults Counter */}
-            <div className="mb-5">
+            <div className="flex flex-row items-center justify-between mb-5">
               <label className="block text-sm font-medium text-slate-600 mb-3 tracking-tight">Adults</label>
               <div className="flex items-center gap-6">
                 <button 
                   onClick={() => decreaseAdultsInRoom(room.id)}
                   disabled={room.adults <= 1}
-                  className={`p-2 ${room.adults > 1 ? 'text-purple-900' : 'text-gray-300'} rounded-full transition-colors bg-blue-950`}
+                  className={`p-2 ${room.adults > 1 ? 'text-purple-900' : 'text-gray-300'} rounded-full transition-colors bg-primary`}
                   aria-label="Decrease adults"
                 >
                   <Minus size={14} className='text-white' />
@@ -79,7 +81,7 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
                 <button 
                   onClick={() => increaseAdultsInRoom(room.id)}
                   disabled={room.adults >= 3}
-                  className={`p-2 ${room.adults < 3 ? 'text-purple-900' : 'text-gray-300'} rounded-full transition-colors bg-blue-950`}
+                  className={`p-2 ${room.adults < 3 ? 'text-purple-900' : 'text-gray-300'} rounded-full transition-colors bg-primary`}
                   aria-label="Increase adults"
                 >
                   <Plus size={14} className='text-white' />
@@ -89,59 +91,108 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
 
             {/* Children Management */}
             <div className="pt-4">
-              <label className="block text-sm font-medium text-slate-600 mb-3 tracking-tight">Children (0-17 years)</label>
-              
-              {room.children.map((child, childIndex) => (
-                <div key={childIndex} className="flex items-center gap-3 mb-3">
-                  <input
-                    type="number"
-                    className="border border-gray-200 rounded-lg py-2 px-3 w-20 text-gray-800 text-center"
-                    value={child.age.toString()}
-                    onChange={(e) => handleAgeChange(room.id, childIndex, e.target.value)}
-                    min={0}
-                    max={17}
-                    placeholder="Age"
-                    aria-label="Child age"
-                  />
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-slate-600 mb-3 tracking-tight">Children</label>
+                <div className="flex items-center gap-6">
                   <button 
-                    onClick={() => removeChildFromRoom(room.id, childIndex)}
-                    className="p-2 text-red-500 hover:text-red-600"
-                    aria-label="Remove child"
+                    onClick={() => room.children.length > 0 && removeChildFromRoom(room.id, room.children.length - 1)}
+                    disabled={room.children.length === 0}
+                    className={`p-2 ${room.children.length > 0 ? 'text-purple-900' : 'text-gray-300'} rounded-full transition-colors bg-primary`}
+                    aria-label="Decrease children"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <Minus size={14} className='text-white' />
+                  </button>
+                  <span style={{ fontFamily: 'var(--font-nohemi)' }} className="font-medium text-lg text-gray-800 min-w-10 text-center">{room.children.length}</span>
+                  <button 
+                    onClick={() => addChildToRoom(room.id, 0)}
+                    disabled={room.children.length >= 2}
+                    className={`p-2 ${room.children.length < 2 ? 'text-purple-900' : 'text-gray-300'} rounded-full transition-colors bg-primary`}
+                    aria-label="Increase children"
+                  >
+                    <Plus size={14} className='text-white' />
                   </button>
                 </div>
-              ))}
+              </div>
               
-              {room.children.length < 2 && (
-                <button 
-                  className="flex items-center gap-2 text-blue-950 bg-slate-100 py-2 px-3 rounded-full"
-                  onClick={() => addChildToRoom(room.id, 0)}
-                  aria-label="Add child"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span className="font-medium text-sm ">Add Child</span>
-                </button>
+              {room.children.length > 0 && (
+                <div className="mt-3 mb-3 p-4 bg-gray-50 rounded-xl">
+                  <p className="text-sm font-medium text-slate-600 mb-4">Age of Children</p>
+                  {room.children.map((child, childIndex) => (
+                      <div key={childIndex} className="mb-4 last:mb-0">
+                        <div className="flex flex-col">
+                          <label className="text-sm font-medium text-slate-600 mb-2">Child {childIndex + 1}</label>
+                          <Listbox
+                            value={child.age.toString()}
+                            onChange={(value) => handleAgeChange(room.id, childIndex, value)}
+                          >
+                            <div className="relative">
+                              <ListboxButton
+                                className="appearance-none w-full bg-white border border-gray-200 rounded-lg py-3 px-4 pr-8 text-left text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 relative"
+                              >
+                                <span className="block truncate">{child.age} {child.age === 1 ? 'year' : 'years'}</span>
+                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                  <ChevronDown size={18} />
+                                </span>
+                              </ListboxButton>
+                              <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                {[...Array(18)].map((_, age) => (
+                                  <ListboxOption
+                                    key={age}
+                                    value={age.toString()}
+                                    className={({ active }) =>
+                                      `cursor-default select-none relative py-2 px-4 ${active ? 'bg-blue-100 text-blue-900' : 'text-gray-900'}`
+                                    }
+                                  >
+                                    {({ selected, active }) => (
+                                      <>
+                                        <span
+                                          className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                                        >
+                                          {age} {age === 1 ? 'year' : 'years'}
+                                        </span>
+                                      </>
+                                    )}
+                                  </ListboxOption>
+                                ))}
+                              </ListboxOptions>
+                            </div>
+                          </Listbox>
+                        </div>
+                      </div>
+                  ))}
+                  <p className="text-sm text-gray-500 mt-2">Please provide right number of children along with their right age for best options and prices.</p>
+                </div>
               )}
             </div>
           </div>
         ))}
 
+      <div className="mt-4">
+        {itinerary.rooms.length < 5 ? (
+          <button 
+            className="flex items-center justify-center gap-3 text-blue-600 hover:text-blue-700 w-full py-3 bg-white rounded-lg shadow-sm border border-gray-100"
+            onClick={addRoomToItinerary}
+            disabled={itinerary.rooms.length >= 5}
+            aria-label="Add another room"
+          >
+            <Plus size={18} />
+            <span className="font-medium">Add Another Room</span>
+          </button>
+        ) : (
+          <div className="text-center py-2">
+            <p className="text-sm text-gray-500">Maximum 5 rooms allowed per booking</p>
+          </div>
+        )}
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-white border-t border-gray-200 z-10 md:max-w-md mx-auto">
         <button 
-          className="flex items-center justify-center gap-3 text-blue-600 hover:text-blue-700 w-full py-3"
-          onClick={addRoomToItinerary}
-          disabled={itinerary.rooms.length >= 5}
-          aria-label="Add another room"
+          className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={onClose}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          <span className="font-medium">Add Another Room</span>
+          DONE
         </button>
+      </div>
       </div>
     </div>
   );

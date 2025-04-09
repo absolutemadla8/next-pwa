@@ -41,7 +41,7 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
   if (sortedDayNumbers.length === 0) {
     return (
       <div className="flex flex-col items-start justify-start w-full bg-white rounded-lg p-4">
-        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-lg font-bold mb-2">
+        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-lg font-bold mb-2">
           {destination}
         </h1>
         <p className="text-gray-500">No itinerary items available for this destination</p>
@@ -55,7 +55,7 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
         return (
           item.hotel && (
             <div className="bg-blue-900/10 p-4 rounded-lg h-full">
-              <div className="text-blue-950 font-semibold mb-2">{item.hotel.name}</div>
+              <div className="text-primary font-semibold mb-2">{item.hotel.name}</div>
               {item.room && (
                 <div className="text-gray-600 text-sm mb-1">{item.room.name}</div>
               )}
@@ -77,11 +77,11 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
                   className="h-8 mb-2 object-contain"
                 />
               )}
-              <div className="font-semibold text-blue-950">{item.flight.carrier}</div>
+              <div className="font-semibold text-primary">{item.flight.carrier}</div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-blue-950">{item.flight.depCode}</span>
-                <span className="text-blue-950">→</span>
-                <span className="text-blue-950">{item.flight.arrivalCode}</span>
+                <span className="text-primary">{item.flight.depCode}</span>
+                <span className="text-primary">→</span>
+                <span className="text-primary">{item.flight.arrivalCode}</span>
               </div>
             </div>
           )
@@ -99,10 +99,10 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
                 />
               )}
               <div className="p-3">
-                <h3 className="text-blue-950 text-lg font-semibold mb-1">{item.activity.name}</h3>
-                <div className="bg-blue-950/10 p-2 rounded-md inline-block mb-2">
-                  <div className="text-blue-950/60 text-xs">Duration</div>
-                  <div className="text-blue-950 text-sm font-medium">
+                <h3 className="text-primary text-lg font-semibold mb-1">{item.activity.name}</h3>
+                <div className="bg-primary/10 p-2 rounded-md inline-block mb-2">
+                  <div className="text-primary/60 text-xs">Duration</div>
+                  <div className="text-primary text-sm font-medium">
                     {Math.floor(item.activity.duration / 60)} hours
                   </div>
                 </div>
@@ -126,7 +126,7 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
                 />
               )}
               <div className="p-3">
-                <h3 className="text-blue-950 text-lg font-semibold mb-1">{item.generic.name}</h3>
+                <h3 className="text-primary text-lg font-semibold mb-1">{item.generic.name}</h3>
                 {item.generic.subtitle && (
                   <p className="text-gray-500 text-sm mb-1">{item.generic.subtitle}</p>
                 )}
@@ -141,7 +141,7 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
       default:
         return (
           <div className="bg-blue-900/10 p-4 rounded-lg h-full">
-            <div className="text-blue-950 font-semibold">Item Type: {item.itemType}</div>
+            <div className="text-primary font-semibold">Item Type: {item.itemType}</div>
             <div className="text-gray-600 text-sm">Day: {item.dayNumber}</div>
           </div>
         );
@@ -152,7 +152,7 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
     <div className="flex flex-col items-start justify-start w-full rounded-lg mb-4">
       {/* Destination Header */}
       <div className="p-4 w-full">
-        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-lg font-bold">
+        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-lg font-bold">
           {destination}
         </h1>
       </div>
@@ -164,13 +164,13 @@ const DaySection: React.FC<DaySectionProps> = ({ destination, items }) => {
             <div 
               key={dayNumber}
               className={`flex flex-col items-center justify-center w-20 rounded-lg py-2 h-fit cursor-pointer mx-1 ${
-                selectedDay === dayNumber ? 'bg-blue-950' : 'bg-slate-100'
+                selectedDay === dayNumber ? 'bg-primary' : 'bg-slate-100'
               }`}
               onClick={() => setSelectedDay(dayNumber)}
             >
               <h2 
                 style={{ fontFamily: 'var(--font-nohemi)' }} 
-                className={`${selectedDay === dayNumber ? 'text-white' : 'text-blue-950'} text-md`}
+                className={`${selectedDay === dayNumber ? 'text-white' : 'text-primary'} text-md`}
               >
                 Day {dayNumber}
               </h2>

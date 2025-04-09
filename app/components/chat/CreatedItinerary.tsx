@@ -167,7 +167,7 @@ export function CreatedItinerary({
                 transition={{ duration: 0.6 }}
               >
                 <p style={{ fontFamily: 'var(--font-domine)'}} 
-                  className="text-xl text-blue-950 font-medium mb-2">
+                  className="text-xl text-primary font-medium mb-2">
                   {tripResult.trip.name}
                 </p>
                 <div className="mb-4 text-sm text-slate-600">
@@ -194,7 +194,7 @@ export function CreatedItinerary({
                       </div>
                       <div>
                         <h1 style={{ fontFamily: 'var(--font-nohemi)'}}
-                          className="text-lg text-blue-950 font-medium">
+                          className="text-lg text-primary font-medium">
                           {dest.name}
                         </h1>
                         <p className="text-sm text-slate-600">

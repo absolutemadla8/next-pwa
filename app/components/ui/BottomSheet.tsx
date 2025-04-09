@@ -2,7 +2,8 @@
 
 import useVoiceChatStore from '@/app/store/voiceChatStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 interface BottomSheetProps {
   isOpen?: boolean;
@@ -70,22 +71,34 @@ const BottomSheet = ({
 
             <div className="flex flex-col flex-grow overflow-hidden">
               <div className="flex flex-row items-center justify-between w-full px-6 flex-shrink-0">
-                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-blue-950">{title}</h2>
+                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-primary">{title}</h2>
                 
-                {showPin && sessionPin ? (
-                  <div className="flex justify-center space-x-1">
-                    {sessionPin.split("").map((digit, index) => (
-                      <div 
-                        key={index} 
-                        className="w-5 h-6 flex items-center justify-center bg-blue-100 border border-blue-600 rounded-md text-blue-800 text-md capitalize"
-                      >
-                        {digit}
-                      </div>
-                    ))}
-                  </div>
-                ) : showPin ? (
-                  <p className='text-blue-800 text-md'>No active session</p>
-                ) : null}
+                <div className="flex items-center space-x-3">
+                  {showPin && sessionPin ? (
+                    <div className="flex justify-center space-x-1">
+                      {sessionPin.split("").map((digit, index) => (
+                        <div 
+                          key={index} 
+                          className="w-5 h-6 flex items-center justify-center bg-blue-100 border border-blue-600 rounded-md text-blue-800 text-md capitalize"
+                        >
+                          {digit}
+                        </div>
+                      ))}
+                    </div>
+                  ) : showPin ? (
+                    <p className='text-blue-800 text-md'>No active session</p>
+                  ) : null}
+                  
+                  {onClose && (
+                    <button 
+                      onClick={onClose}
+                      className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                      aria-label="Close"
+                    >
+                      <X size={20} className="text-gray-600" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Content with separate scrolling */}

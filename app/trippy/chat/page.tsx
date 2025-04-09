@@ -57,7 +57,7 @@ const Page = () => {
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             placeholder="Ask about your trip..."
-            className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none shadow-sm text-blue-950"
+            className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none shadow-sm text-primary"
             disabled={loading}
           />
           <button

@@ -134,11 +134,11 @@ const HotelFilterBottomSheet = () => {
           animate="visible"
           variants={filterItemVariants}
         >
-          <h3 className="text-blue-950 font-semibold text-lg">Price Range</h3>
+          <h3 className="text-primary font-semibold text-lg">Price Range</h3>
           <div className="px-2">
             <div className="flex justify-between mb-2">
-              <span className="text-blue-950" style={{ fontFamily: 'var(--font-nohemi)' }}>₹{sliderValues.min}</span>
-              <span className="text-blue-950" style={{ fontFamily: 'var(--font-nohemi)' }}>₹{sliderValues.max}</span>
+              <span className="text-primary" style={{ fontFamily: 'var(--font-nohemi)' }}>₹{sliderValues.min}</span>
+              <span className="text-primary" style={{ fontFamily: 'var(--font-nohemi)' }}>₹{sliderValues.max}</span>
             </div>
             <div className="relative mb-6 pt-2">
               <RangeSlider
@@ -162,17 +162,17 @@ const HotelFilterBottomSheet = () => {
           variants={filterItemVariants}
           custom={1}
         >
-          <h3 className="text-blue-950 font-semibold text-lg">Star Rating</h3>
+          <h3 className="text-primary font-semibold text-lg">Star Rating</h3>
           <div className="flex flex-wrap gap-2">
             {[5, 4, 3, 2, 1].map((rating) => (
               <motion.div
                 key={rating}
                 onClick={() => toggleStarRating(rating)}
-                className={`flex items-center justify-center px-4 py-2 rounded-full cursor-pointer transition-all ${starRatings.includes(rating) ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-blue-950'}`}
+                className={`flex items-center justify-center px-4 py-2 rounded-full cursor-pointer transition-all ${starRatings.includes(rating) ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-primary'}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <IconStar size={14} className={starRatings.includes(rating) ? 'text-white' : 'text-blue-950'} />
+                <IconStar size={14} className={starRatings.includes(rating) ? 'text-white' : 'text-primary'} />
                 <span className="ml-1 mt-0.5 text-sm" style={{ fontFamily: 'var(--font-nohemi)' }}>{rating}</span>
               </motion.div>
             ))}
@@ -187,13 +187,13 @@ const HotelFilterBottomSheet = () => {
           variants={filterItemVariants}
           custom={2}
         >
-          <h3 className="text-blue-950 font-semibold text-lg">Inclusions</h3>
+          <h3 className="text-primary font-semibold text-lg">Inclusions</h3>
           <div className="flex flex-wrap gap-2">
             {inclusions.map((inclusion) => (
               <motion.div
                 key={inclusion.id}
                 onClick={() => toggleInclusion(inclusion.id)}
-                className={`px-4 py-2 text-sm rounded-full cursor-pointer transition-all ${inclusion.selected ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-blue-950'}`}
+                className={`px-4 py-2 text-sm rounded-full cursor-pointer transition-all ${inclusion.selected ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-primary'}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -208,7 +208,7 @@ const HotelFilterBottomSheet = () => {
         <AnimatedButton
             onClick={resetFilters}
             variant='bland'
-            className='text-blue-950'
+            className='text-primary'
           >
            Reset Selections
           </AnimatedButton>

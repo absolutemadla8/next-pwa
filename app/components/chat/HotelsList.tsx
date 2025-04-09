@@ -126,7 +126,7 @@ export function HotelsList({
             <div className="mb-4">
             <div className="">
             <p style={{ fontFamily: 'var(--font-domine)'}} 
-                className="text-lg text-blue-950 font-medium mb-2">
+                className="text-lg text-primary font-medium mb-2">
                 Yo, dude! Just blazed through some searches and found these totally chill hotels for your trip!
               </p>
             <HorizontalScroll>
@@ -143,7 +143,7 @@ export function HotelsList({
                     <img src={result?.hero_image?.url || "https://often-public-assets.blr1.cdn.digitaloceanspaces.com/altimagehotels.png"} alt={result.name} className='w-full h-36 object-cover' />
                     <div className='flex flex-col items-start justify-start w-full p-2'>
                         <div className='flex flex-row items-center justify-between w-full'>
-                            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-blue-950 w-[68%] truncate'>
+                            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg text-primary w-[68%] truncate'>
                                 {result.name}
                             </h1>
                             {result.star_rating && 

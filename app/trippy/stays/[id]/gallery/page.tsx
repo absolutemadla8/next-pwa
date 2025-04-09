@@ -49,9 +49,9 @@ const Page = () => {
                     onClick={() => window.history.back()} 
                     className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors mr-3"
                 >
-                    <IconArrowLeft className='text-blue-950' size={20} />
+                    <IconArrowLeft className='text-primary' size={20} />
                 </button>
-                <h1 className="text-lg text-blue-950 truncate w-[80%]" style={{ fontFamily: 'var(--font-nohemi)' }}>
+                <h1 className="text-lg text-primary truncate w-[80%]" style={{ fontFamily: 'var(--font-nohemi)' }}>
                     {hotel?.name || 'Hotel Gallery'}
                 </h1>
             </div>

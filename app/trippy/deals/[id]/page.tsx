@@ -105,7 +105,7 @@ const Page = () => {
           return (
             <div key={itinerary.id} className="flex flex-col w-full bg-white rounded-lg mb-6">
               <div className="p-4 w-full border-b border-gray-100">
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-lg">
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-lg">
                   Itinerary
                 </h1>
               </div>
@@ -119,19 +119,19 @@ const Page = () => {
                       <div 
                         key={dayNumber}
                         className={`flex flex-col items-center justify-center min-w-[5rem] rounded-lg py-2 px-2 h-fit cursor-pointer mx-1 ${
-                          selectedDay === dayNumber ? 'bg-blue-950' : 'bg-white'
+                          selectedDay === dayNumber ? 'bg-primary' : 'bg-white'
                         }`}
                         onClick={() => setSelectedDay(dayNumber)}
                       >
                         <h2 
                           style={{ fontFamily: 'var(--font-nohemi)' }} 
-                          className={`${selectedDay === dayNumber ? 'text-white' : 'text-blue-950'} text-md`}
+                          className={`${selectedDay === dayNumber ? 'text-white' : 'text-primary'} text-md`}
                         >
                           Day {dayNumber}
                         </h2>
                         {dayDestination && (
                           <span 
-                            className={`${selectedDay === dayNumber ? 'text-white/70' : 'text-blue-950/70'} text-xs mt-1`}
+                            className={`${selectedDay === dayNumber ? 'text-white/70' : 'text-primary/70'} text-xs mt-1`}
                           >
                             {dayDestination.name}
                           </span>
@@ -145,7 +145,7 @@ const Page = () => {
               {/* Display destination name for current day */}
               {currentDestination && (
                 <div className="px-4 py-2 mt-2">
-                  <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-md font-medium">
+                  <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-md font-medium">
                     {currentDestination.name}
                   </h2>
                 </div>
@@ -194,11 +194,11 @@ const Page = () => {
                       className="h-8 mb-2 object-contain"
                     />
                   )}
-                  <div className="font-semibold text-blue-950">{item.flight.carrier}</div>
+                  <div className="font-semibold text-primary">{item.flight.carrier}</div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-blue-950">{item.flight.depCode}</span>
-                    <span className="text-blue-950">→</span>
-                    <span className="text-blue-950">{item.flight.arrivalCode}</span>
+                    <span className="text-primary">{item.flight.depCode}</span>
+                    <span className="text-primary">→</span>
+                    <span className="text-primary">{item.flight.arrivalCode}</span>
                   </div>
                 </div>
               )
@@ -216,10 +216,10 @@ const Page = () => {
                     />
                   )}
                   <div className="p-3">
-                    <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-lg mb-1">{item.activity.name}</h3>
-                    <div className="bg-blue-950/10 p-2 rounded-md inline-block mb-2">
-                      <div className="text-blue-950/60 text-xs">Duration</div>
-                      <div className="text-blue-950 text-sm font-medium">
+                    <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-lg mb-1">{item.activity.name}</h3>
+                    <div className="bg-primary/10 p-2 rounded-md inline-block mb-2">
+                      <div className="text-primary/60 text-xs">Duration</div>
+                      <div className="text-primary text-sm font-medium">
                         {Math.floor(item.activity.duration / 60)} hours
                       </div>
                     </div>
@@ -243,7 +243,7 @@ const Page = () => {
                     />
                   )}
                   <div className="p-3">
-                    <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-blue-950 text-lg font-semibold mb-1">{item.generic.name}</h3>
+                    <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-primary text-lg font-semibold mb-1">{item.generic.name}</h3>
                     {item.generic.subtitle && (
                       <p className="text-gray-500 text-sm mb-1">{item.generic.subtitle}</p>
                     )}
@@ -258,7 +258,7 @@ const Page = () => {
           default:
             return (
               <div className="bg-blue-900/10 p-4 rounded-lg">
-                <div className="text-blue-950 font-semibold">Item Type: {item.itemType}</div>
+                <div className="text-primary font-semibold">Item Type: {item.itemType}</div>
                 <div className="text-gray-600 text-sm">Day: {item.dayNumber}</div>
               </div>
             );
@@ -276,13 +276,13 @@ const Page = () => {
                            <img src='https://aktt5yjwyc.ufs.sh/f/VfNn67L471Nr09H0PGyN69PzLBI5kGd34SqJQVxpOwXWubog' className='w-14 h-6 object-contain' /> 
                        <StarRating size={4} rating={4.5} />
                         </div>
-            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg font-normal text-blue-950'>
+            <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-lg font-normal text-primary'>
                 {deal.name}
             </h1>
             <SeeMoreText text={deal.description} maxLength={180} />
          </div>
          <div className='flex flex-col items-start justify-start w-full p-4 bg-white rounded-lg'>
-            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md mb-2'>
+            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md mb-2'>
               Inclusions
             </h2>
             <div className="flex flex-row flex-wrap items-start justify-start gap-x-2 gap-y-2">
@@ -292,7 +292,7 @@ const Page = () => {
                 .map((inclusion, index) => (
                   <div key={index} className="flex flex-row items-start justify-start gap-x-2">
                     <IconCircleCheckFilled className="h-5 w-5 text-teal-600 flex-shrink-0" />
-                    <span className="text-blue-950 text-sm font-medium tracking-tight">
+                    <span className="text-primary text-sm font-medium tracking-tight">
                       {inclusion.trim()}
                     </span>
                   </div>

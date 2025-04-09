@@ -205,7 +205,7 @@ export default function MapSearchPage() {
                       />
                     </div>
                   )}
-                  <h3 className="font-medium text-lg mb-1 text-blue-950">{selectedHotel.name}</h3>
+                  <h3 className="font-medium text-lg mb-1 text-primary">{selectedHotel.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">
                     {selectedHotel.address.cityName}, {selectedHotel.address.countryName}
                   </p>

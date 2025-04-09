@@ -100,7 +100,7 @@ const Page = () => {
   useEffect(() => {
     const fetchSessionData = async () => {
       try {
-        const response = await api.get(`/hotels/itineraries/${params.id}`);
+        const response = await api.get(`/hotels/itinerary/${params.id}`);
         console.log("API Response:", response.data);
 //@ts-ignore mlmr
         if (response.data.status === 'success') {
@@ -222,42 +222,29 @@ const submitBooking = React.useCallback(async () => {
     }
     
     const roomAllocationPayload = {
-      traceId: session.traceId,
-      roomsAllocations: roomAllocationData.map((roomData:any, index:number) => {
-        // Ensure each guest has the required fields filled in
-        const guestData = {
-          ...guests[index],
-          // Ensure the guest type is "adult" - this was missing in the initial form data
-          type: 'adult',
-          // Ensure the guest data is properly structured
+      guests: roomAllocationData.map((roomData:any, index:number) => {
+        return {
+          title: guests[index].title,
           firstName: guests[index].firstName.trim(),
           lastName: guests[index].lastName.trim(),
+          isLeadGuest: true,  // First guest is lead guest
+          type: 'adult',
           email: guests[index].email.trim(),
-          contactNumber: guests[index].contactNumber.trim()
+          isdCode: guests[index].isdCode,
+          contactNumber: guests[index].contactNumber.trim(),
+          panCardNumber: guests[index].panCardNumber || null,
+          passportNumber: guests[index].passportNumber || null,
+          passportExpiry: guests[index].passportExpiry || null,
+          roomIndex: index
         };
-        
-        // Get rate_id and room_id using the appropriate property names
-        // This handles both roomAllocations and rooms data structures
-        const rateId = roomData.rate_id || roomData.rateId;
-        const roomId = roomData.room_id || roomData.roomId;
-        
-        if (!rateId || !roomId) {
-          console.error('Missing rate_id or room_id in room allocation data:', roomData);
-          throw new Error('Missing rate or room information');
-        }
-        
-        return {
-          rateId: String(rateId),
-          roomId: String(roomId),
-          guests: [guestData]
-        };
-      })
+      }),
+      specialRequests: ""
     };
 
     console.log('Room allocation payload:', roomAllocationPayload);
 
     const roomAllocationResponse = await api.post(
-      `/hotels/itineraries/${session.itineraryCode}/rooms-allocations`,
+      `/hotels/booking/${params.id}/guests`,
       roomAllocationPayload
     );
     
@@ -268,7 +255,7 @@ const submitBooking = React.useCallback(async () => {
     }
 
     // Step 2: Generate Order
-    const orderResponse = await api.post(`/hotels/itineraries/${params.id}/order`);
+    const orderResponse = await api.post(`/hotels/booking/${params.id}/order`);
     
     //@ts-ignore can't be fixed will do later
     if (orderResponse.data.status !== 'success') {
@@ -352,7 +339,7 @@ const submitBooking = React.useCallback(async () => {
                        <StarRating rating={4.5} />
                         </div>
                         <div className='flex flex-col w-full'>
-                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg truncate'>
+                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg truncate'>
                             {session.hotelDetails.name ? session.hotelDetails.name : ""}
                         </h1>
                         <span className='text-slate-600 text-sm font-normal tracking-tight'>
@@ -369,10 +356,10 @@ const submitBooking = React.useCallback(async () => {
                         <Star className='size-3 fill-white' />
                             </div>
                             <div className='flex flex-col items-center justify-center bg-slate-100 p-1'>
-                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-sm font-normal'>
+                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-sm font-normal'>
                             {+hotel.reviews[0].count ? +hotel.reviews[0].count : 0}
                         </span>
-                        <span className='text-blue-950 text-xs font-normal tracking-tighter'>
+                        <span className='text-primary text-xs font-normal tracking-tighter'>
                             reviews
                         </span>
                             </div>
@@ -385,7 +372,7 @@ const submitBooking = React.useCallback(async () => {
                         <span className='text-gray-800 text-sm font-normal'>
                             Check-in
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {session.checkin ? new Date(session.checkin).toLocaleDateString('en-GB', {
   day: '2-digit',
   month: 'short',
@@ -400,7 +387,7 @@ const submitBooking = React.useCallback(async () => {
                         <span className='text-gray-800 text-sm font-normal'>
                             Check out
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {session.checkout ? new Date(session.checkout).toLocaleDateString('en-GB', {
   day: '2-digit',
   month: 'short',
@@ -418,7 +405,7 @@ const submitBooking = React.useCallback(async () => {
                         <span className='text-gray-800 text-sm font-normal'>
                             Guests & Room
                         </span>
-                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg' >
+                        <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg' >
                         {totalAdults} Adults, {totalRooms} Room{totalRooms > 1 ? 's' : ''}
                         </h2>
                         </div>
@@ -427,7 +414,7 @@ const submitBooking = React.useCallback(async () => {
                 
                 {/* Improved Room details section */}
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl shadow-sm gap-y-4'>
-  <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 font-normal text-lg'>
+  <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-lg'>
     {totalRooms > 1 ? 'Your Rooms' : 'Your Room'}
   </h1>
   
@@ -444,7 +431,7 @@ const submitBooking = React.useCallback(async () => {
             </span>
           </div>
           <div className='flex flex-col'>
-            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md font-normal'>
+            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md font-normal'>
               {roomData.room_name}
             </span>
             <div className='flex flex-row items-center gap-x-2'>
@@ -511,7 +498,7 @@ const submitBooking = React.useCallback(async () => {
 </div>
                 
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg'>
                            Guest Information
                         </h1>
                         {Array.from({ length: totalRooms }).map((_, index) => (
@@ -532,9 +519,9 @@ const submitBooking = React.useCallback(async () => {
                             <ListCheck className='text-white size-4' />
                         </div>
                         <div className='flex flex-col mb-2'>
-                        <span className='flex flex-row items-center justify-start gap-x-1 text-blue-950 text-sm font-normal tracking-tight'>
+                        <span className='flex flex-row items-center justify-start gap-x-1 text-primary text-sm font-normal tracking-tight'>
                             To Pay
-                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-sm'>
+                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-sm'>
                             Rs. {session?.finalRate? (+session.finalRate).toFixed() : 0}
                         </span>
                         </span>
@@ -562,10 +549,10 @@ const submitBooking = React.useCallback(async () => {
                     </div>
                     <hr className='w-full' />
                     <div className='flex flex-row items-center justify-between w-full'>
-                        <span className='text-blue-950 text-md font-normal'>
+                        <span className='text-primary text-md font-normal'>
                             Total
                         </span>
-                        <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
+                        <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg'>
                         ₹{session?.finalRate? session.finalRate : 0}
                         </span>
                     </div>

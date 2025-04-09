@@ -41,16 +41,12 @@ const Page = () => {
     try {
       const payload: CreateItineraryPayload = {
         hotelId: params.id as string,
-        traceId: traceId,
+        journeyId: traceId,
       };
 
-      const response = await api.post('/hotels/itineraries/create', payload);
+      const response = await api.post('/hotels/itinerary', payload);
       //@ts-ignore mlmr
       if (response.data.status === 'success') {
-        //@ts-ignore mlmr
-        const sessionId = response.data.data.sessionId;
-        //@ts-ignore mlmr
-        setSessionId(response.data.data.sessionId);
         //@ts-ignore mlmr
         setRooms(response.data.data.rooms);
          //@ts-ignore mlmr
@@ -60,7 +56,7 @@ const Page = () => {
         //@ts-ignore mlmr
         setType(response.data.data.item)
         
-        router.push(`/trippy/stays/itinerary/${sessionId}/rooms`);
+        router.push(`/trippy/stays/itinerary/${params.id}/rooms`);
       } else {
         throw new Error('Failed to create itinerary');
       }
@@ -136,7 +132,7 @@ const Page = () => {
                        <StarRating rating={4.5} />
                         </div>
                         <div className='flex flex-col w-full'>
-                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-lg'>
+                        <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-lg'>
                             {hotel.name}
                         </h1>
                         <span className='text-slate-600 text-sm font-normal tracking-tight'>
@@ -152,10 +148,10 @@ const Page = () => {
                         <Star className='size-3 fill-white' />
                             </div>
                             <div className='flex flex-col items-center justify-center bg-slate-100 p-1'>
-                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-sm font-normal'>
+                            <span style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-sm font-normal'>
                             {+hotel.reviews[0].count}
                         </span>
-                        <span className='text-blue-950 text-xs font-normal tracking-tighter'>
+                        <span className='text-primary text-xs font-normal tracking-tighter'>
                             reviews
                         </span>
                             </div>
@@ -163,7 +159,7 @@ const Page = () => {
                     </div>
                     <hr className='w-full' />
                     <div className='flex flex-col items-start justify-start'>
-                    <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md'>
+                    <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md'>
                            About this property
                         </h2>
                         <SeeMoreText
@@ -174,13 +170,13 @@ const Page = () => {
                     </div>
                 </div>
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md'>
                            Location Info
                         </h1>
                     <div className='flex flex-row items-start justify-start w-full gap-x-2'>
                     <img src="https://aktt5yjwyc.ufs.sh/f/VfNn67L471NrgCbs7rKWSpe0yJ4MKVqkD12ZwUYB37j85oFi" className='size-14 rounded-lg bg-blue-600' />
                     <div className='flex flex-col w-full'>
-                        <span className='text-blue-950 text-sm font-normal tracking-tight'>
+                        <span className='text-primary text-sm font-normal tracking-tight'>
                             This property is{' '}
                             <span className='font-semibold'>
                                 {hotel?.nearByAttractions[0].distance}
@@ -202,7 +198,7 @@ const Page = () => {
                         </div>
                 </div>
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md'>
                            Amenities
                         </h1>
                         <div className='flex flex-row flex-wrap items-start justify-start gap-x-2 gap-y-2'>
@@ -231,7 +227,7 @@ const Page = () => {
           </div>
                 </div>
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md'>
                            Reviews
                         </h1>
                         <div>
@@ -239,7 +235,7 @@ const Page = () => {
                         </div>
                 </div>
                 <div className='flex flex-col items-start justify-start w-full bg-white p-4 rounded-xl gap-y-2'>
-                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-blue-950 text-md'>
+                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary text-md'>
                            Rules & Policies
                         </h1>
 <div className='flex flex-row items-center justify-start gap-x-4 w-full'>

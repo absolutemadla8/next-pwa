@@ -72,7 +72,7 @@ export function Section({ title, tool, children }: SectionProps) {
       case 'getTrip':
         return "text-violet-600";
       default:
-        return "text-blue-950";
+        return "text-primary";
     }
   };
 
@@ -124,7 +124,7 @@ export function ResultItem({ type, name, subtext, onClick }: ResultItemProps) {
         <div>
           <div 
             style={{ fontFamily: 'var(--font-nohemi)' }}
-            className="font-normal text-lg text-blue-950"
+            className="font-normal text-lg text-primary"
           >
             {name}
           </div>

@@ -90,7 +90,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             /> */}
             <div className='flex flex-col p-4 gap-y-3 w-full'>
                 <div className='flex flex-col'>
-                    <h1 className='text-sm font-semibold text-blue-950 lowercase truncate'>
+                    <h1 className='text-sm font-semibold text-primary lowercase truncate'>
                         {hotelName}
                     </h1>
                     <p className='text-xs font-medium text-gray-500 truncate'>
@@ -102,7 +102,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 
                 <div className='flex flex-col space-y-1'>
                     <p className='text-xs font-medium text-blue-600'>Room Type</p>
-                    <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-blue-950 truncate w-[95%]'>
+                    <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-primary truncate w-[95%]'>
                         {roomName}
                     </h1>
                     
@@ -121,7 +121,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                     <div className='flex flex-row gap-x-2 w-full items-center justify-between'>
                         {showPrice && roomPrice > 0 && (
                             <div className='flex flex-col pt-2'>
-                                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-blue-950'>
+                                <h1 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-md text-primary'>
                                 ₹{formattedPrice}
                                 </h1>
                                 <p className='text-xs font-medium text-gray-500'>

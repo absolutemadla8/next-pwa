@@ -37,7 +37,7 @@ const TripCard: React.FC<TripCardProps> = ({ trip }) => {
         </div>
         <h1 
           style={{ fontFamily: 'var(--font-nohemi)' }} 
-          className="text-blue-950 text-lg line-clamp-2"
+          className="text-primary text-lg line-clamp-2"
         >
           {trip.name}
         </h1>
@@ -45,7 +45,7 @@ const TripCard: React.FC<TripCardProps> = ({ trip }) => {
           {trip.inclusions?.split(',').map((inclusion, index) => (
             <div key={index} className='flex flex-row items-center justify-start gap-x-1'>
               <CheckCircle2 className='text-teal-500 text-xs size-4' />
-              <p className='text-sm font-medium text-blue-950'>
+              <p className='text-sm font-medium text-primary'>
                 {inclusion.trim()}
               </p>
             </div>

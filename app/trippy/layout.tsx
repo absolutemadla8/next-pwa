@@ -1,17 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Sparkles, Building2, MessageCircle } from 'lucide-react';
 import BottomSheet from '../components/ui/BottomSheet';
 import HorizontalScroll from '../components/ui/HorizontalScroll';
 import DateRangeEvent from '../components/ui/DateRangeEvent';
 import CalendarList from '../components/ui/CalendarList';
 import SearchComponent from '../components/ui/Search';
 import useBottomSheetStore from '../store/bottomSheetStore';
-import RoomConfiguration from '../components/ui/RoomConfiguration';
+import ItineraryViewSheetBottomSheet from '../components/itineraryViewSheet/ItineraryViewSheetBottomSheet';import RoomConfiguration from '../components/ui/RoomConfiguration';
 import ErrorSheet from '../components/ui/ErrorSheet';
 import PassportExpiryPicker from '../components/ui/PassportExpiryPicker';
 import AmenitiesBottomSheet from '../components/stays/AmenitiesBottomSheet';
@@ -19,8 +16,9 @@ import PoliciesBottomSheet from '../components/stays/PoliciesBottomSheet';
 import HotelFilterBottomSheet from '../components/stays/HotelFilterBottomSheet';
 import useItineraryStore from '../store/itineraryStore';
 import BottomNavigation from '../components/trippy/BottomNavigation';
-import { IconApps, IconBubbleText, IconBuildings, IconDiscount, IconHome, IconNavigationDiscount, IconSparkles, IconUserCircle } from '@tabler/icons-react';
+import { IconSparkles, IconUserCircle } from '@tabler/icons-react';
 import BottomOrderInfo from '../components/trippy/BottomOrderInfo';
+import { Building4, Drop, Happyemoji, PercentageCircle, User } from 'iconsax-react';
 
 export default function TrippyLayout({
   children,
@@ -81,31 +79,21 @@ export default function TrippyLayout({
   };
   
   // Navigation items
-  const navigationItems: any[] = [
+  const navigationItems = [
     {
-      name: 'Deals',
-      path: '/trippy/deals',
-      icon: IconNavigationDiscount
+      name: 'Drops',
+      path: '/trippy/deals/drops',
+      icon: PercentageCircle
     },
     {
-      name: 'Chat',
-      path: '/trippy/chat',
-      icon: IconSparkles
-    },
-    {
-      name: 'Home',
-      path: '/trippy', 
-      icon: IconApps
-    },
-    {
-      name: 'Stays',
-      path: '/trippy/stays',
-      icon: IconBuildings
+      name: 'Trippy',
+      path: '/trippy',
+      icon: Happyemoji
     },
     {
       name: 'Profile',
       path: '/trippy/profile',
-      icon: IconUserCircle
+      icon: User
     },
   ];
 
@@ -115,14 +103,14 @@ export default function TrippyLayout({
   }, [pathname, closeSheet]);
 
   return (
-    <div className="flex flex-col min-h-screen max-h-screen overflow-hidden bg-gray-800">
+    <div className="flex flex-col min-h-screen max-h-screen overflow-hidden bg-black">
       {/* Main content */}
       <main className="flex min-h-[91vh] max-h-[91vh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b bg-[#F1F2F4] overflow-y-auto">
         <div className="w-full overflow-auto">{children}</div>
       </main>
 
       {/* Bottom Navigation */}
-      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search' || pathname === '/trippy/deals' || pathname === '/trippy/stays/search/map') ?
+      {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search' || pathname === '/trippy/deals' || pathname === '/trippy/deals/deal-check' || pathname === '/trippy/deals/drops' || pathname === '/trippy/stays/search/map') ?
       <div className='flex items-center w-full h-[9vh]'>
         <BottomNavigation navItems={navigationItems} />
       </div>
@@ -147,7 +135,7 @@ export default function TrippyLayout({
         showPin={sheetConfig.showPin}
       >
         <div className='flex flex-col w-full'>
-          <div className='flex flex-col items-start justify-start bg-blue-600 mb-4'>
+          {/* <div className='flex flex-col items-start justify-start bg-blue-600 mb-4'>
             <h2 className='text-white font-normal text-md pt-3 px-6 tracking-tight'>Popular Dates</h2>
             <HorizontalScroll className='pt-2 pb-4'>
               {popularDates.map(date => {
@@ -167,7 +155,8 @@ export default function TrippyLayout({
                 );
               })}
             </HorizontalScroll>
-          </div>
+          </div> */}
+          <div className='py-2 bg-gray-200 mb-1'/>
           <CalendarList
             mode="range"
             minDate={new Date()} // Set min date to today
@@ -226,6 +215,7 @@ export default function TrippyLayout({
          removeChildFromRoom={removeChildFromRoom}
          removeRoomFromItinerary={removeRoomFromItinerary}
          itinerary={itinerary}
+         onClose={closeSheet}
          />
         </div>
       </BottomSheet>
@@ -291,6 +281,16 @@ export default function TrippyLayout({
         showPin={sheetConfig.showPin}
       >
         <HotelFilterBottomSheet />
+      </BottomSheet>
+      <BottomSheet
+        isOpen={activeSheet === 'itineraryviewsheet'}
+        onClose={closeSheet}
+        title={sheetConfig.title}
+        minHeight={sheetConfig.minHeight}
+        maxHeight={sheetConfig.maxHeight}
+        showPin={sheetConfig.showPin}
+      >
+        <ItineraryViewSheetBottomSheet />
       </BottomSheet>
     </div>
   );

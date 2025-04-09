@@ -12,6 +12,7 @@ import { IconFilter, IconMap } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import { useRoomStore } from '@/app/store/roomRateStore'
+import { Filter, Map } from 'iconsax-react'
 
 // Helper function to count active filters
 const countActiveFilters = (filters: FilterData): number => {
@@ -103,13 +104,13 @@ const Page = () => {
     }
 
     try {
-      const response = await api.post('/hotels/search-hotels', searchParams);
+      const response = await api.post('/hotels/search', searchParams);
       //@ts-ignore mlmr
       if (response.data.status === 'success') {
          //@ts-ignore mlmr
         setHotels(response.data.data.results || []);
         //@ts-ignore mlmr
-        setTraceId(response.data.data.traceId);
+        setTraceId(response.data.data.journey_id);
       } else {
         setError('Failed to fetch hotels');
       }
@@ -144,7 +145,7 @@ const Page = () => {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-[#F1F2F4] w-full">
+        <div className="flex items-center justify-center min-h-screen bg-white w-full">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       );
@@ -152,7 +153,7 @@ const Page = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#F1F2F4] w-full">
+      <div className="flex items-center justify-center min-h-screen bg-white w-full">
         <p className="text-red-500">{error}</p>
       </div>
     );
@@ -163,7 +164,7 @@ const Page = () => {
         <div className='flex w-full sticky top-0 z-10'>
           <StayInformationHeader />
         </div>
-        <div className='flex flex-col items-start justify-start w-full p-6 gap-y-4'>
+        <div className='flex flex-col items-start justify-start w-full py-6 gap-y-4 bg-white'>
           {hotels.map((hotel: any) => (
             <HotelCard 
                 key={hotel.id}
@@ -180,10 +181,10 @@ const Page = () => {
         </div>
         <div className='absolute w-full bottom-20 flex flex-row items-center justify-center gap-4 pb-2'>
           <button 
-            className='px-4 py-2 bg-gray-800 text-white rounded-full flex items-center relative'
+            className='px-4 py-2 bg-primary text-white rounded-full flex flex-row gap-x-1 items-center relative'
             onClick={openFilterSheet}
           >
-            <IconFilter className='mr-2'/>
+            <Filter size={18} variant='Bulk'/>
             <span className='text-sm tracking-tight'>
               Filter
             </span>
@@ -194,10 +195,10 @@ const Page = () => {
             )}
           </button>
           <button 
-            className='px-4 py-2 bg-gray-800 text-white rounded-full flex items-center'
+            className='px-4 py-2 bg-primary text-white rounded-full flex flex-row gap-x-1 items-center'
             onClick={() => router.push('/trippy/stays/search/map')}
           >
-            <IconMap className='mr-2'/>
+            <Map size={18} variant='Bulk'/>
             <span className='text-sm tracking-tight'>
               Map View
             </span>

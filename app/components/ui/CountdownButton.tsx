@@ -131,7 +131,7 @@ const CountdownButton: React.FC<CountdownButtonProps> = ({
             onClick={() => handleSelect(index)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 
               ${buttonClassName} 
-              ${selectedIndex === index ? `relative ${activeButtonClassName || 'bg-blue-600 text-white'}` : 'bg-white text-blue-950 border border-slate-200'}`}
+              ${selectedIndex === index ? `relative ${activeButtonClassName || 'bg-blue-600 text-white'}` : 'bg-white text-primary border border-slate-200'}`}
             disabled={autoSelectComplete}
           >
             {option.name}

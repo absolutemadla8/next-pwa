@@ -439,7 +439,7 @@ const VoiceChat = () => {
         onClose={() => setIsFormOpen(false)}
       >
         <div className="p-4 space-y-6 bg-white">
-          <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-blue-950 mb-6">Create New Session</h2>
+          <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-primary mb-6">Create New Session</h2>
 
           <div className="space-y-4">
             <div>
@@ -448,7 +448,7 @@ const VoiceChat = () => {
                 name="country"
                 value={formData.country}
                 onChange={handleInputChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-blue-950"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-primary"
               >
                 <option value="">Select a country</option>
                 <option value="Maldives">Maldives</option>
@@ -470,7 +470,7 @@ const VoiceChat = () => {
                     checked={formData.type === 'hotel'}
                     onChange={handleInputChange}
                     className="text-blue-600" />
-                  <span className='font-normal text-blue-950'>Hotel</span>
+                  <span className='font-normal text-primary'>Hotel</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input
@@ -480,7 +480,7 @@ const VoiceChat = () => {
                     checked={formData.type === 'trip'}
                     onChange={handleInputChange}
                     className="text-blue-600" />
-                  <span className='font-normal text-blue-950'>Trip</span>
+                  <span className='font-normal text-primary'>Trip</span>
                 </label>
               </div>
             </div>
@@ -494,7 +494,7 @@ const VoiceChat = () => {
                     name="checkIn"
                     value={formData.checkIn}
                     onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-blue-950" />
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-primary" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
@@ -503,7 +503,7 @@ const VoiceChat = () => {
                     name="checkOut"
                     value={formData.checkOut}
                     onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-blue-950" />
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-primary" />
                 </div>
               </div>
             ) : (
@@ -514,7 +514,7 @@ const VoiceChat = () => {
                   name="travelMonth"
                   value={formData.travelMonth}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-blue-950" />
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-primary" />
               </div>
             )}
 
@@ -525,7 +525,7 @@ const VoiceChat = () => {
                 value={formData.additionalRequests}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-blue-950"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-normal text-primary"
                 placeholder="Any special requirements or preferences..." />
             </div>
 
