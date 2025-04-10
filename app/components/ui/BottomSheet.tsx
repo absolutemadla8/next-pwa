@@ -62,16 +62,16 @@ const BottomSheet = ({
               minHeight: minHeight, 
               maxHeight: maxHeight 
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-100 rounded-t-[32px] flex flex-col w-full md:max-w-md"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white flex flex-col w-full md:max-w-md"
           >
             {/* Drag Handle */}
             <div className="w-full flex justify-center pt-4 pb-2 flex-shrink-0">
-              <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+              {/* <div className="w-12 h-1.5 bg-gray-300 rounded-full" /> */}
             </div>
 
             <div className="flex flex-col flex-grow overflow-hidden">
               <div className="flex flex-row items-center justify-between w-full px-6 flex-shrink-0">
-                <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className="text-lg text-primary">{title}</h2>
+                <h2 style={{ fontFamily: 'var(--font-domine)' }} className="text-lg text-primary lowercase">{title}</h2>
                 
                 <div className="flex items-center space-x-3">
                   {showPin && sessionPin ? (

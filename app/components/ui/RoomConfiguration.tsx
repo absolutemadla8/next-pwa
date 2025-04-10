@@ -48,12 +48,12 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
   };
 
   return (
-    <div className="bg-gray-100 px-4 rounded-lg pb-24">
+    <div className="px-4 rounded-lg pb-24">
       <div className="space-y-4">
         {itinerary.rooms.map((room, roomIndex) => (
           <div key={room.id} className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
             <div className="flex justify-between items-center pb-3 mb-4 border-b border-gray-200">
-              <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className=" text-gray-800">Room {roomIndex + 1}</h3>
+              <h3 style={{ fontFamily: 'var(--font-domine)' }} className=" text-gray-800 lowercase">Room {roomIndex + 1}</h3>
               {itinerary.rooms.length > 1 && (
                 <button 
                   onClick={() => removeRoomFromItinerary(room.id)}
@@ -115,7 +115,7 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
               </div>
               
               {room.children.length > 0 && (
-                <div className="mt-3 mb-3 p-4 bg-gray-50 rounded-xl">
+                <div className="mt-3 mb-3 p-4 bg-[#F4F2EB] rounded-xl">
                   <p className="text-sm font-medium text-slate-600 mb-4">Age of Children</p>
                   {room.children.map((child, childIndex) => (
                       <div key={childIndex} className="mb-4 last:mb-0">
@@ -160,7 +160,7 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
                         </div>
                       </div>
                   ))}
-                  <p className="text-sm text-gray-500 mt-2">Please provide right number of children along with their right age for best options and prices.</p>
+                  <p className="text-xs text-gray-500 mt-2">Please provide right number of children along with their right age for best options and prices.</p>
                 </div>
               )}
             </div>
@@ -170,13 +170,13 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
       <div className="mt-4">
         {itinerary.rooms.length < 5 ? (
           <button 
-            className="flex items-center justify-center gap-3 text-blue-600 hover:text-blue-700 w-full py-3 bg-white rounded-lg shadow-sm border border-gray-100"
+            className="flex items-center justify-center gap-3 text-[#1999F5] w-full py-3"
             onClick={addRoomToItinerary}
             disabled={itinerary.rooms.length >= 5}
             aria-label="Add another room"
           >
             <Plus size={18} />
-            <span className="font-medium">Add Another Room</span>
+            <span className="font-medium tracking-tight">add another room</span>
           </button>
         ) : (
           <div className="text-center py-2">
@@ -187,10 +187,10 @@ const RoomConfiguration: React.FC<RoomConfigurationProps> = ({
 
       <div className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-white border-t border-gray-200 z-10 md:max-w-md mx-auto">
         <button 
-          className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          className="w-full py-3 px-4 bg-[#1999F5] text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors tracking-tight"
           onClick={onClose}
         >
-          DONE
+          done
         </button>
       </div>
       </div>

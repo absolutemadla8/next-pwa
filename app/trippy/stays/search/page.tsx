@@ -179,7 +179,7 @@ const Page = () => {
             />
           ))}
         </div>
-        <div className='absolute w-full bottom-20 flex flex-row items-center justify-center gap-4 pb-2'>
+        <div className='absolute w-full bottom-14 flex flex-row items-center justify-center gap-4 pb-2'>
           <button 
             className='px-4 py-2 bg-primary text-white rounded-full flex flex-row gap-x-1 items-center relative'
             onClick={openFilterSheet}

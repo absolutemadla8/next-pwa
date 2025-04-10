@@ -79,29 +79,29 @@ const StaysTopSheet: React.FC<StaysTopSheetProps> = ({ isOpen, onClose }) => {
         <div className='flex flex-col items-center justify-start gap-y-2 w-full'>
           <div onClick={() => openSheet('search', { 
             title: 'Search Locations',
-            minHeight: '55%',
-            maxHeight: '55%',
+            minHeight: '100%',
+            maxHeight: '100%',
           })} className='flex flex-col items-start justify-center bg-white rounded-lg px-4 w-full h-14'>
-            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-md truncate w-[90%]'>
+            <h2 className='text-primary font-normal text-md truncate w-[90%] tracking-tight'>
               {itinerary.locationName || "Select a location"}
             </h2>
           </div>
           <div onClick={() => openSheet('dateRange', { 
             title: 'Check in & Check out',
-            minHeight: '55%',
-            maxHeight: '55%',
+            minHeight: '100%',
+            maxHeight: '100%',
           })} className='flex flex-col items-start justify-center bg-white rounded-lg px-4 w-full h-14'>
             <span className='text-slate-600 font-normal text-xs tracking-tighter'>Checkin & Checkout</span>
-            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-md'>
+            <h2 className='text-primary font-normal text-md tracking-tight'>
               {itinerary.checkIn ? formatDate(itinerary.checkIn) : 'No date selected'} - {itinerary.checkOut ? formatDate(itinerary.checkOut) : 'No date selected'}
             </h2>
           </div>
           <div onClick={() => openSheet('roomConfig', { 
             title: 'Rooms & Guests',
-            minHeight: '55%',
-            maxHeight: '55%',
+            minHeight: '100%',
+            maxHeight: '100%',
           })} className='flex flex-col items-start justify-center bg-white rounded-lg px-4 w-full h-14'>
-            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-primary font-normal text-md'>
+            <h2 className='text-primary font-normal text-md tracking-tight'>
               {getTotalAdults() + getTotalChildren()} Guests, {getTotalRooms()} Room
             </h2>
           </div>
@@ -109,7 +109,7 @@ const StaysTopSheet: React.FC<StaysTopSheetProps> = ({ isOpen, onClose }) => {
             onClick={handleSearch} 
             className='flex flex-row items-center justify-between bg-primary rounded-lg px-4 w-full h-14'
           >
-            <h2 style={{ fontFamily: 'var(--font-nohemi)' }} className='text-white font-normal text-md'>Search</h2>
+            <h2 className='text-white font-semibold text-md tracking-tight'>Search</h2>
             <ArrowRight size={20} className='text-white' />
           </button>
         </div>

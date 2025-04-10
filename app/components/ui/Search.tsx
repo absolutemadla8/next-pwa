@@ -90,10 +90,9 @@ export default function LocationSearch() {
         <input
           type="text"
           value={keyword}
-          style={{ fontFamily: 'var(--font-nohemi)' }}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder="Search locations, hotels, or airports..."
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-primary"
+          className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-primary tracking-tight"
         />
       </div>
       {(isLoading || results.length > 0 || isError) && (
@@ -112,9 +111,9 @@ export default function LocationSearch() {
                 <div className="flex-shrink-0 mr-3 text-primary">
                   {getIcon(item.type)}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 style={{ fontFamily: 'var(--font-nohemi)' }} className="font-medium text-primary truncate">{item.name}</h3>
-                  <p className="text-sm text-slate-600 tracking-tight truncate">
+                <div className="flex-1 min-w-0 py-2">
+                  <h3 className="font-normal text-primary truncate tracking-tight">{item.name}</h3>
+                  <p className="text-xs text-slate-600 tracking-tight truncate">
                     {item.fullName}
                   </p>
                 </div>

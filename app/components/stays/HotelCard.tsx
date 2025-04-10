@@ -62,9 +62,6 @@ const HotelCard: React.FC<HotelCardProps> = ({
                    Inclusive of taxes and fee
                 </span>
             </div>
-            <button className='text-sm text-white font-medium bg-primary px-4 py-2 rounded-md'>
-                View Offer
-            </button>
             </div>
         </div>
     </div>
