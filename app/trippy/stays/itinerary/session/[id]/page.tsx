@@ -143,7 +143,7 @@ const Page = () => {
     }
     
     const options = {
-      key: process.env.RAZORPAY_KEY,
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
       amount: amount * 100,
       currency: currency || "INR",
       name: "Often Travel",
