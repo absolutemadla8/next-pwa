@@ -90,9 +90,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${Nohemi.variable} ${Domine.variable}`}>
+    <html lang="en" className={`${Nohemi.variable} ${Domine.variable} h-full`}>
     <body
-      className={`${poppins.className} antialiased w-full min-h-screen max-h-screen md:max-w-md items-center mx-auto bg-primary`}
+      className={`${poppins.className} antialiased w-full min-h-screen md:max-w-md items-center mx-auto bg-primary overflow-hidden`}
     >
       <AuthProvider>
         {children}

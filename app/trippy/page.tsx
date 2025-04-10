@@ -170,7 +170,7 @@ const Page = () => {
         <p className='text-sm font-normal text-gray-500 mb-2'>
           Discover new places to stay, events, and more
         </p>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4'>
+        <div className='grid grid-cols-1 md:grid-cols-1 gap-4 w-full mt-4'>
           <div onClick={()=>setStaysSheetOpen(true)} className='relative flex flex-col items-start justify-start w-full gap-2 bg-[#F4F2EB] p-3 rounded-md overflow-hidden'>
             <div className='flex flex-row items-center justify-between w-full'>
               <div className='flex flex-row items-center justify-center gap-2'>
