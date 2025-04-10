@@ -103,13 +103,14 @@ export default function TrippyLayout({
   }, [pathname, closeSheet]);
 
   return (
-    <div className="flex flex-col min-h-screen max-h-screen overflow-hidden bg-black relative h-[100dvh]">
+    <div className="flex flex-col max-h-[100dvh] overflow-hidden bg-black relative">
       {/* Main content */}
-      <main className="flex flex-1 rounded-b-2xl w-full md:max-w-md bg-gradient-to-b bg-[#F1F2F4] overflow-y-auto">
+      <main className="flex max-h-[90dvh] rounded-b-2xl w-full md:max-w-md bg-gradient-to-b bg-[#F1F2F4] overflow-y-auto">
         <div className="w-full overflow-auto">{children}</div>
       </main>
 
       {/* Bottom Navigation */}
+      <div className='flex w-full max-h-[10dvh]'>
       {(pathname === '/trippy' || pathname === '/trippy/stays' || pathname === '/trippy/chat' || pathname === '/trippy/profile' || pathname === '/trippy/stays/search' || pathname === '/trippy/deals' || pathname === '/trippy/deals/deal-check' || pathname === '/trippy/deals/drops' || pathname === '/trippy/stays/search/map') ?
       <div className='flex items-center w-full h-14 flex-shrink-0'>
         <BottomNavigation navItems={navigationItems} />
@@ -124,6 +125,7 @@ export default function TrippyLayout({
         <BottomOrderInfo  />
       </div>
       }   
+      </div>
       
       {/* Date Range Bottom Sheet */}
       <BottomSheet 

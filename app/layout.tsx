@@ -92,7 +92,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${Nohemi.variable} ${Domine.variable} h-full`}>
     <body
-      className={`${poppins.className} antialiased w-full min-h-screen md:max-w-md items-center mx-auto bg-primary overflow-hidden`}
+      className={`${poppins.className} antialiased w-full h-full md:max-w-md items-center mx-auto bg-primary overflow-hidden`}
     >
       <AuthProvider>
         {children}
